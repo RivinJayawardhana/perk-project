@@ -170,9 +170,9 @@ const Home = () => {
             </div>
             
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 max-w-4xl mx-auto leading-tight text-gray-900">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 max-w-4xl mx-auto leading-tight text-gray-900">
               Perks that fuel<br />
-              <span className="italic">your growth</span>
+              <span className="font-display">your growth</span>
             </h1>
             
             {/* Subtitle */}
@@ -199,7 +199,7 @@ const Home = () => {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-8 md:mb-10 text-center md:text-left">
             <div>
               <span className="text-yellow-600 font-medium text-sm">Featured deals</span>
-              <h2 className="text-2xl md:text-4xl font-bold mt-2 text-gray-900">Top picks this month</h2>
+              <h2 className="font-display text-2xl md:text-4xl font-bold mt-2 text-gray-900">Top picks this month</h2>
             </div>
             <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg mt-4 md:mt-0 w-full md:w-auto">
               View all perks <ArrowRight className="ml-2 w-4 h-4" />
@@ -223,7 +223,7 @@ const Home = () => {
                       <img src={perk.logo} alt={perk.name} className="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{perk.name}</h3>
+                      <h3 className="font-display font-semibold text-gray-900">{perk.name}</h3>
                       <p className="text-xs text-gray-500">{perk.category}</p>
                     </div>
                   </div>
@@ -250,7 +250,7 @@ const Home = () => {
       <section className="py-12 md:py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 md:px-6">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-2xl md:text-4xl font-bold mb-4 text-gray-900">How it works</h2>
+            <h2 className="font-display text-2xl md:text-4xl font-bold mb-4 text-gray-900">How it works</h2>
             <p className="text-gray-600 text-sm md:text-base">Get exclusive perks in three simple steps</p>
           </div>
           
@@ -285,8 +285,8 @@ const Home = () => {
                 <div className="w-12 h-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-4 mx-auto">
                   <item.icon className="w-6 h-6 text-gray-600" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2 text-gray-900">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
+                <h3 className="font-display font-semibold text-lg mb-2 text-gray-900">{item.title}</h3>
+                <p className="font-display text-gray-600">{item.description}</p>
               </div>
             ))}
           </div>
@@ -299,7 +299,7 @@ const Home = () => {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-8 md:mb-10 text-center md:text-left">
             <div>
               <span className="text-yellow-600 font-medium text-sm">From our journal</span>
-              <h2 className="text-2xl md:text-4xl font-bold mt-2 text-gray-900">Insights for founders</h2>
+              <h2 className="font-display text-2xl md:text-4xl font-bold mt-2 text-gray-900">Insights for founders</h2>
             </div>
             <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg mt-4 md:mt-0 w-full md:w-auto">
               Read all articles <ArrowRight className="ml-2 w-4 h-4" />
@@ -325,10 +325,10 @@ const Home = () => {
                   </span>
                 </div>
                 
-                <h3 className="font-semibold text-lg mb-2 group-hover:text-yellow-600 transition-colors text-gray-900">
+                <h3 className="font-display font-semibold text-lg mb-2 group-hover:text-yellow-600 transition-colors text-gray-900">
                   {post.title}
                 </h3>
-                <p className="text-gray-600">{post.excerpt}</p>
+                <p className="font-display text-gray-600">{post.excerpt}</p>
               </article>
             ))}
           </div>
@@ -344,8 +344,8 @@ const Home = () => {
               <div className="w-12 h-12 rounded-xl bg-yellow-500 flex items-center justify-center mb-4 md:mb-6">
                 <Users className="w-6 h-6 text-black" />
               </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-3">For Founders & Teams</h3>
-              <p className="text-gray-300 mb-4 md:mb-6 text-sm md:text-base">
+              <h3 className="font-display text-xl md:text-2xl font-bold mb-3">For Founders & Teams</h3>
+              <p className="font-display text-gray-300 mb-4 md:mb-6 text-sm md:text-base">
                 Access hundreds of exclusive perks to save money and grow your business faster.
               </p>
               <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium rounded-lg w-full md:w-auto">
@@ -358,8 +358,8 @@ const Home = () => {
               <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center mb-4 md:mb-6">
                 <Sparkles className="w-6 h-6 text-yellow-600" />
               </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-3 text-gray-900">Become a Partner</h3>
-              <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">
+              <h3 className="font-display text-xl md:text-2xl font-bold mb-3 text-gray-900">Become a Partner</h3>
+              <p className="font-display text-gray-600 mb-4 md:mb-6 text-sm md:text-base">
                 Reach thousands of decision-makers at startups and growing businesses.
               </p>
               <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg w-full md:w-auto">

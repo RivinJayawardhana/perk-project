@@ -50,8 +50,8 @@ const Contact = () => {
         <div className="max-w-3xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Send us a message</h2>
-              <p className="text-lg text-gray-600">
+              <h2 className="font-display text-3xl font-bold text-gray-900 mb-4">Send us a message</h2>
+              <p className="font-display text-lg text-gray-600">
                 Fill out the form below and we'll get back to you shortly.
               </p>
             </div>

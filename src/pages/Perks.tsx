@@ -155,10 +155,10 @@ export default function Perks() {
       {/* Hero Section */}
       <section className="py-16 px-6 text-center bg-gray-50">
         <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4">
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-slate-800 mb-4">
             Discover your next perk
           </h1>
-          <p className="text-lg text-slate-600">
+          <p className="font-display text-lg text-slate-600">
             Browse 51 exclusive deals on tools, services, and experiences for founders and teams.
           </p>
         </div>
@@ -172,7 +172,7 @@ export default function Perks() {
             <div className="lg:col-span-1">
               <Card className="sticky top-24">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-lg mb-6">Filters</h3>
+                  <h3 className="font-display font-semibold text-lg mb-6">Filters</h3>
                   
                   {/* Search */}
                   <div className="mb-6">
@@ -262,13 +262,13 @@ export default function Perks() {
                           className="w-10 h-10 rounded-lg border"
                         />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-slate-800 truncate">{perk.company}</h3>
-                          <p className="text-sm text-gray-500">{perk.category}</p>
+                          <h3 className="font-display font-semibold text-slate-800 truncate">{perk.company}</h3>
+                          <p className="font-display text-sm text-gray-500">{perk.category}</p>
                         </div>
                       </div>
 
-                      <h4 className="font-semibold text-lg mb-2">{perk.title}</h4>
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">{perk.description}</p>
+                      <h4 className="font-display font-semibold text-lg mb-2">{perk.title}</h4>
+                      <p className="font-display text-sm text-gray-600 mb-4 line-clamp-2">{perk.description}</p>
                       
                       <div className="flex items-center justify-between">
                         <div className="text-xs text-gray-500">
@@ -289,8 +289,8 @@ export default function Perks() {
                   <div className="text-gray-400 mb-4">
                     <Search className="w-16 h-16 mx-auto" />
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No perks found</h3>
-                  <p className="text-gray-500 mb-6">Try adjusting your search or filter criteria</p>
+                  <h3 className="font-display text-lg font-medium text-gray-900 mb-2">No perks found</h3>
+                  <p className="font-display text-gray-500 mb-6">Try adjusting your search or filter criteria</p>
                   <Button 
                     variant="outline" 
                     onClick={() => {

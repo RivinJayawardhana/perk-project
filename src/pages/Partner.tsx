@@ -55,7 +55,7 @@ const Partner = () => {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <p className="text-yellow-500 font-medium mb-4">Why partner with us</p>
-            <h2 className="text-4xl font-bold text-white">Benefits for your brand</h2>
+            <h2 className="font-display text-4xl font-bold text-white">Benefits for your brand</h2>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -64,8 +64,8 @@ const Partner = () => {
                 <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
                   <Users className="w-6 h-6 text-black" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Reach Decision Makers</h3>
-                <p className="text-gray-400">
+                <h3 className="font-display text-xl font-semibold text-white mb-3">Reach Decision Makers</h3>
+                <p className="font-display text-gray-400">
                   Connect with founders, CTOs and team leads actively looking for solutions.
                 </p>
               </CardContent>
@@ -76,8 +76,8 @@ const Partner = () => {
                 <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
                   <TrendingUp className="w-6 h-6 text-black" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Drive Conversions</h3>
-                <p className="text-gray-400">
+                <h3 className="font-display text-xl font-semibold text-white mb-3">Drive Conversions</h3>
+                <p className="font-display text-gray-400">
                   Our audience is ready to buy—they just need the right incentive.
                 </p>
               </CardContent>
@@ -88,8 +88,8 @@ const Partner = () => {
                 <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
                   <Heart className="w-6 h-6 text-black" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Build Brand Loyalty</h3>
-                <p className="text-gray-400">
+                <h3 className="font-display text-xl font-semibold text-white mb-3">Build Brand Loyalty</h3>
+                <p className="font-display text-gray-400">
                   Create lasting relationships with high-growth companies from day one.
                 </p>
               </CardContent>
@@ -100,8 +100,8 @@ const Partner = () => {
                 <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
                   <Globe className="w-6 h-6 text-black" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Global Exposure</h3>
-                <p className="text-gray-400">
+                <h3 className="font-display text-xl font-semibold text-white mb-3">Global Exposure</h3>
+                <p className="font-display text-gray-400">
                   Reach a worldwide audience of remote workers and digital nomads.
                 </p>
               </CardContent>
@@ -115,7 +115,7 @@ const Partner = () => {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <p className="text-red-500 font-medium mb-4">How it works</p>
-            <h2 className="text-4xl font-bold text-gray-900">Simple partnership process</h2>
+            <h2 className="font-display text-4xl font-bold text-gray-900">Simple partnership process</h2>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -123,8 +123,8 @@ const Partner = () => {
               <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4 mx-auto">
                 01
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Apply</h3>
-              <p className="text-gray-600">
+              <h3 className="font-display text-xl font-semibold text-gray-900 mb-3">Apply</h3>
+              <p className="font-display text-gray-600">
                 Fill out the form with your offer details.
               </p>
             </div>
@@ -133,8 +133,8 @@ const Partner = () => {
               <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4 mx-auto">
                 02
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Review</h3>
-              <p className="text-gray-600">
+              <h3 className="font-display text-xl font-semibold text-gray-900 mb-3">Review</h3>
+              <p className="font-display text-gray-600">
                 We review within 24 hours.
               </p>
             </div>
@@ -143,8 +143,8 @@ const Partner = () => {
               <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4 mx-auto">
                 03
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Launch</h3>
-              <p className="text-gray-600">
+              <h3 className="font-display text-xl font-semibold text-gray-900 mb-3">Launch</h3>
+              <p className="font-display text-gray-600">
                 Your perk goes live to our audience.
               </p>
             </div>
@@ -153,8 +153,8 @@ const Partner = () => {
               <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4 mx-auto">
                 04
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Grow</h3>
-              <p className="text-gray-600">
+              <h3 className="font-display text-xl font-semibold text-gray-900 mb-3">Grow</h3>
+              <p className="font-display text-gray-600">
                 Track and optimize performance.
               </p>
             </div>
@@ -167,8 +167,8 @@ const Partner = () => {
         <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-12">
             <p className="text-yellow-600 font-medium mb-4">Get started</p>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Apply to become a partner</h2>
-            <p className="text-xl text-gray-600">
+            <h2 className="font-display text-4xl font-bold text-gray-900 mb-4">Apply to become a partner</h2>
+            <p className="font-display text-xl text-gray-600">
               Fill out the form below and we'll get back to you within 24 hours.
             </p>
           </div>

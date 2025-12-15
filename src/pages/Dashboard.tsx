@@ -36,8 +36,8 @@ export default function Dashboard() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Here's an overview of your perks platform.</p>
+        <h1 className="font-display text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="font-display text-muted-foreground">Welcome back! Here's an overview of your perks platform.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

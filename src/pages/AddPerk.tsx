@@ -31,8 +31,8 @@ export default function AddPerk() {
       </Link>
 
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground">Add New Perk</h1>
-        <p className="text-muted-foreground">
+        <h1 className="font-display text-2xl font-bold text-foreground">Add New Perk</h1>
+        <p className="font-display text-muted-foreground">
           Fill in the details below to create a new perk for founders
         </p>
       </div>

@@ -180,7 +180,7 @@ const BlogPost = () => {
         </div>
 
         {/* Title */}
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+        <h1 className="font-display text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
           {post.title}
         </h1>
 
@@ -208,8 +208,8 @@ const BlogPost = () => {
             className="w-12 h-12 rounded-full object-cover"
           />
           <div>
-            <h3 className="font-semibold text-gray-900">{post.author.name}</h3>
-            <p className="text-gray-600 text-sm">{post.author.title}</p>
+            <h3 className="font-display font-semibold text-gray-900">{post.author.name}</h3>
+            <p className="font-display text-gray-600 text-sm">{post.author.title}</p>
           </div>
         </div>
 
@@ -225,13 +225,13 @@ const BlogPost = () => {
         <div className="prose prose-lg max-w-none mb-12">
           <div 
             dangerouslySetInnerHTML={{ __html: post.content }}
-            className="text-gray-700 leading-relaxed"
+            className="font-display text-gray-700 leading-relaxed"
           />
         </div>
 
         {/* Share Section */}
         <div className="border-t border-gray-200 pt-8 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Share</h3>
+          <h3 className="font-display text-lg font-semibold text-gray-900 mb-4">Share</h3>
           <div className="flex items-center gap-4">
             <button className="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

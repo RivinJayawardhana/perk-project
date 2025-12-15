@@ -118,10 +118,10 @@ const About = () => {
       <section className="py-12 md:py-20 px-4 md:px-6 text-center bg-gray-50">
         <div className="container mx-auto max-w-4xl">
           <p className="text-yellow-600 font-medium mb-4 text-sm md:text-base">About VentureNext</p>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 mb-4 md:mb-6 leading-tight">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 mb-4 md:mb-6 leading-tight">
             Empowering founders to build faster
           </h1>
-          <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="font-display text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
             We believe every founder deserves access to premium tools and services without breaking the bank. That's why we built VentureNext.
           </p>
         </div>
@@ -150,10 +150,10 @@ const About = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12 md:mb-16">
             <p className="text-yellow-600 font-medium mb-4 text-sm md:text-base">What we do</p>
-            <h2 className="text-2xl md:text-4xl font-bold text-slate-800 mb-4">
+            <h2 className="font-display text-2xl md:text-4xl font-bold text-slate-800 mb-4">
               Connecting founders with value
             </h2>
-            <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto">
+            <p className="font-display text-lg md:text-xl text-slate-600 max-w-2xl mx-auto">
               VentureNext is the marketplace where ambition meets opportunity.
             </p>
           </div>
@@ -164,10 +164,10 @@ const About = () => {
                 <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
                   <item.icon className="w-8 h-8 text-yellow-600" />
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold text-slate-800 mb-3 md:mb-4">
+                <h3 className="font-display text-lg md:text-xl font-semibold text-slate-800 mb-3 md:mb-4">
                   {item.title}
                 </h3>
-                <p className="text-slate-600 leading-relaxed text-sm md:text-base">
+                <p className="font-display text-slate-600 leading-relaxed text-sm md:text-base">
                   {item.description}
                 </p>
               </div>
@@ -181,10 +181,10 @@ const About = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12 md:mb-16">
             <p className="text-yellow-600 font-medium mb-4 text-sm md:text-base">Who we serve</p>
-            <h2 className="text-2xl md:text-4xl font-bold text-slate-800 mb-4">
+            <h2 className="font-display text-2xl md:text-4xl font-bold text-slate-800 mb-4">
               Built for builders
             </h2>
-            <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto">
+            <p className="font-display text-lg md:text-xl text-slate-600 max-w-2xl mx-auto">
               Our community includes the most ambitious people creating the future of work.
             </p>
           </div>
@@ -195,7 +195,7 @@ const About = () => {
                 <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
                   <item.icon className="w-6 h-6 text-yellow-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-800 mb-3">
+                <h3 className="font-display text-lg font-semibold text-slate-800 mb-3">
                   {item.title}
                 </h3>
                 <p className="text-slate-600 text-sm leading-relaxed">
@@ -210,10 +210,10 @@ const About = () => {
       {/* CTA Section */}
       <section className="py-12 md:py-20 px-4 md:px-6 bg-slate-800 text-white">
         <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6">
+          <h2 className="font-display text-2xl md:text-4xl font-bold mb-4 md:mb-6">
             Ready to start saving?
           </h2>
-          <p className="text-lg md:text-xl text-slate-300 mb-6 md:mb-8 max-w-2xl mx-auto">
+          <p className="font-display text-lg md:text-xl text-slate-300 mb-6 md:mb-8 max-w-2xl mx-auto">
             Join thousands of founders already using VentureNext to unlock exclusive perks.
           </p>
           <Button className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 font-semibold px-6 md:px-8 py-3 text-base md:text-lg w-full sm:w-auto">

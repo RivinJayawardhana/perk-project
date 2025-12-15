@@ -284,12 +284,12 @@ const Journal = () => {
               </div>
               
               <Link to={`/blog/${featuredPost.id}`}>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight hover:text-yellow-600 transition-colors cursor-pointer">
+                <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight hover:text-yellow-600 transition-colors cursor-pointer">
                   {featuredPost.title}
                 </h1>
               </Link>
               
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+              <p className="font-display text-base md:text-lg text-gray-600 leading-relaxed">
                 {featuredPost.excerpt}
               </p>
               
@@ -341,12 +341,12 @@ const Journal = () => {
             </div>
 
             <Link to={`/blog/${post.id}`}>
-              <h3 className="font-bold text-base md:text-lg text-gray-900 leading-tight group-hover:text-yellow-600 transition-colors line-clamp-2">
+              <h3 className="font-display font-bold text-base md:text-lg text-gray-900 leading-tight group-hover:text-yellow-600 transition-colors line-clamp-2">
                 {post.title}
               </h3>
             </Link>
 
-            <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
+            <p className="font-display text-gray-600 text-sm leading-relaxed line-clamp-2">
               {post.excerpt}
             </p>
 
