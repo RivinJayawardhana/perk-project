@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 
 export default function BlogPost() {
   const params = useParams();
-  const id = params.id;
+  const id = params?.id as string | undefined;
 
   return (
     <div className="min-h-screen bg-white">

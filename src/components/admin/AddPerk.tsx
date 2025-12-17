@@ -46,7 +46,7 @@ export default function AddPerk() {
           <div className="space-y-6">
             <div>
               <Label className="text-sm font-medium mb-2 block">Banner Image</Label>
-              <ImageUpload description="Recommended: 1200 x 400px" />
+              <ImageUpload label="Banner Image" description="Recommended: 1200 x 400px" />
             </div>
             <div>
               <Label className="text-sm font-medium mb-2 block">Company Logo</Label>

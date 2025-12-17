@@ -92,10 +92,10 @@ const mockPerks: Perk[] = [
   }
 ];
 
-
-
+export default function Perks() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [dealType, setDealType] = useState<string[]>([]);
   const [bestFor, setBestFor] = useState<string[]>([]);

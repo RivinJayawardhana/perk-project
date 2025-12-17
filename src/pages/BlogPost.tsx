@@ -130,8 +130,10 @@ const blogPosts = {
 };
 
 const BlogPost = () => {
-  const { id } = useRouterParams() as { id: string };
-  const post = blogPosts[parseInt(id) || 1];
+  const params = useRouterParams();
+  const id = params?.id as string | undefined;
+  const postId = (parseInt(id || "1")) as keyof typeof blogPosts;
+  const post = blogPosts[postId];
 
   if (!post) {
     return <div>Post not found</div>;
