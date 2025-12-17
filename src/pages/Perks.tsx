@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { PerksFilters } from "@/components/perks/PerksFilters";
 
 interface Perk {
   id: string;
@@ -91,37 +92,23 @@ const mockPerks: Perk[] = [
   }
 ];
 
-const categories = [
-  "All Categories",
-  "SaaS & AI Tools", 
-  "B2B Services",
-  "Lifestyle & Coworking",
-  "Productivity",
-  "Marketing & Sales"
-];
 
-const locations = [
-  "All Locations",
-  "Global",
-  "European Union", 
-  "United States",
-  "Asia Pacific",
-  "Remote"
-];
 
-export default function Perks() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All Categories");
-  const [selectedLocation, setSelectedLocation] = useState("All Locations");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
+  const [dealType, setDealType] = useState<string[]>([]);
+  const [bestFor, setBestFor] = useState<string[]>([]);
 
+  // Filtering logic (update as needed for real data)
   const filteredPerks = mockPerks.filter(perk => {
     const matchesSearch = perk.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         perk.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         perk.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "All Categories" || perk.category === selectedCategory;
-    const matchesLocation = selectedLocation === "All Locations" || perk.location === selectedLocation;
-    
-    return matchesSearch && matchesCategory && matchesLocation;
+      perk.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      perk.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = !selectedCategory || perk.category === selectedCategory;
+    // Subcategory filtering would require perks to have subcategory info
+    // For now, always true (add logic if subcategory exists in data)
+    return matchesSearch && matchesCategory;
   });
 
   return (
@@ -172,7 +159,7 @@ export default function Perks() {
             <div className="lg:col-span-1">
               <Card className="sticky top-24">
                 <CardContent className="p-6">
-                  <h3 className="font-display font-semibold text-lg mb-6">Filters</h3>
+                  <h3 className="font-display font-semibold text-lg mb-6">Filterssss</h3>
                   
                   {/* Search */}
                   <div className="mb-6">
@@ -188,39 +175,18 @@ export default function Perks() {
                     </div>
                   </div>
 
-                  {/* Category Filter */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium mb-2">Category</label>
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
 
-                  {/* Location Filter */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium mb-2">Location</label>
-                    <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {locations.map((location) => (
-                          <SelectItem key={location} value={location}>
-                            {location}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {/* New Filters */}
+                  <PerksFilters
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
+                    selectedSubcategories={selectedSubcategories}
+                    setSelectedSubcategories={setSelectedSubcategories}
+                    dealType={dealType}
+                    setDealType={setDealType}
+                    bestFor={bestFor}
+                    setBestFor={setBestFor}
+                  />
 
                   <div className="text-sm text-gray-500">
                     {filteredPerks.length} perks found

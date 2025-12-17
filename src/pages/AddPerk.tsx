@@ -16,9 +16,12 @@ import {
 import { ImageUpload } from "@/components/perks/ImageUpload";
 import { PerkTypeSelector } from "@/components/perks/PerkTypeSelector";
 import { LeadCaptureForm } from "@/components/perks/LeadCaptureForm";
+import { DealTypeAndBestForFields } from "@/components/perks/DealTypeAndBestForFields";
 
 export default function AddPerk() {
   const [perkType, setPerkType] = useState("lead");
+  const [dealType, setDealType] = useState<string[]>([]);
+  const [bestFor, setBestFor] = useState<string[]>([]);
 
   return (
     <div className="p-8 max-w-4xl">
@@ -135,6 +138,13 @@ export default function AddPerk() {
             )}
           </CardContent>
         </Card>
+
+        <DealTypeAndBestForFields
+          dealType={dealType}
+          setDealType={setDealType}
+          bestFor={bestFor}
+          setBestFor={setBestFor}
+        />
 
         <div className="flex items-center justify-end gap-4 pt-4">
           <Button variant="outline">Save as Draft</Button>

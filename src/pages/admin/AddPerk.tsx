@@ -9,9 +9,33 @@ const initialFields = [
   { label: "Phone", type: "Phone", placeholder: "+60 123 456 789", required: true },
 ];
 
+// Deal Type options
+const dealTypeOptions = [
+  "Free trial",
+  "Discount",
+  "Credits included",
+  "Free consultation",
+  "Free perks / Add-ons",
+  "Bundle deal",
+  "Exclusive deal",
+  "Intro/First-time offer"
+];
+
+// Best For options
+const bestForOptions = [
+  "Solopreneurs",
+  "Startups",
+  "SMEs",
+  "Agencies",
+  "Enterprises",
+  "Remote teams"
+];
+
 export default function AddPerk() {
   const [fields, setFields] = useState(initialFields);
-  const [dealType, setDealType] = useState("Affiliate Link");
+  const [claimType, setClaimType] = useState("Affiliate Link");
+  const [selectedDealTypes, setSelectedDealTypes] = useState([]);
+  const [selectedBestFor, setSelectedBestFor] = useState([]);
 
   const handleAddField = () => {
     setFields([
@@ -26,6 +50,24 @@ export default function AddPerk() {
 
   const handleRemoveField = (idx) => {
     setFields(fields.filter((_, i) => i !== idx));
+  };
+
+  // Handle Deal Type checkbox
+  const handleDealTypeToggle = (type) => {
+    setSelectedDealTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
+  // Handle Best For checkbox
+  const handleBestForToggle = (option) => {
+    setSelectedBestFor(prev =>
+      prev.includes(option)
+        ? prev.filter(t => t !== option)
+        : [...prev, option]
+    );
   };
 
   return (
@@ -106,9 +148,45 @@ export default function AddPerk() {
           <input type="text" className="border rounded-lg px-3 py-2 w-full" placeholder="$200 credit, 40% off" />
           <span className="text-xs text-[#7a7f8c] mt-1 block">Short text shown on the card badge</span>
         </div>
-        <div>
+        <div className="mb-6">
           <label className="block mb-2 font-medium">Description</label>
           <textarea className="border rounded-lg px-3 py-2 w-full" rows={3} placeholder="Describe the perk and what founders get..." />
+        </div>
+
+        {/* Deal Type Section */}
+        <div className="mb-6">
+          <label className="block mb-2 font-medium">Deal Type (Multiple Select)</label>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {dealTypeOptions.map((type) => (
+              <label key={type} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedDealTypes.includes(type)}
+                  onChange={() => handleDealTypeToggle(type)}
+                  className="rounded border-gray-300 text-[#e6b756] focus:ring-[#e6b756]"
+                />
+                <span className="text-sm">{type}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Best For Section */}
+        <div>
+          <label className="block mb-2 font-medium">Best For (Multiple Select)</label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {bestForOptions.map((option) => (
+              <label key={option} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedBestFor.includes(option)}
+                  onChange={() => handleBestForToggle(option)}
+                  className="rounded border-gray-300 text-[#e6b756] focus:ring-[#e6b756]"
+                />
+                <span className="text-sm">{option}</span>
+              </label>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -140,8 +218,8 @@ export default function AddPerk() {
           {['Affiliate Link', 'Coupon Code', 'Lead Capture'].map((type) => (
             <button
               key={type}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition font-medium ${dealType === type ? 'border-[#e6b756] bg-[#fffbe6]' : 'border-gray-200 bg-white'}`}
-              onClick={() => setDealType(type)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition font-medium ${claimType === type ? 'border-[#e6b756] bg-[#fffbe6]' : 'border-gray-200 bg-white'}`}
+              onClick={() => setClaimType(type)}
               type="button"
             >
               {type === 'Affiliate Link' && <><Upload className="w-4 h-4" /> Affiliate Link</>}
@@ -150,20 +228,20 @@ export default function AddPerk() {
             </button>
           ))}
         </div>
-        {dealType === 'Affiliate Link' && (
+        {claimType === 'Affiliate Link' && (
           <div>
             <label className="block mb-2 font-medium">Deal URL</label>
             <input type="text" className="border rounded-lg px-3 py-2 w-full" placeholder="https://..." />
             <span className="text-xs text-[#7a7f8c] mt-1 block">Affiliate or partner link</span>
           </div>
         )}
-        {dealType === 'Coupon Code' && (
+        {claimType === 'Coupon Code' && (
           <div>
             <label className="block mb-2 font-medium">Coupon Code</label>
             <input type="text" className="border rounded-lg px-3 py-2 w-full" placeholder="Enter coupon code" />
           </div>
         )}
-        {dealType === 'Lead Capture' && (
+        {claimType === 'Lead Capture' && (
           <div>
             <label className="block mb-2 font-medium">Lead Capture Form Fields</label>
             <div className="space-y-2 mb-2">
