@@ -87,59 +87,96 @@ export default function Home() {
       <main className="bg-[#fcfaf7] min-h-screen">
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 py-16 flex flex-col items-center text-center relative">
-        <div className="flex flex-wrap gap-6 justify-center absolute left-0 right-0 -top-20 md:-top-24 z-0 opacity-80 pointer-events-none">
-          {/* Example images, replace src with your own */}
-          <img src="/images/remote.jpg" alt="remote" className="w-32 h-28 object-cover rounded-2xl shadow-md hidden md:block" />
-          <img src="/images/ai.jpg" alt="ai" className="w-32 h-28 object-cover rounded-2xl shadow-md" />
-          <img src="/images/cowork.jpg" alt="cowork" className="w-32 h-28 object-cover rounded-2xl shadow-md hidden md:block" />
-          <img src="/images/legal.jpg" alt="legal" className="w-32 h-28 object-cover rounded-2xl shadow-md" />
-        </div>
-        <div className="relative z-10 pt-20 md:pt-32">
-          <div className="mb-4 flex justify-center">
-            <span className="bg-[#f8eac7] text-[#b48a1e] px-4 py-1 rounded-full text-sm font-semibold font-display">500+ exclusive perks for founders</span>
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-[#23272f] mb-6 leading-tight font-display">
-            Perks that fuel <br className="hidden md:block" /> your <span className="relative inline-block"><span className="z-10 relative">growth</span><span className="absolute left-0 right-0 bottom-0 h-2 bg-[#f8eac7] -z-10 rounded"></span></span>
-          </h1>
-          <p className="text-lg md:text-xl text-[#6b6f76] mb-8 max-w-2xl mx-auto">
-            Exclusive deals on the tools, services, and experiences that help founders, freelancers, and remote teams thrive.
-          </p>
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Link href="/perks">
-              <Button className="bg-[#e6b756] text-[#1a2233] font-semibold px-8 py-3 rounded-full text-lg hover:bg-[#f5d488] flex items-center gap-2">
-                Explore All Perks <ArrowRight className="w-5 h-5" />
-              </Button>
-            </Link>
-            <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-8 py-3 rounded-full text-lg">How It Works</Button>
+      <section className="bg-[#fcfaf7] py-12 sm:py-16 lg:py-24 overflow-hidden relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+            {/* Left Images - Hidden on mobile */}
+            <div className="hidden lg:grid lg:col-span-3 gap-4 items-start">
+              {/* Top Left Image */}
+              <img 
+                src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80" 
+                alt="Team work" 
+                className="w-32 h-24 object-cover rounded-2xl shadow-lg transform -rotate-3 ml-4"
+              />
+              {/* Middle Left Images Stack */}
+              <div className="flex flex-col gap-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80" 
+                  alt="Workspace" 
+                  className="w-28 h-32 object-cover rounded-2xl shadow-lg transform rotate-2"
+                />
+                <img 
+                  src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80" 
+                  alt="Collaboration" 
+                  className="w-32 h-28 object-cover rounded-2xl shadow-lg transform -rotate-2 ml-4"
+                />
+              </div>
+            </div>
+
+            {/* Center Content */}
+            <div className="lg:col-span-6 flex flex-col items-center text-center">
+              <div className="mb-4 flex justify-center">
+                <span className="bg-[#f8eac7] text-[#b48a1e] px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-semibold font-display">500+ exclusive perks for founders</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 leading-tight font-display">
+                Perks that fuel <br className="hidden sm:block" /> your <span className="relative inline-block"><span className="z-10 relative">growth</span><span className="absolute left-0 right-0 bottom-0 h-2 bg-[#f8eac7] -z-10 rounded"></span></span>
+              </h1>
+              <p className="text-sm sm:text-base md:text-lg text-[#6b6f76] mb-6 sm:mb-8 max-w-2xl">
+                Exclusive deals on the tools, services, and experiences that help founders, freelancers, and remote teams thrive.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center w-full sm:w-auto">
+                <Link href="/perks" className="w-full sm:w-auto">
+                  <Button className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base hover:bg-[#f5d488] flex items-center justify-center gap-2 w-full">
+                    Explore All Perks <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5" />
+                  </Button>
+                </Link>
+                <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base w-full sm:w-auto">How It Works</Button>
+              </div>
+            </div>
+
+            {/* Right Images - Hidden on mobile */}
+            <div className="hidden lg:grid lg:col-span-3 gap-4 items-start">
+              {/* Top Right Small Image */}
+              <img 
+                src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80" 
+                alt="Office space" 
+                className="w-32 h-24 object-cover rounded-2xl shadow-lg transform rotate-3 ml-auto mr-4"
+              />
+              {/* Bottom Right Larger Image */}
+              <img 
+                src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=400&q=80" 
+                alt="Remote work setup" 
+                className="w-36 h-40 object-cover rounded-2xl shadow-lg transform -rotate-2 ml-auto"
+              />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Featured Deals */}
-      <section className="py-12 bg-[#f5f3f0]">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold text-[#23272f] font-display">Top picks this month</h2>
-          <Link href="/perks">
-            <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full flex items-center gap-2">View all perks <ArrowRight className="w-4 h-4" /></Button>
+      <section className="py-12 sm:py-16 bg-[#f5f3f0]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#23272f] font-display">Top picks this month</h2>
+          <Link href="/perks" className="w-full sm:w-auto">
+            <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto text-sm sm:text-base">View all perks <ArrowRight className="w-4 h-4" /></Button>
           </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {featuredDeals.map((perk) => (
-            <div key={perk.id} className="bg-white rounded-2xl border shadow-sm p-5 flex flex-col h-full relative">
-              <img src={perk.image} alt={perk.name} className="w-full h-32 object-cover rounded-xl mb-4" />
+            <div key={perk.id} className="bg-white rounded-2xl border shadow-sm p-4 sm:p-5 flex flex-col h-full relative">
+              <img src={perk.image} alt={perk.name} className="w-full h-28 sm:h-32 object-cover rounded-xl mb-3 sm:mb-4" />
               <div className="flex items-center gap-2 mb-2">
-                <img src={perk.logo} alt={perk.name} className="w-8 h-8 rounded-full border" />
-                <span className="font-semibold text-[#23272f] font-display">{perk.name}</span>
+                <img src={perk.logo} alt={perk.name} className="w-7 sm:w-8 h-7 sm:h-8 rounded-full border flex-shrink-0" />
+                <span className="font-semibold text-[#23272f] font-display text-sm sm:text-base line-clamp-1">{perk.name}</span>
               </div>
-              <div className="text-sm text-[#6b6f76] mb-2">{perk.category}</div>
-              <div className="text-base text-[#23272f] mb-2 font-display">{perk.description}</div>
-              <div className="flex items-center justify-between mt-auto">
-                <span className="text-xs text-[#6b6f76] flex items-center gap-1"><span className="bg-[#f8eac7] text-[#b48a1e] px-2 py-0.5 rounded-full font-semibold">{perk.discount}</span></span>
+              <div className="text-xs sm:text-sm text-[#6b6f76] mb-2">{perk.category}</div>
+              <div className="text-sm sm:text-base text-[#23272f] mb-2 font-display line-clamp-2">{perk.description}</div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-auto gap-2">
+                <span className="text-xs text-[#6b6f76] flex items-center gap-1"><span className="bg-[#f8eac7] text-[#b48a1e] px-2 py-0.5 rounded-full font-semibold text-xs">{perk.discount}</span></span>
                 <span className="text-xs text-[#6b6f76]">{perk.expiry}</span>
               </div>
-              <Link href="/perks" className="absolute right-4 bottom-4 text-[#e6b756] font-semibold font-display">Get deal →</Link>
+              <Link href="/perks" className="absolute right-3 sm:right-4 bottom-3 sm:bottom-4 text-[#e6b756] font-semibold font-display text-sm">Get deal →</Link>
             </div>
           ))}
         </div>
@@ -147,48 +184,48 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section className="py-16 bg-[#faf8f6]">
-      <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-[#23272f] text-center mb-4 font-display">How it works</h2>
-        <p className="text-[#6b6f76] text-center mb-10">Get exclusive perks in three simple steps</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col items-center">
+      <section className="py-12 sm:py-16 lg:py-20 bg-[#faf8f6]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#23272f] text-center mb-3 sm:mb-4 font-display">How it works</h2>
+        <p className="text-[#6b6f76] text-center mb-8 sm:mb-10 text-sm sm:text-base">Get exclusive perks in three simple steps</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-8 flex flex-col items-center">
             <div className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center font-bold text-[#1a2233] mb-4 font-display">01</div>
-            <div className="text-xl font-semibold mb-2 font-display">Discover perks</div>
-            <div className="text-[#6b6f76] text-center">Browse hundreds of exclusive deals curated for founders and remote teams.</div>
+            <div className="text-lg sm:text-xl font-semibold mb-2 font-display">Discover perks</div>
+            <div className="text-[#6b6f76] text-center text-sm sm:text-base">Browse hundreds of exclusive deals curated for founders and remote teams.</div>
           </div>
-          <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col items-center">
+          <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-8 flex flex-col items-center">
             <div className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center font-bold text-[#1a2233] mb-4 font-display">02</div>
-            <div className="text-xl font-semibold mb-2 font-display">Unlock your discount</div>
-            <div className="text-[#6b6f76] text-center">Click to reveal the deal and get instant access to partner offers.</div>
+            <div className="text-lg sm:text-xl font-semibold mb-2 font-display">Unlock your discount</div>
+            <div className="text-[#6b6f76] text-center text-sm sm:text-base">Click to reveal the deal and get instant access to partner offers.</div>
           </div>
-          <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col items-center">
+          <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-8 flex flex-col items-center">
             <div className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center font-bold text-[#1a2233] mb-4 font-display">03</div>
-            <div className="text-xl font-semibold mb-2 font-display">Save & grow</div>
-            <div className="text-[#6b6f76] text-center">Apply your savings to fuel growth with premium tools and services.</div>
+            <div className="text-lg sm:text-xl font-semibold mb-2 font-display">Save & grow</div>
+            <div className="text-[#6b6f76] text-center text-sm sm:text-base">Apply your savings to fuel growth with premium tools and services.</div>
           </div>
         </div>
       </div>
       </section>
 
       {/* Insights for founders */}
-      <section className="py-16 bg-[#f5f3f0]">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold text-[#23272f] font-display">Insights for founders</h2>
-          <Link href="/journal">
-            <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full flex items-center gap-2">Read all articles <ArrowRight className="w-4 h-4" /></Button>
+      <section className="py-12 sm:py-16 lg:py-20 bg-[#f5f3f0]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#23272f] font-display">Insights for founders</h2>
+          <Link href="/journal" className="w-full sm:w-auto">
+            <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto text-sm sm:text-base">Read all articles <ArrowRight className="w-4 h-4" /></Button>
           </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {journalArticles.map((article) => (
-            <div key={article.id} className="bg-white rounded-2xl border shadow-sm p-5 flex flex-col h-full relative">
-              <img src={article.image} alt={article.title} className="w-full h-32 object-cover rounded-xl mb-4" />
-              <span className="absolute left-4 top-4 bg-[#f8eac7] text-[#b48a1e] px-3 py-1 rounded-full text-xs font-semibold font-display">{article.tag}</span>
-              <div className="text-lg font-semibold text-[#23272f] mb-2 font-display">{article.title}</div>
-              <div className="text-[#6b6f76] mb-2 text-sm">{article.description}</div>
-              <div className="flex items-center gap-2 text-xs text-[#6b6f76] mt-auto">
-                <span>{article.author}</span>
+            <div key={article.id} className="bg-white rounded-2xl border shadow-sm p-4 sm:p-5 flex flex-col h-full relative">
+              <img src={article.image} alt={article.title} className="w-full h-28 sm:h-32 object-cover rounded-xl mb-3 sm:mb-4" />
+              <span className="absolute left-3 sm:left-4 top-3 sm:top-4 bg-[#f8eac7] text-[#b48a1e] px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold font-display">{article.tag}</span>
+              <div className="text-base sm:text-lg font-semibold text-[#23272f] mb-2 font-display line-clamp-2">{article.title}</div>
+              <div className="text-[#6b6f76] mb-2 text-xs sm:text-sm line-clamp-2">{article.description}</div>
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-[#6b6f76] mt-auto">
+                <span className="truncate">{article.author}</span>
                 <span>•</span>
                 <span>{article.time}</span>
               </div>
@@ -199,32 +236,32 @@ export default function Home() {
       </section>
 
       {/* CTA Cards */}
-      <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-[#1a2233] rounded-2xl p-10 flex flex-col justify-between text-white shadow-md">
+      <section className="py-12 sm:py-16 lg:py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        <div className="bg-[#1a2233] rounded-2xl p-8 sm:p-10 flex flex-col justify-between text-white shadow-md">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <span className="bg-[#e6b756] text-[#1a2233] rounded-full p-2"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M16 7a4 4 0 1 0-8 0v2a4 4 0 1 0 8 0V7Z" stroke="#1a2233" strokeWidth="1.5"/><path d="M12 17v2m-6 0h12" stroke="#e6b756" strokeWidth="1.5"/></svg></span>
-              <span className="text-lg font-semibold font-display">For Founders & Teams</span>
+              <span className="text-base sm:text-lg font-semibold font-display">For Founders & Teams</span>
             </div>
-            <div className="mb-6 text-[#e6b756] text-2xl font-bold font-display">Explore Perks</div>
-            <div className="text-[#c7c9d1] mb-6 font-display">Access hundreds of exclusive perks to save money and grow your business faster.</div>
+            <div className="mb-4 sm:mb-6 text-xl sm:text-2xl font-bold font-display text-[#e6b756]">Explore Perks</div>
+            <div className="text-sm sm:text-base text-[#c7c9d1] mb-6 font-display">Access hundreds of exclusive perks to save money and grow your business faster.</div>
           </div>
           <Link href="/perks">
-            <Button className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 py-2 rounded-full hover:bg-[#f5d488] font-display">Explore Perks</Button>
+            <Button className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 py-2 rounded-full hover:bg-[#f5d488] font-display w-full sm:w-auto">Explore Perks</Button>
           </Link>
         </div>
-        <div className="bg-white rounded-2xl p-10 flex flex-col justify-between shadow-md">
+        <div className="bg-white rounded-2xl p-8 sm:p-10 flex flex-col justify-between shadow-md">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <span className="bg-[#f8eac7] text-[#b48a1e] rounded-full p-2"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M16 7a4 4 0 1 0-8 0v2a4 4 0 1 0 8 0V7Z" stroke="#b48a1e" strokeWidth="1.5"/><path d="M12 17v2m-6 0h12" stroke="#b48a1e" strokeWidth="1.5"/></svg></span>
-              <span className="text-lg font-semibold text-[#23272f] font-display">Become a Partner</span>
+              <span className="text-base sm:text-lg font-semibold text-[#23272f] font-display">Become a Partner</span>
             </div>
-            <div className="mb-6 text-[#23272f] text-2xl font-bold font-display">Partner With Us</div>
-            <div className="text-[#6b6f76] mb-6 font-display">Reach thousands of decision-makers at startups and growing businesses.</div>
+            <div className="mb-4 sm:mb-6 text-xl sm:text-2xl font-bold font-display text-[#23272f]">Partner With Us</div>
+            <div className="text-sm sm:text-base text-[#6b6f76] mb-6 font-display">Reach thousands of decision-makers at startups and growing businesses.</div>
           </div>
           <Link href="/partner">
-            <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full font-semibold font-display">Partner With Us</Button>
+            <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full font-semibold font-display w-full sm:w-auto">Partner With Us</Button>
           </Link>
         </div>
       </div>

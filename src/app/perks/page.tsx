@@ -259,20 +259,20 @@ export default function Perks() {
       <Header />
       <main className="bg-[#fcfaf7] min-h-screen">
         {/* Hero Section */}
-        <section className="py-16 bg-[#faf8f6] border-b">
-          <div className="max-w-4xl mx-auto text-center px-4">
-            <h1 className="text-4xl md:text-5xl font-bold text-[#23272f] mb-4 font-display">Discover your next perk</h1>
-            <p className="text-[#6b6f76] text-lg">Browse {mockPerks.length}+ exclusive deals on tools, services, and experiences for founders and teams.</p>
+        <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6] border-b">
+          <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-3 sm:mb-4 font-display">Discover your next perk</h1>
+            <p className="text-[#6b6f76] text-sm sm:text-base md:text-lg">Browse {mockPerks.length}+ exclusive deals on tools, services, and experiences for founders and teams.</p>
           </div>
         </section>
 
         {/* Perks Grid with Filters */}
-        <section className="py-12 bg-[#f5f3f0]">
-        <div className="max-w-7xl mx-auto px-4 flex gap-8">
+        <section className="py-8 sm:py-12 bg-[#f5f3f0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Filters Sidebar */}
-          <aside className="w-80 bg-white rounded-2xl shadow-sm p-6 h-fit hidden lg:block">
-            <div className="flex justify-between items-center mb-6">
-              <div className="font-bold text-lg text-[#23272f] font-display">
+          <aside className="w-full lg:w-80 bg-white rounded-2xl shadow-sm p-4 sm:p-6 h-fit hidden lg:block">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <div className="font-bold text-base sm:text-lg text-[#23272f] font-display">
                 {filteredPerks.length} deals found
               </div>
               {activeFiltersCount > 0 && (
@@ -286,7 +286,7 @@ export default function Perks() {
             </div>
 
             {/* Search */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <Input
                 placeholder="Search deals..."
                 value={searchTerm}
@@ -299,8 +299,8 @@ export default function Perks() {
             </div>
 
             {/* Deal Type Section */}
-            <div className="mb-8">
-              <h3 className="font-semibold text-[#23272f] mb-4 font-display">Deal Type</h3>
+            <div className="mb-6 sm:mb-8">
+              <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Deal Type</h3>
               <div className="space-y-3">
                 {dealTypeOptions.map((option) => (
                   <label key={option.label} className="flex items-center justify-between cursor-pointer group">
@@ -326,8 +326,8 @@ export default function Perks() {
             <hr className="my-6 border-gray-200" />
 
             {/* Category Section */}
-            <div className="mb-8">
-              <h3 className="font-semibold text-[#23272f] mb-4 font-display">Category</h3>
+            <div className="mb-6 sm:mb-8">
+              <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Category</h3>
               <div className="space-y-3">
                 {categoryOptions.map((option) => (
                   <label key={option.label} className="flex items-center justify-between cursor-pointer group">
@@ -378,8 +378,8 @@ export default function Perks() {
             ))}
 
             {/* Location Section */}
-            <div className="mb-8">
-              <h3 className="font-semibold text-[#23272f] mb-4 font-display">Location</h3>
+            <div className="mb-6 sm:mb-8">
+              <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Location</h3>
               <div className="space-y-3">
                 {locationOptions.map((option) => (
                   <label key={option.label} className="flex items-center justify-between cursor-pointer group">
@@ -406,7 +406,7 @@ export default function Perks() {
 
             {/* Best For Section */}
             <div className="mb-4">
-              <h3 className="font-semibold text-[#23272f] mb-4 font-display">Best For (optional)</h3>
+              <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Best For (optional)</h3>
               <div className="space-y-3">
                 {bestForOptions.map((option) => (
                   <label key={option.label} className="flex items-center justify-between cursor-pointer group">
@@ -440,12 +440,12 @@ export default function Perks() {
           </div>
 
           {/* Perks Grid */}
-          <div className="flex-1">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="flex-1 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {filteredPerks.slice(0, 12).map((perk) => (
                 <div key={perk.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
                   <div className="relative">
-                    <img src={perk.image} alt={perk.title} className="w-full h-48 object-cover" />
+                    <img src={perk.image} alt={perk.title} className="w-full h-40 sm:h-48 object-cover" />
                     <span className="absolute top-3 right-3 bg-[#e6b756] text-[#1a2233] text-xs font-semibold px-3 py-1 rounded-full font-display">
                       {perk.discount}
                     </span>
@@ -453,7 +453,7 @@ export default function Perks() {
                       {perk.location}
                     </span>
                   </div>
-                  <div className="p-4 flex-1 flex flex-col">
+                  <div className="p-3 sm:p-4 flex-1 flex flex-col">
                     {/* Category & Deal Type Badges */}
                     <div className="flex flex-wrap gap-1 mb-2">
                       <Badge variant="outline" className="text-xs">
@@ -476,10 +476,10 @@ export default function Perks() {
                       <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold font-display">
                         {perk.company.charAt(0)}
                       </div>
-                      <span className="text-sm text-[#6b6f76]">{perk.company}</span>
+                      <span className="text-xs sm:text-sm text-[#6b6f76]">{perk.company}</span>
                     </div>
-                    <h3 className="font-semibold text-[#23272f] mb-2 text-lg font-display">{perk.title}</h3>
-                    <p className="text-[#6b6f76] text-sm mb-4 flex-1">{perk.description}</p>
+                    <h3 className="font-semibold text-[#23272f] mb-2 text-base sm:text-lg font-display">{perk.title}</h3>
+                    <p className="text-[#6b6f76] text-xs sm:text-sm mb-3 sm:mb-4 flex-1">{perk.description}</p>
 
                     {/* Best For Badges */}
                     <div className="flex flex-wrap gap-1 mb-4">
@@ -496,14 +496,14 @@ export default function Perks() {
                     </div>
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                      <span className="text-xs text-[#6b6f76] flex items-center gap-1">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 pt-2 sm:pt-3 border-t border-gray-100">
+                      <span className="text-xs text-[#6b6f76] flex items-center gap-1 flex-shrink-0">
                         <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
                           <path d="M8 2v2M16 2v2M3 8.5h18M4 21h16a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1Z" stroke="#b48a1e" strokeWidth="1.5"/>
                         </svg>
                         Valid until {perk.validUntil}
                       </span>
-                      <Button className="bg-[#e6b756] text-[#1a2233] font-semibold px-4 py-1.5 rounded-full text-sm hover:bg-[#f5d488] transition-colors font-display">
+                      <Button className="bg-[#e6b756] text-[#1a2233] font-semibold px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm hover:bg-[#f5d488] transition-colors font-display w-full sm:w-auto">
                         Get Deal
                       </Button>
                     </div>
@@ -514,8 +514,8 @@ export default function Perks() {
 
             {/* Load More Button */}
             {filteredPerks.length > 12 && (
-              <div className="text-center mt-10">
-                <Button className="bg-white border border-[#e6b756] text-[#e6b756] font-semibold px-8 py-2 rounded-full hover:bg-[#fffbe6] transition-colors font-display">
+              <div className="text-center mt-8 sm:mt-10">
+                <Button className="bg-white border border-[#e6b756] text-[#e6b756] font-semibold px-6 sm:px-8 py-2 rounded-full hover:bg-[#fffbe6] transition-colors font-display text-sm sm:text-base">
                   Load More
                 </Button>
               </div>

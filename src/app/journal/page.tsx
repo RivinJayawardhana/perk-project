@@ -311,15 +311,15 @@ export default function JournalPage() {
       <Header />
       <div className="flex-grow">
       {/* Featured Article Section */}
-      <section className="bg-[#faf8f6] py-16 border-b">
+      <section className="bg-[#faf8f6] py-12 sm:py-16 lg:py-20 border-b">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
             {/* Featured Image */}
             <div className="relative">
               <img
                 src={featuredPost.image}
                 alt={featuredPost.title}
-                className="rounded-xl object-cover w-full h-80 md:h-96 shadow-lg"
+                className="rounded-xl object-cover w-full h-64 sm:h-72 md:h-80 lg:h-96 shadow-lg"
               />
               <div className="absolute top-4 left-4">
                 <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-amber-400 text-black">
@@ -329,33 +329,33 @@ export default function JournalPage() {
             </div>
 
             {/* Featured Content */}
-            <div className="space-y-5">
-              <div className="flex gap-3 items-center">
-                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+            <div className="space-y-4 sm:space-y-5">
+              <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
+                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm font-semibold">
                   {featuredPost.category}
                 </span>
-                <span className="flex items-center gap-1 text-sm text-gray-600">
-                  <Clock className="w-4 h-4" />
+                <span className="flex items-center gap-1 text-xs sm:text-sm text-gray-600">
+                  <Clock className="w-3 sm:w-4 h-3 sm:h-4" />
                   {featuredPost.readTime}
                 </span>
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight text-slate-900">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-slate-900">
                 {featuredPost.title}
               </h1>
               
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
                 {featuredPost.excerpt}
               </p>
               
-              <div className="flex items-center gap-2 pt-4">
-                <span className="text-sm text-gray-600">
+              <div className="flex items-center gap-2 pt-2 sm:pt-4">
+                <span className="text-xs sm:text-sm text-gray-600">
                   By <span className="font-semibold text-slate-900">{featuredPost.author}</span>
                 </span>
               </div>
               
               <Link href={`/journal/${featuredPost.id}`}>
-                <span className="inline-block text-amber-500 hover:text-amber-600 font-semibold text-lg">
+                <span className="inline-block text-amber-500 hover:text-amber-600 font-semibold text-base sm:text-lg">
                   Read article →
                 </span>
               </Link>
@@ -365,12 +365,12 @@ export default function JournalPage() {
       </section>
 
       {/* Latest Articles Section */}
-      <section className="py-16 bg-[#f5f3f0]">
+      <section className="py-12 sm:py-16 lg:py-20 bg-[#f5f3f0]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-slate-900 mb-12">Latest Articles</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8 sm:mb-12">Latest Articles</h2>
 
           {/* Articles Grid - 3 columns x 4 rows = 12 per page */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12">
             {currentArticles.map((article) => (
               <Link key={article.id} href={`/journal/${article.id}`}>
                 <div className="group cursor-pointer h-full flex flex-col bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
@@ -379,33 +379,33 @@ export default function JournalPage() {
                     <img
                       src={article.image}
                       alt={article.title}
-                      className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-40 sm:h-48 md:h-56 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute top-4 left-4">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(article.category)}`}>
+                    <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
+                      <span className={`inline-block px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold ${getCategoryColor(article.category)}`}>
                         {article.category}
                       </span>
                     </div>
                   </div>
 
                   {/* Article Content */}
-                  <div className="p-5 flex flex-col flex-grow">
+                  <div className="p-4 sm:p-5 flex flex-col flex-grow">
                     {/* Article Meta - Author and Read Time */}
                     <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
-                      <span>{article.author}</span>
-                      <span className="flex items-center gap-1">
+                      <span className="truncate">{article.author}</span>
+                      <span className="flex items-center gap-1 flex-shrink-0">
                         <Clock className="w-3 h-3" />
                         {article.readTime}
                       </span>
                     </div>
 
                     {/* Article Title */}
-                    <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-amber-500 transition-colors line-clamp-2">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-3 group-hover:text-amber-500 transition-colors line-clamp-2">
                       {article.title}
                     </h3>
 
                     {/* Article Excerpt */}
-                    <p className="text-sm text-gray-600 line-clamp-2">
+                    <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
                       {article.excerpt}
                     </p>
                   </div>
@@ -415,17 +415,17 @@ export default function JournalPage() {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-center gap-4 pt-8 border-t">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-8 border-t px-4">
             <button
               onClick={handlePrevPage}
               disabled={currentPage === 1}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-slate-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-slate-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base w-full sm:w-auto"
             >
               <ChevronLeft className="w-4 h-4" />
               Previous
             </button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-center">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
@@ -433,7 +433,7 @@ export default function JournalPage() {
                     setCurrentPage(page);
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className={`w-10 h-10 rounded-lg font-semibold transition-colors ${
+                  className={`w-9 sm:w-10 h-9 sm:h-10 rounded-lg font-semibold transition-colors text-sm sm:text-base ${
                     currentPage === page
                       ? "bg-amber-400 text-black"
                       : "border border-gray-300 text-slate-900 hover:bg-gray-50"
@@ -447,7 +447,7 @@ export default function JournalPage() {
             <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-slate-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-slate-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base w-full sm:w-auto"
             >
               Next
               <ChevronRight className="w-4 h-4" />
@@ -455,7 +455,7 @@ export default function JournalPage() {
           </div>
 
           {/* Page Info */}
-          <div className="text-center mt-6 text-sm text-gray-600">
+          <div className="text-center mt-6 text-xs sm:text-sm text-gray-600 px-4">
             Page {currentPage} of {totalPages} • Showing {currentArticles.length} of {allArticles.length} articles
           </div>
         </div>
