@@ -6,7 +6,7 @@ export default function Footer() {
       {/* Newsletter Section */}
       <div className="max-w-3xl mx-auto text-center mb-10">
         <h2 className="text-2xl md:text-3xl font-bold mb-2">
-          Never Miss a <span className="text-[#ff4ecd]">Gift Moment</span>
+          Never Miss a <span className="text-[#e6b756]">Gift Moment</span>
         </h2>
         <div className="text-[#b0b4bb] mb-4">
           Get exclusive offers, new experience alerts, and gifting inspiration delivered to your inbox.
@@ -20,7 +20,7 @@ export default function Footer() {
           <button
             type="submit"
             className="px-6 py-2 rounded-full font-semibold text-white"
-            style={{ background: 'linear-gradient(90deg, #a259ff 0%, #ff6a00 100%)' }}
+            style={{ background: 'linear-gradient(90deg, #e6b756 0%, #7d5f0aff 100%)' }}
           >
             Subscribe
           </button>
