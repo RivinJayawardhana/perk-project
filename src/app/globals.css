@@ -93,20 +93,7 @@
     font-family: 'Inter', sans-serif;
   }
 
-  /* Use Playfair Display for all bold, black, or display text */
-  .font-bold,
-  .font-black,
-  .font-extrabold,
-  .font-semibold,
-  .font-display,
-  .text-black {
-    font-family: 'Playfair Display', serif !important;
-    letter-spacing: 0;
-  }
-  
   .text-\[#23272f\] {
     color: #23272f;
-    font-family: 'Playfair Display', serif !important;
-    letter-spacing: 0;
   }
 }
