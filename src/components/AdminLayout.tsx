@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Gift,
@@ -20,6 +21,9 @@ import {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [frontendOpen, setFrontendOpen] = useState(true);
+  const pathname = usePathname();
+
+  const isActive = (href: string) => pathname === href;
 
   return (
     <div className="flex min-h-screen bg-[#fcfaf7]">
@@ -31,16 +35,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <nav className="flex-1">
             <ul className="space-y-1">
-              <li><a href="/admin" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><LayoutDashboard className="w-5 h-5" />Dashboard</a></li>
-              <li><a href="/admin/perks" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Gift className="w-5 h-5" />All Perks</a></li>
-              <li><a href="/admin/perks/add" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Plus className="w-5 h-5" />Add Perk</a></li>
-              <li><a href="/admin/categories" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><FolderOpen className="w-5 h-5" />Categories</a></li>
-                            <li><a href="/admin/subcategories" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Layers className="w-5 h-5" />Sub Categories</a></li>
+              <li><a href="/admin" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><LayoutDashboard className="w-5 h-5" />Dashboard</span></a></li>
+              <li><a href="/admin/perks" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Gift className="w-5 h-5" />All Perks</span></a></li>
+              <li><a href="/admin/perks/add" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Plus className="w-5 h-5" />Add Perk</span></a></li>
+              <li><a href="/admin/categories" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><FolderOpen className="w-5 h-5" />Categories</span></a></li>
+              <li><a href="/admin/subcategories" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Layers className="w-5 h-5" />Sub Categories</span></a></li>
             </ul>
             {/* Frontend Pages Dropdown */}
             <div className="mt-6">
               <button
-                className="flex items-center gap-3 px-3 py-2 rounded-lg uppercase text-xs tracking-wider text-[#b0b4bb] font-semibold w-full hover:bg-[#23272f]"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg uppercase text-xs tracking-wider text-[#b0b4bb] font-semibold w-full transition duration-150 hover:bg-[#23272f] hover:text-white"
                 onClick={() => setFrontendOpen((v) => !v)}
                 style={{ cursor: 'pointer' }}
               >
@@ -49,19 +53,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </button>
               {frontendOpen && (
                 <ul className="space-y-1 mt-2 ml-2">
-                  <li><a href="/admin/pages/homepage" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Home className="w-5 h-5" />Homepage</a></li>
-                  <li><a href="/admin/pages/about" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f] text-[#e6b756] bg-[#23272f]">
-                    <Info className="w-5 h-5 text-[#e6b756]" />About Us</a></li>
-                  <li><a href="/admin/pages/perks" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Tag className="w-5 h-5" />Perks Page</a></li>
-                  <li><a href="/admin/pages/contact" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Phone className="w-5 h-5" />Contact</a></li>
-                  <li><a href="/admin/pages/partner" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Handshake className="w-5 h-5" />Partner With Us</a></li>
-                  <li><a href="/admin/pages/privacy" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Shield className="w-5 h-5" />Privacy/TOS</a></li>
+                  <li><a href="/admin/pages/homepage" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Home className="w-5 h-5" />Homepage</span></a></li>
+                  <li><a href="/admin/pages/about" className={`block px-3 py-2 rounded-lg transition duration-150 font-medium ${isActive('/admin/pages/about') ? 'text-[#e6b756] bg-[#23272f]' : 'text-white hover:bg-[#23272f] hover:text-white'}`}>
+                    <span className="flex items-center gap-3"><Info className={`w-5 h-5 ${isActive('/admin/pages/about') ? 'text-[#e6b756]' : ''}`} />About Us</span></a></li>
+                  <li><a href="/admin/pages/perks" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Tag className="w-5 h-5" />Perks Page</span></a></li>
+                  <li><a href="/admin/pages/contact" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Phone className="w-5 h-5" />Contact</span></a></li>
+                  <li><a href="/admin/pages/partner" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Handshake className="w-5 h-5" />Partner With Us</span></a></li>
+                  <li><a href="/admin/pages/privacy" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Shield className="w-5 h-5" />Privacy/TOS</span></a></li>
                 </ul>
               )}
             </div>
             <ul className="space-y-1 mt-6">
-              <li><a href="/admin/journal" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><BookOpen className="w-5 h-5" />Journal</a></li>
-              <li><a href="/admin/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Settings className="w-5 h-5" />Settings</a></li>
+              <li><a href="/admin/journal" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><BookOpen className="w-5 h-5" />Journal</span></a></li>
+              <li><a href="/admin/settings" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Settings className="w-5 h-5" />Settings</span></a></li>
             </ul>
           </nav>
         </div>
