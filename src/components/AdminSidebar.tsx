@@ -6,6 +6,7 @@ export default function AdminSidebar({ active }: { active: string }) {
     { label: "All Perks", href: "/admin/perks" },
     { label: "Add Perk", href: "/admin/perks/add" },
     { label: "Categories", href: "/admin/categories" },
+    { label: "Sub Categories", href: "/admin/subcategories" },
     { label: "Frontend Pages", href: "/admin/pages" },
     { label: "Journal", href: "/admin/journal" },
     { label: "Settings", href: "/admin/settings" },

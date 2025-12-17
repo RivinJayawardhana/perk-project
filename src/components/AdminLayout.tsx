@@ -35,6 +35,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <li><a href="/admin/perks" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Gift className="w-5 h-5" />All Perks</a></li>
               <li><a href="/admin/perks/add" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Plus className="w-5 h-5" />Add Perk</a></li>
               <li><a href="/admin/categories" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><FolderOpen className="w-5 h-5" />Categories</a></li>
+                            <li><a href="/admin/subcategories" className="flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium hover:bg-[#23272f]"><Layers className="w-5 h-5" />Sub Categories</a></li>
             </ul>
             {/* Frontend Pages Dropdown */}
             <div className="mt-6">

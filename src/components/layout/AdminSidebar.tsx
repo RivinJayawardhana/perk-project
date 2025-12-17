@@ -25,7 +25,7 @@ import {
 
 const mainNavItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
-  { icon: Gift, label: "Perks", path: "/admin/perks" },
+  { icon: Gift, label: "Perksssss", path: "/admin/perks" },
   { icon: FolderOpen, label: "Categories", path: "/admin/categories" },
   { icon: Layers, label: "Subcategories", path: "/admin/subcategories" },
 ];
@@ -80,16 +80,19 @@ export function AdminSidebar() {
               href={item.path}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                 isActive(item.path)
-                  ? "bg-blue-600 text-white"
-                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                  ? "text-white" // active color
+                  : "text-slate-300 hover:text-white" // inactive color
               }`}
+              style={{ fontWeight: item.label === "Subcategories" ? 500 : undefined }}
             >
               <Icon className="w-5 h-5" />
               <span className="text-sm font-medium">{item.label}</span>
             </Link>
           );
         })}
-        
+
+
+
         {/* Frontend Pages Dropdown Section */}
         <div className="pt-2">
           <button
