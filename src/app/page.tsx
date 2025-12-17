@@ -117,7 +117,8 @@ export default function Home() {
       </section>
 
       {/* Featured Deals */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
+      <section className="py-12 bg-[#f5f3f0]">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-bold text-[#23272f] font-display">Top picks this month</h2>
           <Link href="/perks">
@@ -142,10 +143,12 @@ export default function Home() {
             </div>
           ))}
         </div>
+      </div>
       </section>
 
       {/* How it works */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
+      <section className="py-16 bg-[#faf8f6]">
+      <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-3xl font-bold text-[#23272f] text-center mb-4 font-display">How it works</h2>
         <p className="text-[#6b6f76] text-center mb-10">Get exclusive perks in three simple steps</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -165,10 +168,12 @@ export default function Home() {
             <div className="text-[#6b6f76] text-center">Apply your savings to fuel growth with premium tools and services.</div>
           </div>
         </div>
+      </div>
       </section>
 
       {/* Insights for founders */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
+      <section className="py-16 bg-[#f5f3f0]">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-bold text-[#23272f] font-display">Insights for founders</h2>
           <Link href="/journal">
@@ -190,10 +195,12 @@ export default function Home() {
             </div>
           ))}
         </div>
+      </div>
       </section>
 
       {/* CTA Cards */}
-      <section className="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <section className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-[#1a2233] rounded-2xl p-10 flex flex-col justify-between text-white shadow-md">
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -220,6 +227,7 @@ export default function Home() {
             <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full font-semibold font-display">Partner With Us</Button>
           </Link>
         </div>
+      </div>
       </section>
       </main>
       <Footer />

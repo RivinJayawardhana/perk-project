@@ -12,11 +12,13 @@ export default function About() {
       <main className="bg-[#fcfaf7] min-h-screen">
 
       {/* Hero Section */}
-      <section className="max-w-4xl mx-auto px-4 py-20 text-center">
+      <section className="py-20 bg-[#faf8f6]">
+      <div className="max-w-4xl mx-auto px-4 text-center">
         <div className="mb-4 text-[#e6b756] font-semibold">About VentureNext</div>
 
         <h1 className="text-4xl md:text-5xl font-bold text-[#23272f] mb-6 font-display">Empowering founders to build faster</h1>
         <p className="text-lg text-[#6b6f76] max-w-2xl mx-auto">We believe every founder deserves access to premium tools and services without breaking the bank. That's why we built VentureNext.</p>
+      </div>
       </section>
 
       {/* Stats Section */}
@@ -46,7 +48,8 @@ export default function About() {
       </section>
 
       {/* What we do */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
+      <section className="py-16 bg-[#f5f3f0]">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="mb-4 text-[#e6b756] font-semibold text-center">What we do</div>
 
           <h2 className="text-3xl font-bold text-[#23272f] text-center mb-2 font-display">Connecting founders with value</h2>
@@ -71,6 +74,7 @@ export default function About() {
             <div className="text-[#6b6f76] text-center">No complicated sign-ups. Find a perk, click, and start saving immediately on tools you actually need.</div>
           </div>
         </div>
+      </div>
       </section>
 
       {/* Who we serve */}

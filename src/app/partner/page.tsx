@@ -34,8 +34,8 @@ export default function Partner() {
       <main className="bg-[#fcfaf7] min-h-screen">
 
       {/* Hero Section */}
-      <section className="py-20 bg-[#fcfaf7] border-b">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="py-20 bg-[#faf8f6] border-b">
+        <div className="max-w-3xl mx-auto text-center px-4">
           <div className="text-[#e6b756] font-semibold mb-2 font-display">Partner with us</div>
           <h1 className="text-4xl md:text-5xl font-bold text-[#23272f] mb-6 font-display">Reach the founders building tomorrow</h1>
           <p className="text-[#6b6f76] text-lg mb-8">Join 200+ brands offering exclusive perks to our community of 50,000+ founders, freelancers, and remote teams.</p>
@@ -76,7 +76,7 @@ export default function Partner() {
       </section>
 
       {/* Process Section */}
-      <section className="bg-[#fdf3ef] py-16">
+      <section className="bg-[#f5f3f0] py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-[#e86a2a] font-semibold text-center mb-2 font-display">How it works</div>
           <h2 className="text-3xl font-bold text-[#23272f] text-center mb-10 font-display">Simple partnership process</h2>

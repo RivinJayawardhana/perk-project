@@ -33,8 +33,8 @@ export default function Contact() {
       <Header />
       <main className="bg-[#fcfaf7] min-h-screen py-0">
       {/* Hero Section */}
-      <section className="py-20 bg-[#fcfaf7]">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="py-20 bg-[#faf8f6]">
+        <div className="max-w-3xl mx-auto text-center px-4">
           <div className="text-[#e6b756] font-semibold mb-2 font-display">Contact us</div>
           <h1 className="text-5xl font-bold text-[#23272f] mb-6 font-display">
             We'd love to hear from you
@@ -48,8 +48,8 @@ export default function Contact() {
       </section>
 
       {/* Contact Form Section */}
-      <section className="py-0 bg-[#fcfaf7]">
-        <div className="max-w-2xl mx-auto">
+      <section className="py-12 bg-[#f5f3f0]">
+        <div className="max-w-2xl mx-auto px-4">
           <form
             onSubmit={handleSubmit}
             className="bg-white rounded-2xl shadow-md p-10 flex flex-col gap-8"

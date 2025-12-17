@@ -259,15 +259,16 @@ export default function Perks() {
       <Header />
       <main className="bg-[#fcfaf7] min-h-screen">
         {/* Hero Section */}
-        <section className="py-16 bg-[#f7f5f1] border-b">
-          <div className="max-w-4xl mx-auto text-center">
+        <section className="py-16 bg-[#faf8f6] border-b">
+          <div className="max-w-4xl mx-auto text-center px-4">
             <h1 className="text-4xl md:text-5xl font-bold text-[#23272f] mb-4 font-display">Discover your next perk</h1>
             <p className="text-[#6b6f76] text-lg">Browse {mockPerks.length}+ exclusive deals on tools, services, and experiences for founders and teams.</p>
           </div>
         </section>
 
         {/* Perks Grid with Filters */}
-        <section className="max-w-7xl mx-auto px-4 py-12 flex gap-8">
+        <section className="py-12 bg-[#f5f3f0]">
+        <div className="max-w-7xl mx-auto px-4 flex gap-8">
           {/* Filters Sidebar */}
           <aside className="w-80 bg-white rounded-2xl shadow-sm p-6 h-fit hidden lg:block">
             <div className="flex justify-between items-center mb-6">
@@ -520,6 +521,7 @@ export default function Perks() {
               </div>
             )}
           </div>
+        </div>
         </section>
       </main>
       <Footer />
