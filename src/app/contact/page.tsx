@@ -35,8 +35,8 @@ export default function Contact() {
       {/* Hero Section */}
       <section className="py-20 bg-[#fcfaf7]">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="text-[#e6b756] font-semibold mb-2">Contact us</div>
-          <h1 className="text-5xl font-bold text-[#23272f] mb-6">
+          <div className="text-[#e6b756] font-semibold mb-2 font-display">Contact us</div>
+          <h1 className="text-5xl font-bold text-[#23272f] mb-6 font-display">
             We'd love to hear from you
           </h1>
           <p className="text-[#6b6f76] text-lg">
@@ -54,7 +54,7 @@ export default function Contact() {
             onSubmit={handleSubmit}
             className="bg-white rounded-2xl shadow-md p-10 flex flex-col gap-8"
           >
-            <h2 className="text-2xl font-bold text-[#23272f] text-center mb-2">
+            <h2 className="text-2xl font-bold text-[#23272f] text-center mb-2 font-display">
               Send us a message
             </h2>
             <p className="text-[#6b6f76] text-center mb-4">
@@ -123,7 +123,7 @@ export default function Contact() {
 
             <Button
               type="submit"
-              className="bg-[#e6b756] text-[#1a2233] font-semibold px-8 py-3 rounded-full hover:bg-[#f5d488] text-lg"
+              className="bg-[#e6b756] text-[#1a2233] font-semibold px-8 py-3 rounded-full hover:bg-[#f5d488] text-lg font-display"
               disabled={submitted}
             >
               {submitted ? "Sending..." : "Send Message"}

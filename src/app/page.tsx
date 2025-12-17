@@ -97,9 +97,9 @@ export default function Home() {
         </div>
         <div className="relative z-10 pt-20 md:pt-32">
           <div className="mb-4 flex justify-center">
-            <span className="bg-[#f8eac7] text-[#b48a1e] px-4 py-1 rounded-full text-sm font-semibold">500+ exclusive perks for founders</span>
+            <span className="bg-[#f8eac7] text-[#b48a1e] px-4 py-1 rounded-full text-sm font-semibold font-display">500+ exclusive perks for founders</span>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-[#23272f] mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold text-[#23272f] mb-6 leading-tight font-display">
             Perks that fuel <br className="hidden md:block" /> your <span className="relative inline-block"><span className="z-10 relative">growth</span><span className="absolute left-0 right-0 bottom-0 h-2 bg-[#f8eac7] -z-10 rounded"></span></span>
           </h1>
           <p className="text-lg md:text-xl text-[#6b6f76] mb-8 max-w-2xl mx-auto">
@@ -119,7 +119,7 @@ export default function Home() {
       {/* Featured Deals */}
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold text-[#23272f]">Top picks this month</h2>
+          <h2 className="text-3xl font-bold text-[#23272f] font-display">Top picks this month</h2>
           <Link href="/perks">
             <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full flex items-center gap-2">View all perks <ArrowRight className="w-4 h-4" /></Button>
           </Link>
@@ -130,15 +130,15 @@ export default function Home() {
               <img src={perk.image} alt={perk.name} className="w-full h-32 object-cover rounded-xl mb-4" />
               <div className="flex items-center gap-2 mb-2">
                 <img src={perk.logo} alt={perk.name} className="w-8 h-8 rounded-full border" />
-                <span className="font-semibold text-[#23272f]">{perk.name}</span>
+                <span className="font-semibold text-[#23272f] font-display">{perk.name}</span>
               </div>
               <div className="text-sm text-[#6b6f76] mb-2">{perk.category}</div>
-              <div className="text-base text-[#23272f] mb-2">{perk.description}</div>
+              <div className="text-base text-[#23272f] mb-2 font-display">{perk.description}</div>
               <div className="flex items-center justify-between mt-auto">
                 <span className="text-xs text-[#6b6f76] flex items-center gap-1"><span className="bg-[#f8eac7] text-[#b48a1e] px-2 py-0.5 rounded-full font-semibold">{perk.discount}</span></span>
                 <span className="text-xs text-[#6b6f76]">{perk.expiry}</span>
               </div>
-              <Link href="/perks" className="absolute right-4 bottom-4 text-[#e6b756] font-semibold">Get deal →</Link>
+              <Link href="/perks" className="absolute right-4 bottom-4 text-[#e6b756] font-semibold font-display">Get deal →</Link>
             </div>
           ))}
         </div>
@@ -146,22 +146,22 @@ export default function Home() {
 
       {/* How it works */}
       <section className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-[#23272f] text-center mb-4">How it works</h2>
+        <h2 className="text-3xl font-bold text-[#23272f] text-center mb-4 font-display">How it works</h2>
         <p className="text-[#6b6f76] text-center mb-10">Get exclusive perks in three simple steps</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center font-bold text-[#1a2233] mb-4">01</div>
-            <div className="text-xl font-semibold mb-2">Discover perks</div>
+            <div className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center font-bold text-[#1a2233] mb-4 font-display">01</div>
+            <div className="text-xl font-semibold mb-2 font-display">Discover perks</div>
             <div className="text-[#6b6f76] text-center">Browse hundreds of exclusive deals curated for founders and remote teams.</div>
           </div>
           <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center font-bold text-[#1a2233] mb-4">02</div>
-            <div className="text-xl font-semibold mb-2">Unlock your discount</div>
+            <div className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center font-bold text-[#1a2233] mb-4 font-display">02</div>
+            <div className="text-xl font-semibold mb-2 font-display">Unlock your discount</div>
             <div className="text-[#6b6f76] text-center">Click to reveal the deal and get instant access to partner offers.</div>
           </div>
           <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center font-bold text-[#1a2233] mb-4">03</div>
-            <div className="text-xl font-semibold mb-2">Save & grow</div>
+            <div className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center font-bold text-[#1a2233] mb-4 font-display">03</div>
+            <div className="text-xl font-semibold mb-2 font-display">Save & grow</div>
             <div className="text-[#6b6f76] text-center">Apply your savings to fuel growth with premium tools and services.</div>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function Home() {
       {/* Insights for founders */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold text-[#23272f]">Insights for founders</h2>
+          <h2 className="text-3xl font-bold text-[#23272f] font-display">Insights for founders</h2>
           <Link href="/journal">
             <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full flex items-center gap-2">Read all articles <ArrowRight className="w-4 h-4" /></Button>
           </Link>
@@ -179,8 +179,8 @@ export default function Home() {
           {journalArticles.map((article) => (
             <div key={article.id} className="bg-white rounded-2xl border shadow-sm p-5 flex flex-col h-full relative">
               <img src={article.image} alt={article.title} className="w-full h-32 object-cover rounded-xl mb-4" />
-              <span className="absolute left-4 top-4 bg-[#f8eac7] text-[#b48a1e] px-3 py-1 rounded-full text-xs font-semibold">{article.tag}</span>
-              <div className="text-lg font-semibold text-[#23272f] mb-2">{article.title}</div>
+              <span className="absolute left-4 top-4 bg-[#f8eac7] text-[#b48a1e] px-3 py-1 rounded-full text-xs font-semibold font-display">{article.tag}</span>
+              <div className="text-lg font-semibold text-[#23272f] mb-2 font-display">{article.title}</div>
               <div className="text-[#6b6f76] mb-2 text-sm">{article.description}</div>
               <div className="flex items-center gap-2 text-xs text-[#6b6f76] mt-auto">
                 <span>{article.author}</span>
@@ -198,26 +198,26 @@ export default function Home() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <span className="bg-[#e6b756] text-[#1a2233] rounded-full p-2"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M16 7a4 4 0 1 0-8 0v2a4 4 0 1 0 8 0V7Z" stroke="#1a2233" strokeWidth="1.5"/><path d="M12 17v2m-6 0h12" stroke="#e6b756" strokeWidth="1.5"/></svg></span>
-              <span className="text-lg font-semibold">For Founders & Teams</span>
+              <span className="text-lg font-semibold font-display">For Founders & Teams</span>
             </div>
-            <div className="mb-6 text-[#e6b756] text-2xl font-bold">Explore Perks</div>
-            <div className="text-[#c7c9d1] mb-6">Access hundreds of exclusive perks to save money and grow your business faster.</div>
+            <div className="mb-6 text-[#e6b756] text-2xl font-bold font-display">Explore Perks</div>
+            <div className="text-[#c7c9d1] mb-6 font-display">Access hundreds of exclusive perks to save money and grow your business faster.</div>
           </div>
           <Link href="/perks">
-            <Button className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 py-2 rounded-full hover:bg-[#f5d488]">Explore Perks</Button>
+            <Button className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 py-2 rounded-full hover:bg-[#f5d488] font-display">Explore Perks</Button>
           </Link>
         </div>
         <div className="bg-white rounded-2xl p-10 flex flex-col justify-between shadow-md">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <span className="bg-[#f8eac7] text-[#b48a1e] rounded-full p-2"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M16 7a4 4 0 1 0-8 0v2a4 4 0 1 0 8 0V7Z" stroke="#b48a1e" strokeWidth="1.5"/><path d="M12 17v2m-6 0h12" stroke="#b48a1e" strokeWidth="1.5"/></svg></span>
-              <span className="text-lg font-semibold text-[#23272f]">Become a Partner</span>
+              <span className="text-lg font-semibold text-[#23272f] font-display">Become a Partner</span>
             </div>
-            <div className="mb-6 text-[#23272f] text-2xl font-bold">Partner With Us</div>
-            <div className="text-[#6b6f76] mb-6">Reach thousands of decision-makers at startups and growing businesses.</div>
+            <div className="mb-6 text-[#23272f] text-2xl font-bold font-display">Partner With Us</div>
+            <div className="text-[#6b6f76] mb-6 font-display">Reach thousands of decision-makers at startups and growing businesses.</div>
           </div>
           <Link href="/partner">
-            <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full font-semibold">Partner With Us</Button>
+            <Button variant="outline" className="border-[#e6b756] text-[#1a2233] px-6 py-2 rounded-full font-semibold font-display">Partner With Us</Button>
           </Link>
         </div>
       </section>
