@@ -99,8 +99,13 @@
   .font-extrabold,
   .font-semibold,
   .font-display,
-  .text-black,
-  .text-[#23272f] {
+  .text-black {
+    font-family: 'Playfair Display', serif !important;
+    letter-spacing: 0;
+  }
+  
+  .text-\[#23272f\] {
+    color: #23272f;
     font-family: 'Playfair Display', serif !important;
     letter-spacing: 0;
   }
