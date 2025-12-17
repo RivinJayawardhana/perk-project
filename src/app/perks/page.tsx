@@ -361,7 +361,6 @@ export default function Perks() {
                             checked={selectedSubcategories.includes(subOption.label)}
                             onCheckedChange={() => handleSubcategoryChange(subOption.label)}
                             className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
-                            size="sm"
                           />
                           <span className="text-xs text-[#6b6f76] group-hover:text-[#23272f]">
                             {subOption.label}

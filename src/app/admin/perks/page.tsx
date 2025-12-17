@@ -1,4 +1,4 @@
-import AllPerks from "@/pages/admin/AllPerks";
+import AllPerks from "@/components/admin/AllPerks";
 
 export default function AdminPerksPage() {
   return <AllPerks />;

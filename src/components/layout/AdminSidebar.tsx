@@ -50,7 +50,7 @@ const settingsPages = [
   { icon: FileText, label: "Email Templates", path: "/admin/settings/email" },
 ];
 
-const bottomNavItems = [];
+const bottomNavItems: typeof settingsPages = [];
 
 export function AdminSidebar() {
   const pathname = usePathname();

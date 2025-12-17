@@ -2,7 +2,7 @@
 
 import React from "react";
 import AdminLayout from "@/components/AdminLayout";
-import Subcategories from "@/pages/admin/Subcategories";
+import Subcategories from "@/components/admin/Subcategories";
 
 export default function SubcategoriesPage() {
   return (

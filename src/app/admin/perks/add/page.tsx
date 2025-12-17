@@ -1,4 +1,4 @@
-import AddPerk from "@/pages/admin/AddPerk";
+import AddPerk from "@/components/admin/AddPerk";
 
 export default function AddPerkPage() {
   return <AddPerk />;

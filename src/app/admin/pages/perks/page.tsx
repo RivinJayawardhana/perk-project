@@ -1,5 +1,5 @@
 "use client";
-import EditPerksPage from "@/pages/admin/EditPerksPage";
+import EditPerksPage from "@/components/admin/EditPerksPage";
 import AdminLayout from "@/components/AdminLayout";
 
 export default function AdminPerksPageEditor() {

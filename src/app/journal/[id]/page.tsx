@@ -1,13 +1,17 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-export default function ArticlePage({ params }: { params: { id: string } }) {
+export default function ArticlePage() {
+  const params = useParams();
+  const id = params?.id as string;
+
   // Mock data for demonstration
   const article = {
-    id: params.id,
+    id: id,
     tag: "Business Registration",
     title: "5 Essential Steps to Register Your Business in Singapore",
     date: "December 15, 2024",

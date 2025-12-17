@@ -1,5 +1,5 @@
 "use client";
-import Categories from "@/pages/admin/Categories";
+import Categories from "@/components/admin/Categories";
 import AdminLayout from "@/components/AdminLayout";
 
 export default function AdminCategoriesPage() {

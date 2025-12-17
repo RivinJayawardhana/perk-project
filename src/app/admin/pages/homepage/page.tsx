@@ -1,5 +1,5 @@
 "use client";
-import EditHomePage from "@/pages/admin/EditHomePage";
+import EditHomePage from "@/components/admin/EditHomePage";
 
 export default function AdminHomePageEditor() {
   return <EditHomePage />;

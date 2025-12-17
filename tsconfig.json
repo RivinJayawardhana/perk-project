@@ -20,7 +20,7 @@
       ]
     },
     "types": [
-      "next/env"
+      "node"
     ],
     "target": "ES2017",
     "allowJs": true,
