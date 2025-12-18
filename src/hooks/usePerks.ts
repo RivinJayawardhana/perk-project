@@ -1,18 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export interface Perk {
-  id: string
+  id?: string
   name: string
   description: string
   category: string
   discount: string
   expiry: string
-  image_url: string
-  logo_url: string
+  location?: string
+  status?: string
+  image_url?: string
+  logo_url?: string
   deal_type?: string
   best_for?: string
-  created_at: string
-  updated_at: string
+  subcategory?: string
+  created_at?: string
+  updated_at?: string
 }
 
 export function usePerks() {

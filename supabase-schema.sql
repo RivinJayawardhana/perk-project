@@ -6,6 +6,8 @@ CREATE TABLE perks (
   category TEXT,
   discount TEXT,
   expiry DATE,
+  location TEXT DEFAULT 'Global',
+  status TEXT DEFAULT 'Active',
   image_url TEXT,
   logo_url TEXT,
   deal_type TEXT,

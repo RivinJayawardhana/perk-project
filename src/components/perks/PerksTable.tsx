@@ -33,6 +33,8 @@ interface Perk {
   logo_url: string;
   deal_type?: string;
   best_for?: string;
+  status?: string;
+  location?: string;
   created_at: string;
   updated_at: string;
 }
@@ -99,7 +101,7 @@ export function PerksTable() {
             className="pl-10"
           />
         </div>
-        <Link href="/admin/perks/new">
+        <Link href="/admin/perks/add">
           <Button className="bg-primary hover:bg-primary/90">
             + Add Perk
           </Button>
@@ -112,8 +114,10 @@ export function PerksTable() {
             <tr>
               <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Perk</th>
               <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Category</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Discount</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Expires</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Deal</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Location</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Valid Until</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Status</th>
               <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Actions</th>
             </tr>
           </thead>
@@ -134,12 +138,24 @@ export function PerksTable() {
                   </td>
                   <td className="px-4 py-4 text-sm text-foreground">{perk.category}</td>
                   <td className="px-4 py-4">
-                    <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
+                    <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-0">
                       {perk.discount}
                     </Badge>
                   </td>
                   <td className="px-4 py-4 text-sm text-muted-foreground">
-                    {new Date(perk.expiry).toLocaleDateString()}
+                    {perk.location || "Global"}
+                  </td>
+                  <td className="px-4 py-4 text-sm text-muted-foreground">
+                    {new Date(perk.expiry).toLocaleDateString('en-US', { 
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </td>
+                  <td className="px-4 py-4">
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      {perk.status || "Active"}
+                    </Badge>
                   </td>
                   <td className="px-4 py-4">
                     <DropdownMenu>
@@ -170,7 +186,7 @@ export function PerksTable() {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                   No perks found. Create your first perk to get started!
                 </td>
               </tr>

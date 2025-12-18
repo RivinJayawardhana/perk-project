@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Upload, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,10 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
-import { ImageUpload } from "@/components/perks/ImageUpload";
-import { LeadCaptureForm } from "@/components/perks/LeadCaptureForm";
-import { DealTypeAndBestForFields } from "@/components/perks/DealTypeAndBestForFields";
-import { useCreatePerk } from "@/hooks/usePerks";
+import { useUpdatePerk, usePerk } from "@/hooks/usePerks";
 import { useCategories } from "@/hooks/useCategories";
 import { useSubcategories } from "@/hooks/useSubcategories";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -27,12 +24,37 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 
-export default function AddPerk() {
+const DEAL_TYPE_OPTIONS = [
+  "Free trial",
+  "Discount",
+  "Credits included",
+  "Free consultation",
+  "Free perks / Add-ons",
+  "Bundle deal",
+  "Exclusive deal",
+  "Intro/First-time offer",
+];
+
+const BEST_FOR_OPTIONS = [
+  "Solopreneurs",
+  "Startups",
+  "SMEs",
+  "Agencies",
+  "Enterprises",
+  "Remote teams",
+];
+
+interface EditPerkProps {
+  perkId: string;
+}
+
+export default function EditPerk({ perkId }: EditPerkProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const { data: perkData, isLoading } = usePerk(perkId);
   const { data: categories } = useCategories();
   const { data: allSubcategories } = useSubcategories();
-  const { mutate: createPerk, isPending } = useCreatePerk();
+  const { mutate: updatePerk, isPending } = useUpdatePerk(perkId);
   const { upload, isUploading } = useImageUpload();
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -47,15 +69,42 @@ export default function AddPerk() {
     location: "Global",
     image_url: "",
     logo_url: "",
-    deal_type: "affiliate",
+    deal_type: "",
     deal_url: "",
     best_for: "",
     status: "Active",
   });
 
-  const [dealTypeSelection, setDealTypeSelection] = useState("affiliate");
   const [dealType, setDealType] = useState<string[]>([]);
   const [bestFor, setBestFor] = useState<string[]>([]);
+  const [dealTypeSelection, setDealTypeSelection] = useState("affiliate");
+
+  useEffect(() => {
+    if (perkData) {
+      setFormData({
+        name: perkData.name || "",
+        description: perkData.description || "",
+        category: perkData.category || "",
+        subcategory: perkData.subcategory || "",
+        discount: perkData.discount || "",
+        expiry: perkData.expiry || "",
+        location: perkData.location || "Global",
+        image_url: perkData.image_url || "",
+        logo_url: perkData.logo_url || "",
+        deal_type: perkData.deal_type || "",
+        deal_url: perkData.deal_url || "",
+        best_for: perkData.best_for || "",
+        status: perkData.status || "Active",
+      });
+
+      if (perkData.deal_type) {
+        setDealType(perkData.deal_type.split(", ").filter((t: string) => t));
+      }
+      if (perkData.best_for) {
+        setBestFor(perkData.best_for.split(", ").filter((b: string) => b));
+      }
+    }
+  }, [perkData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -67,11 +116,16 @@ export default function AddPerk() {
     }));
   };
 
-  const handleCategoryChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      category: value,
-    }));
+  const handleDealTypeChange = (option: string) => {
+    setDealType((prev) =>
+      prev.includes(option) ? prev.filter((t) => t !== option) : [...prev, option]
+    );
+  };
+
+  const handleBestForChange = (option: string) => {
+    setBestFor((prev) =>
+      prev.includes(option) ? prev.filter((b) => b !== option) : [...prev, option]
+    );
   };
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,7 +190,7 @@ export default function AddPerk() {
       return;
     }
 
-    createPerk(
+    updatePerk(
       {
         name: formData.name,
         description: formData.description,
@@ -154,20 +208,28 @@ export default function AddPerk() {
         onSuccess: () => {
           toast({
             title: "Success",
-            description: "Perk created successfully!",
+            description: "Perk updated successfully!",
           });
           router.push("/admin/perks");
         },
         onError: (error: any) => {
           toast({
             title: "Error",
-            description: error.message || "Failed to create perk",
+            description: error.message || "Failed to update perk",
             variant: "destructive",
           });
         },
       }
     );
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-8 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 max-w-4xl">
@@ -181,8 +243,8 @@ export default function AddPerk() {
       </div>
 
       <div className="mb-8">
-        <h1 className="font-display text-2xl font-bold text-foreground mb-2">Add New Perk</h1>
-        <p className="text-muted-foreground">Fill in the details below to create a new perk for founders</p>
+        <h1 className="font-display text-2xl font-bold text-foreground mb-2">Edit Perk</h1>
+        <p className="text-muted-foreground">Update the details of this perk</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -294,7 +356,9 @@ export default function AddPerk() {
                 <Label className="text-sm font-medium mb-2 block">
                   Category <span className="text-destructive">*</span>
                 </Label>
-                <Select value={formData.category} onValueChange={handleCategoryChange}>
+                <Select value={formData.category} onValueChange={(value) => 
+                  setFormData(prev => ({ ...prev, category: value }))
+                }>
                   <SelectTrigger className="border-amber-200">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
@@ -312,12 +376,12 @@ export default function AddPerk() {
               <Label className="text-sm font-medium mb-2 block">Subcategory</Label>
               <Select value={formData.subcategory || ""} onValueChange={(value) => 
                 setFormData(prev => ({ ...prev, subcategory: value }))
-              } disabled={!formData.category}>
-                <SelectTrigger className={!formData.category ? "opacity-50" : ""}>
+              }>
+                <SelectTrigger>
                   <SelectValue placeholder="Select subcategory (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {formData.category && allSubcategories && (
+                  {formData.category && allSubcategories ? (
                     allSubcategories
                       .filter((sub: any) => {
                         const selectedCat = categories?.find((c: any) => c.name === formData.category);
@@ -328,6 +392,10 @@ export default function AddPerk() {
                           {sub.name}
                         </SelectItem>
                       ))
+                  ) : (
+                    <SelectItem value="none" disabled>
+                      Select a category first
+                    </SelectItem>
                   )}
                 </SelectContent>
               </Select>
@@ -362,23 +430,6 @@ export default function AddPerk() {
                 />
                 <p className="text-xs text-muted-foreground mt-1">Auto-generated from title</p>
               </div>
-            </div>
-            <div>
-              <Label htmlFor="name" className="text-sm font-medium mb-2 block">
-                Deal Badge Text
-              </Label>
-              <Input
-                id="badge"
-                placeholder="e.g., $200 credit, 40% off"
-                value={formData.discount}
-                onChange={(e) =>
-                  setFormData(prev => ({
-                    ...prev,
-                    discount: e.target.value,
-                  }))
-                }
-              />
-              <p className="text-xs text-muted-foreground mt-1">Short text shown on the card badge</p>
             </div>
             <div>
               <Label htmlFor="description" className="text-sm font-medium mb-2 block">
@@ -437,62 +488,40 @@ export default function AddPerk() {
           </div>
         </Card>
 
-        {/* DEAL TYPE SECTION - CHECKBOXES */}
+        {/* DEAL TYPE SECTION */}
         <Card className="p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Deal Type</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { id: 'free-trial', label: 'Free trial', icon: '🆓' },
-              { id: 'discount', label: 'Discount', icon: '💰' },
-              { id: 'credits', label: 'Credits included', icon: '🎁' },
-              { id: 'consultation', label: 'Free consultation', icon: '💬' },
-              { id: 'perks', label: 'Free perks / Add-ons', icon: '⭐' },
-              { id: 'bundle', label: 'Bundle deal', icon: '📦' },
-              { id: 'exclusive', label: 'Exclusive deal', icon: '🔐' },
-              { id: 'intro', label: 'Intro/First-time offer', icon: '🚀' },
-            ].map((type) => (
-              <label key={type.id} className="flex items-center gap-2 p-3 rounded-lg hover:bg-muted cursor-pointer border border-muted">
+          <div className="grid grid-cols-2 gap-4">
+            {DEAL_TYPE_OPTIONS.map((option) => (
+              <div key={option} className="flex items-center gap-3">
                 <Checkbox
-                  checked={dealType.includes(type.label)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setDealType([...dealType, type.label]);
-                    } else {
-                      setDealType(dealType.filter(item => item !== type.label));
-                    }
-                  }}
+                  id={`deal-${option}`}
+                  checked={dealType.includes(option)}
+                  onCheckedChange={() => handleDealTypeChange(option)}
                 />
-                <span className="text-xs">{type.icon} {type.label}</span>
-              </label>
+                <Label htmlFor={`deal-${option}`} className="font-normal cursor-pointer">
+                  {option}
+                </Label>
+              </div>
             ))}
           </div>
         </Card>
 
-        {/* BEST FOR SECTION - CHECKBOXES */}
+        {/* BEST FOR SECTION */}
         <Card className="p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Best For</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {[
-              { id: 'solopreneurs', label: 'Solopreneurs', icon: '👤' },
-              { id: 'startups', label: 'Startups', icon: '🚀' },
-              { id: 'smes', label: 'SMEs', icon: '🏢' },
-              { id: 'agencies', label: 'Agencies', icon: '🤝' },
-              { id: 'enterprises', label: 'Enterprises', icon: '🏭' },
-              { id: 'remote', label: 'Remote teams', icon: '🌍' },
-            ].map((target) => (
-              <label key={target.id} className="flex items-center gap-2 p-3 rounded-lg hover:bg-muted cursor-pointer border border-muted">
+          <div className="grid grid-cols-2 gap-4">
+            {BEST_FOR_OPTIONS.map((option) => (
+              <div key={option} className="flex items-center gap-3">
                 <Checkbox
-                  checked={bestFor.includes(target.label)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setBestFor([...bestFor, target.label]);
-                    } else {
-                      setBestFor(bestFor.filter(item => item !== target.label));
-                    }
-                  }}
+                  id={`best-${option}`}
+                  checked={bestFor.includes(option)}
+                  onCheckedChange={() => handleBestForChange(option)}
                 />
-                <span className="text-xs">{target.icon} {target.label}</span>
-              </label>
+                <Label htmlFor={`best-${option}`} className="font-normal cursor-pointer">
+                  {option}
+                </Label>
+              </div>
             ))}
           </div>
         </Card>
@@ -503,64 +532,29 @@ export default function AddPerk() {
           <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium mb-3 block">Claim Method</Label>
-              <div className="grid grid-cols-3 gap-4">
-                <label
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                    dealTypeSelection === "affiliate"
-                      ? "border-orange-400 bg-orange-50"
-                      : "border-border"
-                  }`}
-                >
+              <div className="space-y-3">
+                <label className="p-3 border-2 rounded-lg cursor-pointer hover:border-amber-400 transition-colors">
                   <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
-                    <div className="flex items-start gap-3">
-                      <RadioGroupItem value="affiliate" className="mt-1" />
-                      <div>
-                        <p className="font-medium text-sm">🔗 Direct Link</p>
-                        <p className="text-xs text-muted-foreground">Send to affiliate URL</p>
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <RadioGroupItem value="affiliate" />
+                      <Label className="font-normal cursor-pointer">🔗 Affiliate Link</Label>
                     </div>
                   </RadioGroup>
                 </label>
-                <label
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                    dealTypeSelection === "coupon"
-                      ? "border-orange-400 bg-orange-50"
-                      : "border-border"
-                  }`}
-                >
+                <label className="p-3 border-2 rounded-lg cursor-pointer hover:border-amber-400 transition-colors">
                   <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
-                    <div className="flex items-start gap-3">
-                      <RadioGroupItem value="coupon" className="mt-1" />
-                      <div>
-                        <p className="font-medium text-sm">🎟️ Coupon Code</p>
-                        <p className="text-xs text-muted-foreground">Code to use at checkout</p>
-                      </div>
-                    </div>
-                  </RadioGroup>
-                </label>
-                <label
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                    dealTypeSelection === "lead"
-                      ? "border-orange-400 bg-orange-50"
-                      : "border-border"
-                  }`}
-                >
-                  <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
-                    <div className="flex items-start gap-3">
-                      <RadioGroupItem value="lead" className="mt-1" />
-                      <div>
-                        <p className="font-medium text-sm">📋 Lead Capture</p>
-                        <p className="text-xs text-muted-foreground">Collect user details</p>
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <RadioGroupItem value="coupon" />
+                      <Label className="font-normal cursor-pointer">🎟️ Coupon Code</Label>
                     </div>
                   </RadioGroup>
                 </label>
               </div>
             </div>
             <div>
-              <Label className="text-sm font-medium mb-2 block">Deal URL</Label>
+              <Label className="text-sm font-medium mb-2 block">Deal URL or Code</Label>
               <Input
-                placeholder="https://..."
+                placeholder="https://... or coupon code"
                 value={formData.deal_url}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -569,20 +563,10 @@ export default function AddPerk() {
                   }))
                 }
               />
-              <p className="text-xs text-muted-foreground mt-1">Affiliate or partner link</p>
+              <p className="text-xs text-muted-foreground mt-1">Affiliate link or coupon code</p>
             </div>
           </div>
         </Card>
-
-        {/* LEAD CAPTURE FORM SECTION */}
-        {dealTypeSelection === "lead" && (
-          <Card className="p-6">
-            <LeadCaptureForm />
-            <p className="text-xs text-muted-foreground mt-4">
-              Configure fields to collect from users. Common fields: Budget, Purchase Timeline, etc.
-            </p>
-          </Card>
-        )}
 
         {/* ACTION BUTTONS */}
         <div className="flex justify-end gap-3 pt-4">
@@ -599,10 +583,10 @@ export default function AddPerk() {
             {isPending ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Creating...
+                Updating...
               </>
             ) : (
-              "Publish Perk"
+              "Update Perk"
             )}
           </Button>
         </div>
