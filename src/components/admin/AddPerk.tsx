@@ -42,6 +42,7 @@ export default function AddPerk() {
     description: "",
     category: "",
     subcategory: "",
+    perkTitle: "",
     discount: "",
     expiry: "",
     location: "Global",
@@ -342,13 +343,13 @@ export default function AddPerk() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="discount" className="text-sm font-medium mb-2 block">
+                <Label htmlFor="perkTitle" className="text-sm font-medium mb-2 block">
                   Perk Title <span className="text-destructive">*</span>
                 </Label>
                 <Input
-                  id="discount"
+                  id="perkTitle"
                   placeholder="e.g., $200 credit"
-                  value={formData.discount}
+                  value={formData.perkTitle}
                   onChange={handleInputChange}
                   required
                 />
@@ -357,7 +358,7 @@ export default function AddPerk() {
                 <Label className="text-sm font-medium mb-2 block">URL Slug</Label>
                 <Input
                   placeholder="auto-generated from title"
-                  value={(formData.discount?.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')) || ''}
+                  value={(formData.perkTitle?.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')) || ''}
                   disabled
                 />
                 <p className="text-xs text-muted-foreground mt-1">Auto-generated from title</p>
