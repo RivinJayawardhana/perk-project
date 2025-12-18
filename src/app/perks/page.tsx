@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { usePerks } from "@/hooks/usePerks";
+import { useCategories } from "@/hooks/useCategories";
+import { useSubcategories } from "@/hooks/useSubcategories";
 
-interface Perk {
+interface DisplayPerk {
   id: string;
   company: string;
   logo: string;
@@ -28,49 +31,27 @@ interface Perk {
   featured?: boolean;
 }
 
-// Mock data with new fields
-const mockPerks: Perk[] = Array.from({ length: 155 }).map((_, i) => ({
-  id: (i + 1).toString(),
-  company: ["HubFlow CRM", "WriteAI Pro", "WorkHub Spaces", "LegalEase", "DesignPro"][i % 5],
-  logo: "/api/placeholder/40/40",
-  image: [
-    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80",
-    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
-    "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80",
-    "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=400&q=80",
-    "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=400&q=80"
-  ][i % 5],
-  category: ["B2B Services", "SaaS/AI Tools", "Lifestyle", "B2B Services", "SaaS/AI Tools"][i % 5],
-  subcategory: ["Legal", "Marketing", "Workspace", "Legal", "Design"][i % 5],
-  title: ["50% off first year", "Free 3 months", "30% off coworking", "Legal Consultation", "Design Package"][i % 5],
-  description: [
-    "Get 50% off your first year of premium CRM software designed for startups.",
-    "Three months free access to AI-powered writing and content generation tools.",
-    "Discounted hot desk and dedicated desk memberships across 200+ locations.",
-    "Free initial consultation with legal experts specializing in startup law.",
-    "Complete branding package with logo, website, and marketing materials."
-  ][i % 5],
-  discount: ["50% off", "3 months free", "30% off", "Free Consult", "20% off"][i % 5],
-  validUntil: ["Jun 30, 2025", "May 15, 2025", "Dec 31, 2025", "Aug 15, 2025", "Oct 31, 2025"][i % 5],
-  location: ["Malaysia", "Singapore", "Global", "Malaysia", "Singapore"][i % 5],
-  dealTypes: [
-    ["Discount"],
-    ["Free trial", "Credits included"],
-    ["Discount", "Bundle deal"],
-    ["Free consultation"],
-    ["Discount", "Exclusive deal"]
-  ][i % 5],
-  bestFor: [
-    ["Startups", "SMEs"],
-    ["Solopreneurs", "Startups", "Agencies"],
-    ["Solopreneurs", "Remote teams"],
-    ["SMEs", "Enterprises"],
-    ["Agencies", "Startups"]
-  ][i % 5],
-  featured: i % 5 === 0,
-}));
+// Transform API perk data to display format
+const transformPerkData = (apiPerk: any): DisplayPerk => {
+  return {
+    id: apiPerk.id,
+    company: apiPerk.name || "Unknown",
+    logo: apiPerk.logo_url || "/api/placeholder/40/40",
+    image: apiPerk.image_url || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80",
+    category: apiPerk.category || "Uncategorized",
+    subcategory: apiPerk.subcategory || undefined,
+    title: apiPerk.discount || "Special Offer",
+    description: apiPerk.description || "Great deal for founders",
+    discount: apiPerk.discount || "Special",
+    validUntil: apiPerk.expiry ? new Date(apiPerk.expiry).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : "No expiry",
+    location: apiPerk.location || "Global",
+    dealTypes: apiPerk.deal_type ? apiPerk.deal_type.split(", ").filter((t: string) => t) : [],
+    bestFor: apiPerk.best_for ? apiPerk.best_for.split(", ").filter((b: string) => b) : [],
+    featured: false,
+  };
+};
 
-// Filter options
+// Static filter options
 const dealTypeOptions = [
   { label: "Free trial / Trial", count: 45 },
   { label: "Discount", count: 67 },
@@ -80,12 +61,6 @@ const dealTypeOptions = [
   { label: "Bundle deal", count: 15 },
   { label: "Exclusive deal", count: 31 },
   { label: "Intro / First-time offer", count: 12 },
-];
-
-const categoryOptions = [
-  { label: "B2B Services", count: 45 },
-  { label: "SaaS/AI Tools", count: 72 },
-  { label: "Lifestyle", count: 38 },
 ];
 
 const locationOptions = [
@@ -102,39 +77,60 @@ const bestForOptions = [
   { label: "Enterprises", count: 18 },
 ];
 
-// Subcategory options (shown when category is selected)
-const subcategoryOptions: Record<string, Array<{label: string, count: number}>> = {
-  "B2B Services": [
-    { label: "Grow Your Reach", count: 11 },
-    { label: "Handle Legal Stuff", count: 7 },
-    { label: "Manage Your Books", count: 6 },
-    { label: "Build Your Team", count: 8 },
-    { label: "Get Expert Advice", count: 5 },
-  ],
-  "SaaS/AI Tools": [
-    { label: "Design Your Brand", count: 4 },
-    { label: "Tell Your Story", count: 3 },
-    { label: "Find New Opportunities", count: 1 },
-    { label: "Marketing Automation", count: 9 },
-    { label: "Analytics & Insights", count: 7 },
-  ],
-  "Lifestyle": [
-    { label: "Workspace", count: 15 },
-    { label: "Health & Wellness", count: 8 },
-    { label: "Travel", count: 6 },
-    { label: "Food & Dining", count: 5 },
-    { label: "Entertainment", count: 4 },
-  ],
-};
-
 export default function Perks() {
+  const { data: apiPerks = [], isLoading } = usePerks();
+  const { data: categoriesData = [] } = useCategories();
+  const { data: subcategoriesData = [] } = useSubcategories();
+  const [mockPerks, setMockPerks] = useState<DisplayPerk[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<Array<{label: string, count: number}>>([]);
+  const [subcategoryOptions, setSubcategoryOptions] = useState<Record<string, Array<{label: string, count: number}>>>({});
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDealTypes, setSelectedDealTypes] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedBestFor, setSelectedBestFor] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
-  const [filteredPerks, setFilteredPerks] = useState<Perk[]>(mockPerks);
+  const [filteredPerks, setFilteredPerks] = useState<DisplayPerk[]>([]);
+
+  // Transform API perks to display format when data loads
+  useEffect(() => {
+    if (apiPerks && apiPerks.length > 0) {
+      const transformed = apiPerks.map(transformPerkData);
+      setMockPerks(transformed);
+      setFilteredPerks(transformed);
+    }
+  }, [apiPerks]);
+
+  // Build dynamic category options from fetched data
+  useEffect(() => {
+    if (categoriesData && categoriesData.length > 0) {
+      const options = categoriesData.map(cat => ({
+        label: cat.name,
+        count: cat.subcategory_count || 0
+      }));
+      setCategoryOptions(options);
+    }
+  }, [categoriesData]);
+
+  // Build dynamic subcategory options grouped by category
+  useEffect(() => {
+    if (subcategoriesData && subcategoriesData.length > 0 && categoriesData && categoriesData.length > 0) {
+      const grouped: Record<string, Array<{label: string, count: number}>> = {};
+      
+      // Group subcategories by category name
+      categoriesData.forEach(cat => {
+        grouped[cat.name] = subcategoriesData
+          .filter(sub => sub.category_id === cat.id)
+          .map(sub => ({
+            label: sub.name,
+            count: 0 // Set to 0 for now, can be calculated from perks if needed
+          }));
+      });
+      
+      setSubcategoryOptions(grouped);
+    }
+  }, [subcategoriesData, categoriesData]);
 
   const handleFilter = () => {
     let filtered = mockPerks;
@@ -193,9 +189,9 @@ export default function Perks() {
   };
 
   // Update filtered perks when any filter changes
-  useState(() => {
+  useEffect(() => {
     handleFilter();
-  });
+  }, [selectedDealTypes, selectedCategories, selectedLocations, selectedBestFor, selectedSubcategories, searchTerm, mockPerks]);
 
   const handleDealTypeChange = (dealType: string) => {
     setSelectedDealTypes(prev =>
@@ -262,7 +258,9 @@ export default function Perks() {
         <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6] border-b">
           <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-3 sm:mb-4 font-display">Discover your next perk</h1>
-            <p className="text-[#6b6f76] text-sm sm:text-base md:text-lg">Browse {mockPerks.length}+ exclusive deals on tools, services, and experiences for founders and teams.</p>
+            <p className="text-[#6b6f76] text-sm sm:text-base md:text-lg">
+              {isLoading ? "Loading exclusive deals..." : `Browse ${mockPerks.length}+ exclusive deals on tools, services, and experiences for founders and teams.`}
+            </p>
           </div>
         </section>
 
@@ -441,8 +439,26 @@ export default function Perks() {
 
           {/* Perks Grid */}
           <div className="flex-1 w-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-              {filteredPerks.slice(0, 12).map((perk) => (
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                    <div className="w-full h-40 sm:h-48 bg-gray-200 animate-pulse"></div>
+                    <div className="p-3 sm:p-4 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                      <div className="flex gap-2">
+                        <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
+                        <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredPerks.slice(0, 12).map((perk) => (
                 <div key={perk.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <img src={perk.image} alt={perk.title} className="w-full h-40 sm:h-48 object-cover" />
@@ -518,6 +534,8 @@ export default function Perks() {
                 <Button className="bg-white border border-[#e6b756] text-[#e6b756] font-semibold px-6 sm:px-8 py-2 rounded-full hover:bg-[#fffbe6] transition-colors font-display text-sm sm:text-base">
                   Load More
                 </Button>
+              </div>
+            )}
               </div>
             )}
           </div>
