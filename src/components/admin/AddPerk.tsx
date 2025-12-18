@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Upload } from "lucide-react";
+import { ArrowLeft, Upload, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,19 +18,103 @@ import { Card } from "@/components/ui/card";
 import { ImageUpload } from "@/components/perks/ImageUpload";
 import { LeadCaptureForm } from "@/components/perks/LeadCaptureForm";
 import { DealTypeAndBestForFields } from "@/components/perks/DealTypeAndBestForFields";
+import { useCreatePerk } from "@/hooks/usePerks";
+import { useCategories } from "@/hooks/useCategories";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 export default function AddPerk() {
-  const [availability, setAvailability] = useState("global");
+  const router = useRouter();
+  const { toast } = useToast();
+  const { data: categories } = useCategories();
+  const { mutate: createPerk, isPending } = useCreatePerk();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    category: "",
+    discount: "",
+    expiry: "",
+    image_url: "",
+    logo_url: "",
+    deal_type: "affiliate",
+    deal_url: "",
+    best_for: "",
+  });
+
   const [dealTypeSelection, setDealTypeSelection] = useState("affiliate");
   const [dealType, setDealType] = useState<string[]>([]);
   const [bestFor, setBestFor] = useState<string[]>([]);
 
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      category: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.name || !formData.category || !formData.discount || !formData.expiry) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createPerk(
+      {
+        name: formData.name,
+        description: formData.description,
+        category: formData.category,
+        discount: formData.discount,
+        expiry: formData.expiry,
+        image_url: formData.image_url,
+        logo_url: formData.logo_url,
+        deal_type: dealTypeSelection,
+        best_for: bestFor.join(", "),
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Success",
+            description: "Perk created successfully!",
+          });
+          router.push("/admin/perks");
+        },
+        onError: (error: any) => {
+          toast({
+            title: "Error",
+            description: error.message || "Failed to create perk",
+            variant: "destructive",
+          });
+        },
+      }
+    );
+  };
+
   return (
     <div className="p-8 max-w-4xl">
       <div className="flex items-center gap-2 mb-6">
-        <Button variant="ghost" size="icon">
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
+        <Link href="/admin/perks">
+          <Button variant="ghost" size="icon">
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+        </Link>
         <span className="text-sm text-muted-foreground">Back</span>
       </div>
 
@@ -39,29 +123,40 @@ export default function AddPerk() {
         <p className="text-muted-foreground">Fill in the details below to create a new perk for founders</p>
       </div>
 
-      <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* MEDIA SECTION */}
         <Card className="p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Media</h2>
           <div className="space-y-6">
             <div>
               <Label className="text-sm font-medium mb-2 block">Banner Image</Label>
-              <ImageUpload label="Banner Image" description="Recommended: 1200 x 400px" />
+              <Input
+                type="url"
+                placeholder="https://..."
+                value={formData.image_url}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    image_url: e.target.value,
+                  }))
+                }
+              />
+              <p className="text-xs text-muted-foreground mt-1">Recommended: 1200 x 400px</p>
             </div>
             <div>
               <Label className="text-sm font-medium mb-2 block">Company Logo</Label>
-              <div className="flex gap-4">
-                <div className="w-24 h-24 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-background">
-                  <Upload className="w-6 h-6 text-muted-foreground" />
-                </div>
-                <div className="flex-1">
-                  <Input
-                    placeholder="Paste logo URL"
-                    className="mb-1"
-                  />
-                  <p className="text-xs text-muted-foreground">Square image, min 100x100px</p>
-                </div>
-              </div>
+              <Input
+                type="url"
+                placeholder="https://..."
+                value={formData.logo_url}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    logo_url: e.target.value,
+                  }))
+                }
+              />
+              <p className="text-xs text-muted-foreground mt-1">Square image, min 100x100px</p>
             </div>
           </div>
         </Card>
@@ -72,44 +167,34 @@ export default function AddPerk() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="company" className="text-sm font-medium mb-2 block">
+                <Label htmlFor="name" className="text-sm font-medium mb-2 block">
                   Company Name <span className="text-destructive">*</span>
                 </Label>
                 <Input
-                  id="company"
+                  id="name"
                   placeholder="e.g., CloudScale"
-                  className="border-orange-400"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
               <div>
-                <Label htmlFor="category" className="text-sm font-medium mb-2 block">
+                <Label className="text-sm font-medium mb-2 block">
                   Category <span className="text-destructive">*</span>
                 </Label>
-                <Select>
-                  <SelectTrigger className="border-orange-400">
-                    <SelectValue placeholder="Cloud & Infrastructure" />
+                <Select value={formData.category} onValueChange={handleCategoryChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="cloud">Cloud & Infrastructure</SelectItem>
-                    <SelectItem value="saas">SaaS & AI Tools</SelectItem>
-                    <SelectItem value="design">Design</SelectItem>
+                    {categories?.map((cat: any) => (
+                      <SelectItem key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <div>
-              <Label htmlFor="subcategory" className="text-sm font-medium mb-2 block">
-                Subcategory
-              </Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select subcategory" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sub1">Subcategory 1</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground mt-1">Subcategories are managed in the Categories tab</p>
             </div>
           </div>
         </Card>
@@ -118,40 +203,17 @@ export default function AddPerk() {
         <Card className="p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Perk Details</h2>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="title" className="text-sm font-medium mb-2 block">
-                  Perk Title <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="title"
-                  placeholder="e.g., $200 credit"
-                />
-              </div>
-              <div>
-                <Label htmlFor="slug" className="text-sm font-medium mb-2 block">
-                  URL Slug
-                </Label>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">🔗</span>
-                  <Input
-                    id="slug"
-                    placeholder="perk-url-slug"
-                    className="flex-1"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Auto-generated from title</p>
-              </div>
-            </div>
             <div>
-              <Label htmlFor="badge" className="text-sm font-medium mb-2 block">
-                Deal Badge Text
+              <Label htmlFor="discount" className="text-sm font-medium mb-2 block">
+                Discount / Offer <span className="text-destructive">*</span>
               </Label>
               <Input
-                id="badge"
+                id="discount"
                 placeholder="e.g., $200 credit, 40% off"
+                value={formData.discount}
+                onChange={handleInputChange}
+                required
               />
-              <p className="text-xs text-muted-foreground mt-1">Short text shown on the card badge</p>
             </div>
             <div>
               <Label htmlFor="description" className="text-sm font-medium mb-2 block">
@@ -160,67 +222,29 @@ export default function AddPerk() {
               <Textarea
                 id="description"
                 placeholder="Describe the perk and what founders get..."
+                value={formData.description}
+                onChange={handleInputChange}
                 className="min-h-[120px]"
               />
             </div>
           </div>
         </Card>
 
-        {/* AVAILABILITY SECTION */}
+        {/* VALIDITY SECTION */}
         <Card className="p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Availability</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Validity</h2>
           <div className="space-y-4">
             <div>
-              <Label className="text-sm font-medium mb-3 block">
-                Available In <span className="text-destructive">*</span>
+              <Label htmlFor="expiry" className="text-sm font-medium mb-2 block">
+                Valid Until <span className="text-destructive">*</span>
               </Label>
-              <RadioGroup value={availability} onValueChange={setAvailability}>
-                <div className="flex gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <RadioGroupItem value="malaysia" />
-                    <span>Malaysia</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <RadioGroupItem value="singapore" />
-                    <span>Singapore</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <RadioGroupItem value="global" />
-                    <span>Global</span>
-                  </label>
-                </div>
-              </RadioGroup>
-              <p className="text-xs text-muted-foreground mt-2">
-                Selecting "Global" will show the perk in both Malaysia and Singapore
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="location" className="text-sm font-medium mb-2 block">
-                  Location / Region
-                </Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="global">Global</SelectItem>
-                    <SelectItem value="malaysia">Malaysia</SelectItem>
-                    <SelectItem value="singapore">Singapore</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground mt-1">Global perks appear in both Malaysia and Singapore</p>
-              </div>
-              <div>
-                <Label htmlFor="validUntil" className="text-sm font-medium mb-2 block">
-                  Valid Until
-                </Label>
-                <Input
-                  id="validUntil"
-                  type="text"
-                  placeholder="dd/mm/yyyy"
-                />
-              </div>
+              <Input
+                id="expiry"
+                type="date"
+                value={formData.expiry}
+                onChange={handleInputChange}
+                required
+              />
             </div>
           </div>
         </Card>
@@ -242,9 +266,13 @@ export default function AddPerk() {
             <div>
               <Label className="text-sm font-medium mb-3 block">Deal Type</Label>
               <div className="grid grid-cols-3 gap-4">
-                <label className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                  dealTypeSelection === "affiliate" ? "border-orange-400 bg-orange-50" : "border-border"
-                }`}>
+                <label
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+                    dealTypeSelection === "affiliate"
+                      ? "border-orange-400 bg-orange-50"
+                      : "border-border"
+                  }`}
+                >
                   <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
                     <div className="flex items-start gap-3">
                       <RadioGroupItem value="affiliate" className="mt-1" />
@@ -255,9 +283,13 @@ export default function AddPerk() {
                     </div>
                   </RadioGroup>
                 </label>
-                <label className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                  dealTypeSelection === "coupon" ? "border-orange-400 bg-orange-50" : "border-border"
-                }`}>
+                <label
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+                    dealTypeSelection === "coupon"
+                      ? "border-orange-400 bg-orange-50"
+                      : "border-border"
+                  }`}
+                >
                   <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
                     <div className="flex items-start gap-3">
                       <RadioGroupItem value="coupon" className="mt-1" />
@@ -268,9 +300,13 @@ export default function AddPerk() {
                     </div>
                   </RadioGroup>
                 </label>
-                <label className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                  dealTypeSelection === "lead" ? "border-orange-400 bg-orange-50" : "border-border"
-                }`}>
+                <label
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+                    dealTypeSelection === "lead"
+                      ? "border-orange-400 bg-orange-50"
+                      : "border-border"
+                  }`}
+                >
                   <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
                     <div className="flex items-start gap-3">
                       <RadioGroupItem value="lead" className="mt-1" />
@@ -284,12 +320,16 @@ export default function AddPerk() {
               </div>
             </div>
             <div>
-              <Label htmlFor="dealUrl" className="text-sm font-medium mb-2 block">
-                Deal URL
-              </Label>
+              <Label className="text-sm font-medium mb-2 block">Deal URL</Label>
               <Input
-                id="dealUrl"
                 placeholder="https://..."
+                value={formData.deal_url}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    deal_url: e.target.value,
+                  }))
+                }
               />
               <p className="text-xs text-muted-foreground mt-1">Affiliate or partner link</p>
             </div>
@@ -308,12 +348,27 @@ export default function AddPerk() {
 
         {/* ACTION BUTTONS */}
         <div className="flex justify-end gap-3 pt-4">
-          <Button variant="outline">Save as Draft</Button>
-          <Button className="bg-amber-400 hover:bg-amber-500 text-black">
-            Publish Perk
+          <Link href="/admin/perks">
+            <Button variant="outline" type="button">
+              Cancel
+            </Button>
+          </Link>
+          <Button
+            type="submit"
+            className="bg-amber-400 hover:bg-amber-500 text-black"
+            disabled={isPending}
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              "Publish Perk"
+            )}
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from "react";
-import { Search, Filter, MoreHorizontal, Eye, Pencil, Trash2 } from "lucide-react";
+import { Search, Filter, MoreHorizontal, Eye, Pencil, Trash2, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,76 +18,74 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { usePerks, useDeletePerk } from "@/hooks/usePerks";
+import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 interface Perk {
   id: string;
-  initial: string;
   name: string;
-  company: string;
+  description: string;
   category: string;
-  deal: string;
-  location: string;
-  validUntil: string;
-  status: "Active" | "Draft";
+  discount: string;
+  expiry: string;
+  image_url: string;
+  logo_url: string;
+  deal_type?: string;
+  best_for?: string;
+  created_at: string;
+  updated_at: string;
 }
-
-const mockPerks: Perk[] = [
-  {
-    id: "1",
-    initial: "C",
-    name: "$200 credit",
-    company: "CloudScale",
-    category: "SaaS & AI Tools",
-    deal: "$200 credit",
-    location: "Global",
-    validUntil: "Aug 20, 2025",
-    status: "Active",
-  },
-  {
-    id: "2",
-    initial: "L",
-    name: "40% off legal services",
-    company: "LegalEase",
-    category: "B2B Services",
-    deal: "40% off",
-    location: "United States",
-    validUntil: "Sep 30, 2025",
-    status: "Active",
-  },
-  {
-    id: "3",
-    initial: "D",
-    name: "Free 3-month trial",
-    company: "DesignPro",
-    category: "Design",
-    deal: "Free trial",
-    location: "Global",
-    validUntil: "Dec 31, 2025",
-    status: "Active",
-  },
-  {
-    id: "4",
-    initial: "M",
-    name: "50% off first year",
-    company: "MarketBoost",
-    category: "Marketing",
-    deal: "50% off",
-    location: "Europe",
-    validUntil: "Jul 15, 2025",
-    status: "Draft",
-  },
-];
 
 export function PerksTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const { data: perks, isLoading, error } = usePerks();
+  const { mutate: deletePerk, isPending: isDeleting } = useDeletePerk();
+  const { toast } = useToast();
 
-  const filteredPerks = mockPerks.filter((perk) => {
-    const matchesSearch = perk.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      perk.company.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || perk.status.toLowerCase() === statusFilter;
-    return matchesSearch && matchesStatus;
+  const filteredPerks = (perks || []).filter((perk: Perk) => {
+    const matchesSearch = 
+      perk.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      perk.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
   });
+
+  const handleDelete = (id: string) => {
+    deletePerk(id, {
+      onSuccess: () => {
+        toast({ title: "Perk deleted successfully" });
+      },
+      onError: () => {
+        toast({ 
+          title: "Failed to delete perk",
+          variant: "destructive"
+        });
+      },
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading perks...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <p className="text-destructive">Error loading perks</p>
+          <p className="text-sm text-muted-foreground">{error.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -99,17 +99,11 @@ export function PerksTable() {
             className="pl-10"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-40">
-            <Filter className="w-4 h-4 mr-2" />
-            <SelectValue placeholder="All Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-          </SelectContent>
-        </Select>
+        <Link href="/admin/perks/new">
+          <Button className="bg-primary hover:bg-primary/90">
+            + Add Perk
+          </Button>
+        </Link>
       </div>
 
       <div className="bg-card rounded-lg border overflow-hidden">
@@ -118,71 +112,69 @@ export function PerksTable() {
             <tr>
               <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Perk</th>
               <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Category</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Deal</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Location</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Valid Until</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Status</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Discount</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Expires</th>
               <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filteredPerks.map((perk) => (
-              <tr key={perk.id} className="hover:bg-muted/30 transition-colors">
-                <td className="px-4 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm">
-                      {perk.initial}
+            {filteredPerks.length > 0 ? (
+              filteredPerks.map((perk: Perk) => (
+                <tr key={perk.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm">
+                        {perk.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">{perk.name}</p>
+                        <p className="text-sm text-muted-foreground">{perk.description?.substring(0, 30)}...</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-foreground">{perk.name}</p>
-                      <p className="text-sm text-muted-foreground">{perk.company}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-4 text-sm text-foreground">{perk.category}</td>
-                <td className="px-4 py-4">
-                  <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
-                    {perk.deal}
-                  </Badge>
-                </td>
-                <td className="px-4 py-4 text-sm text-foreground">{perk.location}</td>
-                <td className="px-4 py-4 text-sm text-muted-foreground">{perk.validUntil}</td>
-                <td className="px-4 py-4">
-                  <Badge 
-                    variant={perk.status === "Active" ? "default" : "secondary"}
-                    className={perk.status === "Active" 
-                      ? "bg-success text-success-foreground" 
-                      : "bg-muted text-muted-foreground"
-                    }
-                  >
-                    {perk.status}
-                  </Badge>
-                </td>
-                <td className="px-4 py-4">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Eye className="w-4 h-4 mr-2" />
-                        View
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Pencil className="w-4 h-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-foreground">{perk.category}</td>
+                  <td className="px-4 py-4">
+                    <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
+                      {perk.discount}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-muted-foreground">
+                    {new Date(perk.expiry).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-4">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link href={`/admin/perks/${perk.id}`}>
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Edit
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="text-destructive"
+                          onClick={() => handleDelete(perk.id)}
+                          disabled={isDeleting}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          {isDeleting ? "Deleting..." : "Delete"}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                  No perks found. Create your first perk to get started!
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

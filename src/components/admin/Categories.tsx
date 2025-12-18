@@ -5,259 +5,344 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
-import { Plus, Edit2, Trash2 } from "lucide-react";
-
-interface Subcategory {
-  id: string;
-  name: string;
-}
+import { Plus, Edit2, Trash2, Loader2 } from "lucide-react";
+import { useCategories, useCreateCategory, useDeleteCategory, useUpdateCategory } from "@/hooks/useCategories";
+import { useToast } from "@/hooks/use-toast";
 
 interface Category {
   id: string;
   name: string;
   slug: string;
-  subcategories: Subcategory[];
-  createdDate: string;
+  description?: string;
+  subcategories_count?: number;
+  created_at: string;
 }
 
-const DEFAULT_CATEGORIES: Category[] = [
-  {
-    id: "1",
-    name: "Lifestyle",
-    slug: "lifestyle",
-    createdDate: "Dec 6, 2025",
-    subcategories: [
-      { id: "l1", name: "Live & Work Anywhere" },
-      { id: "l2", name: "Health & Wellbeing" },
-      { id: "l3", name: "Manage Your Money" },
-      { id: "l4", name: "Fuel Your Team" },
-      { id: "l5", name: "Community & Experiences" },
-      { id: "l6", name: "Founder Essentials" },
-    ],
-  },
-  {
-    id: "2",
-    name: "SaaS & AI Tools",
-    slug: "saas-tools",
-    createdDate: "Dec 6, 2025",
-    subcategories: [
-      { id: "s1", name: "Close More Deals" },
-      { id: "s2", name: "Market Like a Pro" },
-      { id: "s3", name: "Work Smarter Together" },
-      { id: "s4", name: "Build & Deploy Fast" },
-      { id: "s5", name: "Automate with AI" },
-      { id: "s6", name: "Stay Secure" },
-      { id: "s7", name: "Support Your Customers" },
-      { id: "s8", name: "Handle the Numbers" },
-    ],
-  },
-  {
-    id: "3",
-    name: "B2B Services",
-    slug: "b2b-services",
-    createdDate: "Dec 6, 2025",
-    subcategories: [
-      { id: "b1", name: "Grow Your Reach" },
-      { id: "b2", name: "Handle Legal Stuff" },
-      { id: "b3", name: "Manage Your Books" },
-      { id: "b4", name: "Build Your Team" },
-      { id: "b5", name: "Get Expert Advice" },
-      { id: "b6", name: "Design Your Brand" },
-      { id: "b7", name: "Tell Your Story" },
-      { id: "b8", name: "Find New Opportunities" },
-    ],
-  },
-];
-
 export default function Categories() {
-  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const { data: categories = [], isLoading } = useCategories();
+  const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
+  const { mutate: updateCategory, isPending: isUpdating } = useUpdateCategory("");
+  const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory();
+  const { toast } = useToast();
+
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategorySlug, setNewCategorySlug] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
-
-  const generateSlug = (name: string) => {
-    return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  };
+  
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editSlug, setEditSlug] = useState("");
+  const [openEditDialog, setOpenEditDialog] = useState(false);
 
   const handleAddCategory = () => {
-    if (!newCategoryName.trim()) return;
+    if (!newCategoryName.trim()) {
+      toast({
+        title: "Error",
+        description: "Category name is required",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    const slug = newCategorySlug || generateSlug(newCategoryName);
-    const newCategory: Category = {
-      id: Date.now().toString(),
-      name: newCategoryName,
-      slug,
-      subcategories: [],
-      createdDate: new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }),
-    };
+    createCategory(
+      { name: newCategoryName, slug: newCategorySlug || newCategoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') },
+      {
+        onSuccess: () => {
+          toast({ title: "Category created successfully" });
+          setNewCategoryName("");
+          setNewCategorySlug("");
+          setOpenDialog(false);
+        },
+        onError: (error: any) => {
+          toast({
+            title: "Error",
+            description: error.message || "Failed to create category",
+            variant: "destructive",
+          });
+        },
+      }
+    );
+  };
 
-    setCategories([...categories, newCategory]);
-    setNewCategoryName("");
-    setNewCategorySlug("");
-    setOpenDialog(false);
+  const handleDeleteCategoryClick = (id: string) => {
+    deleteCategory(id, {
+      onSuccess: () => {
+        toast({ title: "Category deleted successfully" });
+      },
+      onError: (error: any) => {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to delete category",
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const handleEditClick = (category: Category) => {
+    setEditingId(category.id);
+    setEditName(category.name);
+    setEditSlug(category.slug);
+    setOpenEditDialog(true);
   };
 
   const handleUpdateCategory = () => {
-    if (!editingCategory || !newCategoryName.trim()) return;
+    if (!editName.trim()) {
+      toast({
+        title: "Error",
+        description: "Category name is required",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    const slug = newCategorySlug || generateSlug(newCategoryName);
-    setCategories(
-      categories.map((c) =>
-        c.id === editingCategory.id
-          ? { ...c, name: newCategoryName, slug }
-          : c
-      )
+    if (editingId) {
+      updateCategory(
+        {
+          id: editingId,
+          data: {
+            name: editName,
+            slug: editSlug || editName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, ''),
+          },
+        },
+        {
+          onSuccess: () => {
+            toast({ title: "Category updated successfully" });
+            setOpenEditDialog(false);
+            setEditingId(null);
+          },
+          onError: (error: any) => {
+            toast({
+              title: "Error",
+              description: error.message || "Failed to update category",
+              variant: "destructive",
+            });
+          },
+        }
+      );
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading categories...</p>
+        </div>
+      </div>
     );
-    setEditingCategory(null);
-    setNewCategoryName("");
-    setNewCategorySlug("");
-    setOpenDialog(false);
-  };
-
-  const handleDeleteCategory = (id: string) => {
-    setCategories(categories.filter((c) => c.id !== id));
-  };
-
-  const handleEditCategory = (category: Category) => {
-    setEditingCategory(category);
-    setNewCategoryName(category.name);
-    setNewCategorySlug(category.slug);
-    setOpenDialog(true);
-  };
+  }
 
   return (
     <div className="p-8 max-w-7xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">Categories</h1>
-        <p className="text-muted-foreground">Manage perk categories and subcategories</p>
+        <p className="text-muted-foreground">Manage perk categories</p>
       </div>
 
       <div className="space-y-4">
-          <div className="flex justify-end mb-4">
-            <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-              <DialogTrigger asChild>
-                <Button
-                  className="bg-amber-400 hover:bg-amber-500 text-black gap-2"
-                  onClick={() => {
-                    setEditingCategory(null);
-                    setNewCategoryName("");
-                    setNewCategorySlug("");
-                  }}
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Category
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingCategory ? "Edit Category" : "Add New Category"}
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Category Name *
-                    </label>
-                    <Input
-                      placeholder="e.g., SaaS Tools"
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Slug (auto-generated)
-                    </label>
-                    <Input
-                      placeholder="saas-tools"
-                      value={newCategorySlug || generateSlug(newCategoryName)}
-                      onChange={(e) => setNewCategorySlug(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex gap-2 justify-end pt-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => setOpenDialog(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={
-                        editingCategory
-                          ? handleUpdateCategory
-                          : handleAddCategory
-                      }
-                      className="bg-amber-400 hover:bg-amber-500 text-black"
-                    >
-                      {editingCategory ? "Update" : "Add"}
-                    </Button>
-                  </div>
+        <div className="flex justify-end mb-4">
+          <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+            <DialogTrigger asChild>
+              <Button
+                className="bg-amber-400 hover:bg-amber-500 text-black gap-2"
+                onClick={() => {
+                  setNewCategoryName("");
+                  setNewCategorySlug("");
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                Add Category
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Category</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Category Name *
+                  </label>
+                  <Input
+                    placeholder="e.g., SaaS Tools"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                  />
                 </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Slug (optional)
+                  </label>
+                  <Input
+                    placeholder="auto-generated from name if empty"
+                    value={newCategorySlug}
+                    onChange={(e) => setNewCategorySlug(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {newCategorySlug || newCategoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') || 'slug-preview'}
+                  </p>
+                </div>
+                <div className="flex gap-2 justify-end pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setOpenDialog(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleAddCategory}
+                    className="bg-amber-400 hover:bg-amber-500 text-black"
+                    disabled={isCreating}
+                  >
+                    {isCreating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      "Add"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-          <div className="border rounded-lg overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-muted/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                    Slug
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                    Subcategories
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                    Created
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {categories.map((category) => (
+        <div className="border rounded-lg overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
+                  Slug
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
+                  Subcategories
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
+                  Created
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {categories.length > 0 ? (
+                categories.map((category: Category) => (
                   <tr key={category.id} className="hover:bg-muted/30">
                     <td className="px-6 py-4 text-sm font-medium">{category.name}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {category.slug}
+                      {category.slug || "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm">{category.subcategories.length}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {category.createdDate}
+                      {category.subcategories_count || 0}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {new Date(category.created_at).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleEditCategory(category)}
+                          onClick={() => handleEditClick(category)}
+                          disabled={isUpdating}
                         >
-                          <Edit2 className="w-4 h-4 text-blue-500" />
+                          <Edit2 className="w-4 h-4 text-blue-600" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleDeleteCategory(category.id)}
+                          onClick={() =>
+                            handleDeleteCategoryClick(category.id)
+                          }
+                          disabled={isDeleting}
                         >
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-6 py-8 text-center text-muted-foreground"
+                  >
+                    No categories yet. Create your first category!
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Edit Category Dialog */}
+        <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Category</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Category Name *
+                </label>
+                <Input
+                  placeholder="e.g., SaaS Tools"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Slug (optional)
+                </label>
+                <Input
+                  placeholder="auto-generated from name if empty"
+                  value={editSlug}
+                  onChange={(e) => setEditSlug(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {editSlug || editName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') || 'slug-preview'}
+                </p>
+              </div>
+              <div className="flex gap-2 justify-end pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setOpenEditDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleUpdateCategory}
+                  className="bg-amber-400 hover:bg-amber-500 text-black"
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    "Update"
+                  )}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

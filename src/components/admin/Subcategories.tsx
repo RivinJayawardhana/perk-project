@@ -5,128 +5,166 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { Plus, Edit2, Trash2, Loader2 } from "lucide-react";
+import { useSubcategories, useCreateSubcategory, useUpdateSubcategory, useDeleteSubcategory } from "@/hooks/useSubcategories";
+import { useCategories } from "@/hooks/useCategories";
+import { useToast } from "@/hooks/use-toast";
 
 interface Subcategory {
   id: string;
   name: string;
-  categoryId: string;
-  categoryName: string;
-  slug: string;
-  createdDate: string;
+  category_id: string;
+  slug?: string;
+  created_at: string;
+  categories?: {
+    id: string;
+    name: string;
+  };
 }
-
-interface Category {
-  id: string;
-  name: string;
-}
-
-const DEFAULT_CATEGORIES: Category[] = [
-  { id: "1", name: "Lifestyle" },
-  { id: "2", name: "SaaS & AI Tools" },
-  { id: "3", name: "B2B Services" },
-];
-
-const DEFAULT_SUBCATEGORIES: Subcategory[] = [
-  { id: "l1", name: "Live & Work Anywhere", categoryId: "1", categoryName: "Lifestyle", slug: "live-work-anywhere", createdDate: "Dec 6, 2025" },
-  { id: "l2", name: "Health & Wellbeing", categoryId: "1", categoryName: "Lifestyle", slug: "health-wellbeing", createdDate: "Dec 6, 2025" },
-  { id: "l3", name: "Manage Your Money", categoryId: "1", categoryName: "Lifestyle", slug: "manage-money", createdDate: "Dec 6, 2025" },
-  { id: "l4", name: "Fuel Your Team", categoryId: "1", categoryName: "Lifestyle", slug: "fuel-team", createdDate: "Dec 6, 2025" },
-  { id: "l5", name: "Community & Experiences", categoryId: "1", categoryName: "Lifestyle", slug: "community-experiences", createdDate: "Dec 6, 2025" },
-  { id: "l6", name: "Founder Essentials", categoryId: "1", categoryName: "Lifestyle", slug: "founder-essentials", createdDate: "Dec 6, 2025" },
-  { id: "s1", name: "Close More Deals", categoryId: "2", categoryName: "SaaS & AI Tools", slug: "close-deals", createdDate: "Dec 6, 2025" },
-  { id: "s2", name: "Market Like a Pro", categoryId: "2", categoryName: "SaaS & AI Tools", slug: "market-pro", createdDate: "Dec 6, 2025" },
-  { id: "s3", name: "Work Smarter Together", categoryId: "2", categoryName: "SaaS & AI Tools", slug: "work-smarter", createdDate: "Dec 6, 2025" },
-  { id: "s4", name: "Build & Deploy Fast", categoryId: "2", categoryName: "SaaS & AI Tools", slug: "build-deploy", createdDate: "Dec 6, 2025" },
-  { id: "s5", name: "Automate with AI", categoryId: "2", categoryName: "SaaS & AI Tools", slug: "automate-ai", createdDate: "Dec 6, 2025" },
-  { id: "s6", name: "Stay Secure", categoryId: "2", categoryName: "SaaS & AI Tools", slug: "stay-secure", createdDate: "Dec 6, 2025" },
-  { id: "s7", name: "Support Your Customers", categoryId: "2", categoryName: "SaaS & AI Tools", slug: "support-customers", createdDate: "Dec 6, 2025" },
-  { id: "s8", name: "Handle the Numbers", categoryId: "2", categoryName: "SaaS & AI Tools", slug: "handle-numbers", createdDate: "Dec 6, 2025" },
-  { id: "b1", name: "Grow Your Reach", categoryId: "3", categoryName: "B2B Services", slug: "grow-reach", createdDate: "Dec 6, 2025" },
-  { id: "b2", name: "Handle Legal Stuff", categoryId: "3", categoryName: "B2B Services", slug: "legal", createdDate: "Dec 6, 2025" },
-  { id: "b3", name: "Manage Your Books", categoryId: "3", categoryName: "B2B Services", slug: "manage-books", createdDate: "Dec 6, 2025" },
-  { id: "b4", name: "Build Your Team", categoryId: "3", categoryName: "B2B Services", slug: "build-team", createdDate: "Dec 6, 2025" },
-  { id: "b5", name: "Get Expert Advice", categoryId: "3", categoryName: "B2B Services", slug: "expert-advice", createdDate: "Dec 6, 2025" },
-  { id: "b6", name: "Design Your Brand", categoryId: "3", categoryName: "B2B Services", slug: "design-brand", createdDate: "Dec 6, 2025" },
-  { id: "b7", name: "Tell Your Story", categoryId: "3", categoryName: "B2B Services", slug: "tell-story", createdDate: "Dec 6, 2025" },
-  { id: "b8", name: "Find New Opportunities", categoryId: "3", categoryName: "B2B Services", slug: "find-opportunities", createdDate: "Dec 6, 2025" },
-];
 
 export default function Subcategories() {
-  const [subcategories, setSubcategories] = useState<Subcategory[]>(DEFAULT_SUBCATEGORIES);
+  const { data: subcategories = [], isLoading } = useSubcategories();
+  const { data: categories = [] } = useCategories();
+  const { mutate: createSubcategory, isPending: isCreating } = useCreateSubcategory();
+  const { mutate: updateSubcategory, isPending: isUpdating } = useUpdateSubcategory("");
+  const { mutate: deleteSubcategory, isPending: isDeleting } = useDeleteSubcategory();
+  const { toast } = useToast();
+
   const [editingSubcategory, setEditingSubcategory] = useState<Subcategory | null>(null);
   const [newSubcategoryName, setNewSubcategoryName] = useState("");
   const [newSubcategorySlug, setNewSubcategorySlug] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("1");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [openDialog, setOpenDialog] = useState(false);
 
   const generateSlug = (name: string) => {
-    return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  };
-
-  const getCategoryName = (categoryId: string) => {
-    return DEFAULT_CATEGORIES.find(c => c.id === categoryId)?.name || "";
+    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
   };
 
   const handleAddSubcategory = () => {
-    if (!newSubcategoryName.trim()) return;
+    if (!newSubcategoryName.trim()) {
+      toast({
+        title: "Error",
+        description: "Subcategory name is required",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    const slug = newSubcategorySlug || generateSlug(newSubcategoryName);
-    const newSubcategory: Subcategory = {
-      id: Date.now().toString(),
-      name: newSubcategoryName,
-      categoryId: selectedCategoryId,
-      categoryName: getCategoryName(selectedCategoryId),
-      slug,
-      createdDate: new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }),
-    };
+    if (!selectedCategoryId) {
+      toast({
+        title: "Error",
+        description: "Please select a category",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    setSubcategories([...subcategories, newSubcategory]);
-    setNewSubcategoryName("");
-    setNewSubcategorySlug("");
-    setSelectedCategoryId("1");
-    setOpenDialog(false);
+    createSubcategory(
+      {
+        name: newSubcategoryName,
+        category_id: selectedCategoryId,
+        slug: newSubcategorySlug || generateSlug(newSubcategoryName),
+      },
+      {
+        onSuccess: () => {
+          toast({ title: "Subcategory created successfully" });
+          setNewSubcategoryName("");
+          setNewSubcategorySlug("");
+          setSelectedCategoryId(categories[0]?.id || "");
+          setOpenDialog(false);
+        },
+        onError: (error: any) => {
+          toast({
+            title: "Error",
+            description: error.message || "Failed to create subcategory",
+            variant: "destructive",
+          });
+        },
+      }
+    );
   };
 
   const handleUpdateSubcategory = () => {
-    if (!editingSubcategory || !newSubcategoryName.trim()) return;
+    if (!editingSubcategory || !newSubcategoryName.trim()) {
+      toast({
+        title: "Error",
+        description: "Subcategory name is required",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    const slug = newSubcategorySlug || generateSlug(newSubcategoryName);
-    setSubcategories(
-      subcategories.map((s) =>
-        s.id === editingSubcategory.id
-          ? {
-              ...s,
-              name: newSubcategoryName,
-              categoryId: selectedCategoryId,
-              categoryName: getCategoryName(selectedCategoryId),
-              slug,
-            }
-          : s
-      )
+    if (!selectedCategoryId) {
+      toast({
+        title: "Error",
+        description: "Please select a category",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateSubcategory(
+      {
+        id: editingSubcategory.id,
+        data: {
+          name: newSubcategoryName,
+          category_id: selectedCategoryId,
+          slug: newSubcategorySlug || generateSlug(newSubcategoryName),
+        },
+      },
+      {
+        onSuccess: () => {
+          toast({ title: "Subcategory updated successfully" });
+          setEditingSubcategory(null);
+          setNewSubcategoryName("");
+          setNewSubcategorySlug("");
+          setSelectedCategoryId(categories[0]?.id || "");
+          setOpenDialog(false);
+        },
+        onError: (error: any) => {
+          toast({
+            title: "Error",
+            description: error.message || "Failed to update subcategory",
+            variant: "destructive",
+          });
+        },
+      }
     );
-    setEditingSubcategory(null);
-    setNewSubcategoryName("");
-    setNewSubcategorySlug("");
-    setSelectedCategoryId("1");
-    setOpenDialog(false);
   };
 
   const handleDeleteSubcategory = (id: string) => {
-    setSubcategories(subcategories.filter((s) => s.id !== id));
+    deleteSubcategory(id, {
+      onSuccess: () => {
+        toast({ title: "Subcategory deleted successfully" });
+      },
+      onError: (error: any) => {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to delete subcategory",
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   const handleEditSubcategory = (subcategory: Subcategory) => {
     setEditingSubcategory(subcategory);
     setNewSubcategoryName(subcategory.name);
-    setNewSubcategorySlug(subcategory.slug);
-    setSelectedCategoryId(subcategory.categoryId);
+    setNewSubcategorySlug(subcategory.slug || "");
+    setSelectedCategoryId(subcategory.category_id);
     setOpenDialog(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading subcategories...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 max-w-7xl">
@@ -145,7 +183,7 @@ export default function Subcategories() {
                   setEditingSubcategory(null);
                   setNewSubcategoryName("");
                   setNewSubcategorySlug("");
-                  setSelectedCategoryId("1");
+                  setSelectedCategoryId(categories[0]?.id || "");
                 }}
               >
                 <Plus className="w-4 h-4" />
@@ -168,7 +206,8 @@ export default function Subcategories() {
                     onChange={(e) => setSelectedCategoryId(e.target.value)}
                     className="w-full border rounded-md px-3 py-2 bg-background"
                   >
-                    {DEFAULT_CATEGORIES.map((category) => (
+                    <option value="">Select a category</option>
+                    {categories.map((category: any) => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>
@@ -209,8 +248,18 @@ export default function Subcategories() {
                         : handleAddSubcategory
                     }
                     className="bg-amber-400 hover:bg-amber-500 text-black"
+                    disabled={isCreating || isUpdating}
                   >
-                    {editingSubcategory ? "Update" : "Add"}
+                    {isCreating || isUpdating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        {editingSubcategory ? "Updating..." : "Creating..."}
+                      </>
+                    ) : editingSubcategory ? (
+                      "Update"
+                    ) : (
+                      "Add"
+                    )}
                   </Button>
                 </div>
               </div>
@@ -240,17 +289,21 @@ export default function Subcategories() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {subcategories.map((subcategory) => (
+              {subcategories.map((subcategory: Subcategory) => (
                 <tr key={subcategory.id} className="hover:bg-muted/30">
                   <td className="px-6 py-4 text-sm font-medium">{subcategory.name}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">
-                    {subcategory.categoryName}
+                    {subcategory.categories?.name || "-"}
                   </td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">
-                    {subcategory.slug}
+                    {subcategory.slug || "-"}
                   </td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">
-                    {subcategory.createdDate}
+                    {new Date(subcategory.created_at).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
@@ -258,6 +311,7 @@ export default function Subcategories() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleEditSubcategory(subcategory)}
+                        disabled={isUpdating}
                       >
                         <Edit2 className="w-4 h-4 text-blue-500" />
                       </Button>
@@ -265,6 +319,7 @@ export default function Subcategories() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDeleteSubcategory(subcategory.id)}
+                        disabled={isDeleting}
                       >
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
