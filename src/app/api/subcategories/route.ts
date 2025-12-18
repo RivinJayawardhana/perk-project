@@ -8,6 +8,7 @@ export async function GET() {
       .select(`
         id,
         name,
+        slug,
         category_id,
         created_at,
         categories(id, name, slug)
