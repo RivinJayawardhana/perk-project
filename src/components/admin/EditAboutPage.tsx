@@ -1,469 +1,474 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 
-interface Feature {
-  id: string;
-  title: string;
-  description: string;
-  iconUrl: string;
+interface AboutPageContent {
+  hero: {
+    subtitle: string;
+    title: string;
+    description: string;
+  };
+  stats: Array<{ value: string; label: string }>;
+  whatWeDo: {
+    subtitle: string;
+    title: string;
+    description: string;
+    features: Array<{ title: string; description: string }>;
+  };
+  whoWeServe: {
+    subtitle: string;
+    title: string;
+    description: string;
+    audiences: Array<{ title: string; description: string }>;
+  };
+  cta: {
+    title: string;
+    description: string;
+    buttonText: string;
+  };
 }
 
-interface Stat {
-  id: string;
-  value: string;
-  label: string;
-}
-
-interface SectionData {
-  id: string;
-  type: "hero" | "stats" | "features" | "audience" | "cta";
-  title: string;
-  subtitle: string;
-  description: string;
-  ctaText?: string;
-  ctaLink?: string;
-  stats?: Stat[];
-  features?: Feature[];
-  backgroundImage?: string;
-}
+type SectionType = "hero" | "stats" | "whatWeDo" | "whoWeServe" | "cta";
 
 export default function EditAboutPage() {
-  const [tab, setTab] = useState<"content" | "seo">("content");
-  const [sections, setSections] = useState<SectionData[]>([
-    {
-      id: "1",
-      type: "hero",
-      title: "Empowering founders to build faster",
-      subtitle: "About VentureNext",
-      description: "We believe every founder deserves access to premium tools and services without breaking the bank. That's why we built VentureNext.",
-      backgroundImage: "",
-    },
-    {
-      id: "2",
-      type: "stats",
-      title: "",
-      subtitle: "",
-      description: "",
-      stats: [
-        { id: "s1", value: "500+", label: "Exclusive Perks" },
-        { id: "s2", value: "50K+", label: "Active Users" },
-        { id: "s3", value: "$2M+", label: "Saved by Users" },
-        { id: "s4", value: "200+", label: "Partner Brands" },
-      ],
-    },
-    {
-      id: "3",
-      type: "features",
-      title: "Connecting founders with value",
-      subtitle: "What we do",
-      description: "VentureNext is the marketplace where ambition meets opportunity.",
-      features: [
-        { id: "f1", title: "Curate Premium Perks", description: "We handpick and negotiate exclusive deals with top-tier brands.", iconUrl: "" },
-        { id: "f2", title: "Build Partnerships", description: "We connect ambitious founders with brands that support growth.", iconUrl: "" },
-        { id: "f3", title: "Deliver Instant Value", description: "No complicated sign-ups. Start saving immediately.", iconUrl: "" },
-      ],
-    },
-    {
-      id: "4",
-      type: "audience",
-      title: "Built for builders",
-      subtitle: "Who we serve",
-      description: "Our community includes the most ambitious people creating the future of work.",
-      features: [
-        { id: "a1", title: "Startup Founders", description: "Early-stage to growth-stage founders looking for tools to scale.", iconUrl: "" },
-        { id: "a2", title: "Freelancers", description: "Independent professionals seeking premium services.", iconUrl: "" },
-        { id: "a3", title: "Solopreneurs", description: "Solo business owners who need enterprise-level tools.", iconUrl: "" },
-        { id: "a4", title: "Remote Teams", description: "Distributed teams looking for productivity tools.", iconUrl: "" },
-      ],
-    },
-    {
-      id: "5",
-      type: "cta",
-      title: "Ready to start saving?",
-      subtitle: "",
-      description: "Join thousands of founders already using VentureNext to unlock exclusive perks.",
-      ctaText: "Explore Perks",
-      ctaLink: "/perks",
-    },
-  ]);
+  const { toast } = useToast();
+  const [content, setContent] = useState<AboutPageContent | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [activeSection, setActiveSection] = useState<SectionType>("hero");
 
-  const [seoData, setSeoData] = useState({
-    metaTitle: "About VentureNext | Empowering Founders",
-    metaDescription: "Learn about VentureNext and how we help founders access premium tools and services.",
-    keywords: "about, founders, perks, VentureNext",
-    canonicalUrl: "/about",
-  });
+  const sections: { id: SectionType; label: string }[] = [
+    { id: "hero", label: "Hero" },
+    { id: "stats", label: "Statistics" },
+    { id: "whatWeDo", label: "What We Do" },
+    { id: "whoWeServe", label: "Who We Serve" },
+    { id: "cta", label: "Call to Action" },
+  ];
 
-  const addSection = (type: SectionData["type"]) => {
-    const newSection: SectionData = {
-      id: Date.now().toString(),
-      type,
-      title: "New Section",
-      subtitle: "",
-      description: "",
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const res = await fetch("/api/about-content");
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setContent(data);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load content",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
     };
-    setSections([...sections, newSection]);
+
+    fetchContent();
+  }, [toast]);
+
+  const handleSave = async () => {
+    if (!content) return;
+
+    setSaving(true);
+    try {
+      const res = await fetch("/api/about-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(content),
+      });
+
+      if (!res.ok) throw new Error("Failed to save");
+
+      toast({
+        title: "Success",
+        description: "About page updated successfully!",
+      });
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to save changes",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const updateSection = (id: string, updates: Partial<SectionData>) => {
-    setSections(
-      sections.map((s) => (s.id === id ? { ...s, ...updates } : s))
+  if (loading || !content) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-[#e6b756]" />
+      </div>
     );
-  };
-
-  const deleteSection = (id: string) => {
-    setSections(sections.filter((s) => s.id !== id));
-  };
-
-  const addFeature = (sectionId: string) => {
-    setSections(
-      sections.map((s) => {
-        if (s.id === sectionId) {
-          return {
-            ...s,
-            features: [
-              ...(s.features || []),
-              { id: Date.now().toString(), title: "New Feature", description: "", iconUrl: "" },
-            ],
-          };
-        }
-        return s;
-      })
-    );
-  };
-
-  const updateFeature = (sectionId: string, featureId: string, updates: Partial<Feature>) => {
-    setSections(
-      sections.map((s) => {
-        if (s.id === sectionId) {
-          return {
-            ...s,
-            features: s.features?.map((f) =>
-              f.id === featureId ? { ...f, ...updates } : f
-            ),
-          };
-        }
-        return s;
-      })
-    );
-  };
-
-  const deleteFeature = (sectionId: string, featureId: string) => {
-    setSections(
-      sections.map((s) => {
-        if (s.id === sectionId) {
-          return {
-            ...s,
-            features: s.features?.filter((f) => f.id !== featureId),
-          };
-        }
-        return s;
-      })
-    );
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="sticky top-0 bg-background border-b z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Edit About Us</h1>
-            <p className="text-sm text-muted-foreground">Customize content and SEO for /about</p>
-          </div>
-          <Button className="bg-black text-white hover:bg-black/90 gap-2">
-            💾 Save Changes
-          </Button>
+    <div className="space-y-6">
+      {/* Section Selection Tabs */}
+      <div className="border-b border-[#e5e7eb] bg-white rounded-t-xl">
+        <div className="flex gap-0">
+          {sections.map((section) => (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(section.id)}
+              className={`px-6 py-3 font-medium text-sm transition-all border-b-2 ${
+                activeSection === section.id
+                  ? "text-[#23272f] border-b-[#23272f]"
+                  : "text-[#9ca3af] border-b-transparent hover:text-[#6b7280]"
+              }`}
+            >
+              {section.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <Tabs value={tab} onValueChange={(v) => setTab(v as "content" | "seo")} className="w-full">
-          <TabsList className="mb-8">
-            <TabsTrigger value="content">Page Content</TabsTrigger>
-            <TabsTrigger value="seo">SEO Settings</TabsTrigger>
-          </TabsList>
+      {/* Hero Section Content */}
+      {activeSection === "hero" && (
+        <div className="bg-white rounded-b-xl shadow-sm p-6 border border-t-0">
+          <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Hero Section</h2>
 
-          <TabsContent value="content" className="space-y-8">
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-sm font-medium text-foreground">Add Section:</span>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={() => addSection("hero")}
-              >
-                🎨 Hero Section
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={() => addSection("stats")}
-              >
-                📊 Stats Section
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={() => addSection("features")}
-              >
-                ✨ Features
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={() => addSection("audience")}
-              >
-                👥 Audience
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={() => addSection("cta")}
-              >
-                🎯 Call to Action
-              </Button>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Subtitle</label>
+              <Input
+                value={content.hero.subtitle}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    hero: { ...content.hero, subtitle: e.target.value },
+                  })
+                }
+                placeholder="e.g., About VentureNext"
+              />
             </div>
 
-            <div className="space-y-6">
-              {sections.map((section, idx) => (
-                <Card key={section.id} className="p-6">
-                  <div className="space-y-6">
-                    {/* Section Header */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3">
-                        <GripVertical className="w-5 h-5 text-muted-foreground mt-1" />
-                        <div>
-                          <h3 className="font-semibold text-foreground capitalize">
-                            {section.type === "cta" ? "Call to Action" : section.type} Section
-                          </h3>
-                          <p className="text-sm text-muted-foreground">{section.title}</p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteSection(section.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
-                    </div>
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Title</label>
+              <Input
+                value={content.hero.title}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    hero: { ...content.hero, title: e.target.value },
+                  })
+                }
+                placeholder="e.g., Empowering founders to build faster"
+              />
+            </div>
 
-                    {/* Common Fields */}
-                    {section.type !== "stats" && (
-                      <>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-sm font-medium mb-2 block">Title</label>
-                            <Input
-                              value={section.title}
-                              onChange={(e) => updateSection(section.id, { title: e.target.value })}
-                              placeholder="Section title"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium mb-2 block">Subtitle</label>
-                            <Input
-                              value={section.subtitle}
-                              onChange={(e) => updateSection(section.id, { subtitle: e.target.value })}
-                              placeholder="Optional subtitle"
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">Description</label>
-                          <Textarea
-                            value={section.description}
-                            onChange={(e) => updateSection(section.id, { description: e.target.value })}
-                            placeholder="Section description"
-                            className="min-h-20"
-                          />
-                        </div>
-                      </>
-                    )}
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Description</label>
+              <Textarea
+                value={content.hero.description}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    hero: { ...content.hero, description: e.target.value },
+                  })
+                }
+                placeholder="Hero section description"
+                rows={3}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
-                    {/* Stats Fields */}
-                    {section.type === "stats" && section.stats && (
-                      <div>
-                        <label className="text-sm font-medium mb-3 block">Statistics</label>
-                        <div className="space-y-3">
-                          {section.stats.map((stat) => (
-                            <div key={stat.id} className="grid grid-cols-2 gap-3 p-3 border rounded bg-muted/30">
-                              <div>
-                                <label className="text-xs font-medium mb-1 block">Value</label>
-                                <Input
-                                  value={stat.value}
-                                  onChange={(e) => {
-                                    const newStats = section.stats?.map((s) =>
-                                      s.id === stat.id ? { ...s, value: e.target.value } : s
-                                    );
-                                    updateSection(section.id, { stats: newStats });
-                                  }}
-                                  placeholder="500+"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs font-medium mb-1 block">Label</label>
-                                <Input
-                                  value={stat.label}
-                                  onChange={(e) => {
-                                    const newStats = section.stats?.map((s) =>
-                                      s.id === stat.id ? { ...s, label: e.target.value } : s
-                                    );
-                                    updateSection(section.id, { stats: newStats });
-                                  }}
-                                  placeholder="Exclusive Perks"
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+      {/* Statistics Section Content */}
+      {activeSection === "stats" && (
+        <div className="bg-white rounded-b-xl shadow-sm p-6 border border-t-0">
+          <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Statistics Section</h2>
 
-                    {/* Features/Audience Fields */}
-                    {(section.type === "features" || section.type === "audience") && section.features && (
-                      <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <label className="text-sm font-medium">
-                            {section.type === "features" ? "Features" : "Audience Types"}
-                          </label>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => addFeature(section.id)}
-                          >
-                            <Plus className="w-3 h-3 mr-1" /> Add Item
-                          </Button>
-                        </div>
-                        <div className="space-y-3">
-                          {section.features.map((feature) => (
-                            <div key={feature.id} className="p-4 border rounded space-y-3 bg-muted/30">
-                              <div className="flex items-start justify-between">
-                                <Input
-                                  value={feature.title}
-                                  onChange={(e) => updateFeature(section.id, feature.id, { title: e.target.value })}
-                                  placeholder="Feature title"
-                                  className="flex-1"
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => deleteFeature(section.id, feature.id)}
-                                >
-                                  <Trash2 className="w-4 h-4 text-destructive" />
-                                </Button>
-                              </div>
-                              <Textarea
-                                value={feature.description}
-                                onChange={(e) => updateFeature(section.id, feature.id, { description: e.target.value })}
-                                placeholder="Feature description"
-                                className="min-h-16"
-                              />
-                              <div>
-                                <label className="text-xs font-medium mb-1 block">Icon URL</label>
-                                <Input
-                                  value={feature.iconUrl}
-                                  onChange={(e) => updateFeature(section.id, feature.id, { iconUrl: e.target.value })}
-                                  placeholder="https://example.com/icon.svg"
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* CTA Fields */}
-                    {section.type === "cta" && (
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">CTA Text</label>
-                          <Input
-                            value={section.ctaText || ""}
-                            onChange={(e) => updateSection(section.id, { ctaText: e.target.value })}
-                            placeholder="Button text"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">CTA Link</label>
-                          <Input
-                            value={section.ctaLink || ""}
-                            onChange={(e) => updateSection(section.id, { ctaLink: e.target.value })}
-                            placeholder="/perks"
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Background Image */}
-                    {(section.type === "hero" || section.type === "cta") && (
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Background Image (Optional)</label>
-                        <Input
-                          value={section.backgroundImage || ""}
-                          onChange={(e) => updateSection(section.id, { backgroundImage: e.target.value })}
-                          placeholder="https://example.com/bg.jpg"
-                        />
-                      </div>
-                    )}
+          <div className="space-y-4">
+            {content.stats.map((stat, idx) => (
+              <div key={idx} className="bg-[#f5f3f0] p-4 rounded-lg border">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[#23272f] mb-2">Value</label>
+                    <Input
+                      value={stat.value}
+                      onChange={(e) => {
+                        const stats = [...content.stats];
+                        stats[idx].value = e.target.value;
+                        setContent({ ...content, stats });
+                      }}
+                      placeholder="e.g., 500+"
+                    />
                   </div>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
 
-          <TabsContent value="seo" className="space-y-6">
-            <Card className="p-6 space-y-4">
-              <h3 className="font-semibold">SEO Settings</h3>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Meta Title</label>
-                <Input
-                  value={seoData.metaTitle}
-                  onChange={(e) => setSeoData({ ...seoData, metaTitle: e.target.value })}
-                  maxLength={60}
-                />
-                <p className="text-xs text-muted-foreground mt-1">{seoData.metaTitle.length}/60 characters</p>
+                  <div>
+                    <label className="block text-sm font-medium text-[#23272f] mb-2">Label</label>
+                    <Input
+                      value={stat.label}
+                      onChange={(e) => {
+                        const stats = [...content.stats];
+                        stats[idx].label = e.target.value;
+                        setContent({ ...content, stats });
+                      }}
+                      placeholder="e.g., Exclusive Perks"
+                    />
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Meta Description</label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* What We Do Section Content */}
+      {activeSection === "whatWeDo" && (
+        <div className="bg-white rounded-b-xl shadow-sm p-6 border border-t-0">
+          <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">What We Do Section</h2>
+
+          <div className="space-y-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Subtitle</label>
+              <Input
+                value={content.whatWeDo.subtitle}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    whatWeDo: { ...content.whatWeDo, subtitle: e.target.value },
+                  })
+                }
+                placeholder="e.g., What we do"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Title</label>
+              <Input
+                value={content.whatWeDo.title}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    whatWeDo: { ...content.whatWeDo, title: e.target.value },
+                  })
+                }
+                placeholder="e.g., Connecting founders with value"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Description</label>
+              <Textarea
+                value={content.whatWeDo.description}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    whatWeDo: { ...content.whatWeDo, description: e.target.value },
+                  })
+                }
+                placeholder="Section description"
+                rows={2}
+              />
+            </div>
+          </div>
+
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold text-[#23272f] mb-4">Features</h3>
+            {content.whatWeDo.features.map((feature, idx) => (
+              <div key={idx} className="bg-[#f5f3f0] p-4 rounded-lg mb-3 border">
+                <Input
+                  value={feature.title}
+                  onChange={(e) => {
+                    const features = [...content.whatWeDo.features];
+                    features[idx].title = e.target.value;
+                    setContent({
+                      ...content,
+                      whatWeDo: { ...content.whatWeDo, features },
+                    });
+                  }}
+                  placeholder="Feature title"
+                  className="mb-2"
+                />
                 <Textarea
-                  value={seoData.metaDescription}
-                  onChange={(e) => setSeoData({ ...seoData, metaDescription: e.target.value })}
-                  maxLength={160}
-                  className="min-h-20"
+                  value={feature.description}
+                  onChange={(e) => {
+                    const features = [...content.whatWeDo.features];
+                    features[idx].description = e.target.value;
+                    setContent({
+                      ...content,
+                      whatWeDo: { ...content.whatWeDo, features },
+                    });
+                  }}
+                  placeholder="Feature description"
+                  rows={2}
                 />
-                <p className="text-xs text-muted-foreground mt-1">{seoData.metaDescription.length}/160 characters</p>
               </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Keywords</label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Who We Serve Section Content */}
+      {activeSection === "whoWeServe" && (
+        <div className="bg-white rounded-b-xl shadow-sm p-6 border border-t-0">
+          <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Who We Serve Section</h2>
+
+          <div className="space-y-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Subtitle</label>
+              <Input
+                value={content.whoWeServe.subtitle}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    whoWeServe: { ...content.whoWeServe, subtitle: e.target.value },
+                  })
+                }
+                placeholder="e.g., Who we serve"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Title</label>
+              <Input
+                value={content.whoWeServe.title}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    whoWeServe: { ...content.whoWeServe, title: e.target.value },
+                  })
+                }
+                placeholder="e.g., Built for builders"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Description</label>
+              <Textarea
+                value={content.whoWeServe.description}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    whoWeServe: { ...content.whoWeServe, description: e.target.value },
+                  })
+                }
+                placeholder="Section description"
+                rows={2}
+              />
+            </div>
+          </div>
+
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold text-[#23272f] mb-4">Audiences</h3>
+            {content.whoWeServe.audiences.map((audience, idx) => (
+              <div key={idx} className="bg-[#f5f3f0] p-4 rounded-lg mb-3 border">
                 <Input
-                  value={seoData.keywords}
-                  onChange={(e) => setSeoData({ ...seoData, keywords: e.target.value })}
-                  placeholder="keyword1, keyword2, keyword3"
+                  value={audience.title}
+                  onChange={(e) => {
+                    const audiences = [...content.whoWeServe.audiences];
+                    audiences[idx].title = e.target.value;
+                    setContent({
+                      ...content,
+                      whoWeServe: { ...content.whoWeServe, audiences },
+                    });
+                  }}
+                  placeholder="Audience title"
+                  className="mb-2"
+                />
+                <Textarea
+                  value={audience.description}
+                  onChange={(e) => {
+                    const audiences = [...content.whoWeServe.audiences];
+                    audiences[idx].description = e.target.value;
+                    setContent({
+                      ...content,
+                      whoWeServe: { ...content.whoWeServe, audiences },
+                    });
+                  }}
+                  placeholder="Audience description"
+                  rows={2}
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Canonical URL</label>
-                <Input
-                  value={seoData.canonicalUrl}
-                  onChange={(e) => setSeoData({ ...seoData, canonicalUrl: e.target.value })}
-                  placeholder="/about"
-                />
-              </div>
-            </Card>
-          </TabsContent>
-        </Tabs>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* CTA Section Content */}
+      {activeSection === "cta" && (
+        <div className="bg-white rounded-b-xl shadow-sm p-6 border border-t-0">
+          <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Call to Action Section</h2>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Title</label>
+              <Input
+                value={content.cta.title}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    cta: { ...content.cta, title: e.target.value },
+                  })
+                }
+                placeholder="e.g., Ready to start saving?"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Description</label>
+              <Textarea
+                value={content.cta.description}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    cta: { ...content.cta, description: e.target.value },
+                  })
+                }
+                placeholder="CTA description"
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Button Text</label>
+              <Input
+                value={content.cta.buttonText}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    cta: { ...content.cta, buttonText: e.target.value },
+                  })
+                }
+                placeholder="e.g., Explore Perks"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex justify-end gap-3 pt-6">
+        <Button
+          variant="outline"
+          onClick={() => window.location.reload()}
+          disabled={saving}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          className="bg-[#e6b756] text-[#1a2233]"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save Changes"
+          )}
+        </Button>
       </div>
     </div>
   );
