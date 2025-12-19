@@ -15,7 +15,7 @@ import { Loader2 } from "lucide-react";
 
 interface EditPostProps {
   params: Promise<{
-    slug: string;
+    id: string;
   }>;
 }
 
@@ -23,7 +23,7 @@ export default function EditPost({ params }: EditPostProps) {
   const router = useRouter();
   const { toast } = useToast();
   const resolvedParams = React.use(params);
-  const { data: journal, isLoading: isLoadingJournal } = useJournal(resolvedParams.slug);
+  const { data: journal, isLoading: isLoadingJournal } = useJournal(resolvedParams.id);
   const updateJournalMutation = useUpdateJournal(journal?.id || "");
   
   const [tab, setTab] = useState<"content" | "seo">("content");

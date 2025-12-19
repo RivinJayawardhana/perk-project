@@ -53,7 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </button>
               {frontendOpen && (
                 <ul className="space-y-1 mt-2 ml-2">
-                  <li><a href="/admin/pages/homepage" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Home className="w-5 h-5" />Homepage</span></a></li>
+                  <li><a href="/admin/home" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Home className="w-5 h-5" />Homepage</span></a></li>
                   <li><a href="/admin/pages/about" className={`block px-3 py-2 rounded-lg transition duration-150 font-medium ${isActive('/admin/pages/about') ? 'text-[#e6b756] bg-[#23272f]' : 'text-white hover:bg-[#23272f] hover:text-white'}`}>
                     <span className="flex items-center gap-3"><Info className={`w-5 h-5 ${isActive('/admin/pages/about') ? 'text-[#e6b756]' : ''}`} />About Us</span></a></li>
                   <li><a href="/admin/pages/perks" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Tag className="w-5 h-5" />Perks Page</span></a></li>
