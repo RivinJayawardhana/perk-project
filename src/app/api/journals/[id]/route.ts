@@ -8,17 +8,24 @@ const supabase = createClient(
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { id } = await params;
 
     // Try to fetch by ID first, then by slug
-    const { data, error } = await supabase
+    let query = supabase
       .from("journals")
-      .select("*")
-      .or(`id.eq.${slug},slug.eq.${slug}`)
-      .single();
+      .select("*");
+
+    // Check if it looks like a UUID (36 chars with hyphens) or a slug
+    if (id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+      query = query.eq("id", id);
+    } else {
+      query = query.eq("slug", id);
+    }
+
+    const { data, error } = await query.single();
 
     if (error && error.code !== "PGRST116") throw error;
     if (!data)
@@ -29,7 +36,7 @@ export async function GET(
 
     return NextResponse.json(data);
   } catch (error: any) {
-    console.error("GET /api/journals/[slug] error:", error);
+    console.error("GET /api/journals/[id] error:", error);
     return NextResponse.json(
       { error: error.message },
       { status: 500 }
@@ -39,23 +46,28 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { id } = await params;
     const body = await req.json();
+
+    // Check if it looks like a UUID or a slug
+    const whereClause = id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+      ? { id }
+      : { slug: id };
 
     const { data, error } = await supabase
       .from("journals")
       .update(body)
-      .eq("id", slug)
+      .match(whereClause)
       .select()
       .single();
 
     if (error) throw error;
     return NextResponse.json(data);
   } catch (error: any) {
-    console.error("PUT /api/journals/[slug] error:", error);
+    console.error("PUT /api/journals/[id] error:", error);
     return NextResponse.json(
       { error: error.message },
       { status: 500 }
@@ -65,20 +77,25 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { id } = await params;
+
+    // Check if it looks like a UUID or a slug
+    const whereClause = id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+      ? { id }
+      : { slug: id };
 
     const { error } = await supabase
       .from("journals")
       .delete()
-      .eq("id", slug);
+      .match(whereClause);
 
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error("DELETE /api/journals/[slug] error:", error);
+    console.error("DELETE /api/journals/[id] error:", error);
     return NextResponse.json(
       { error: error.message },
       { status: 500 }
