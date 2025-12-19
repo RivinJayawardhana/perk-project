@@ -13,6 +13,10 @@ import Footer from "@/components/Footer";
 import { usePerks } from "@/hooks/usePerks";
 import { useCategories } from "@/hooks/useCategories";
 import { useSubcategories } from "@/hooks/useSubcategories";
+import { LeadFormModal } from "@/components/perks/LeadFormModal";
+import { useLeadForm } from "@/hooks/useLeadForms";
+import { useSubmitLead } from "@/hooks/useLeadForms";
+import { useToast } from "@/hooks/use-toast";
 
 interface DisplayPerk {
   id: string;
@@ -81,6 +85,9 @@ export default function Perks() {
   const { data: apiPerks = [], isLoading } = usePerks();
   const { data: categoriesData = [] } = useCategories();
   const { data: subcategoriesData = [] } = useSubcategories();
+  const { toast } = useToast();
+  const submitLeadMutation = useSubmitLead();
+  
   const [mockPerks, setMockPerks] = useState<DisplayPerk[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<Array<{label: string, count: number}>>([]);
   const [subcategoryOptions, setSubcategoryOptions] = useState<Record<string, Array<{label: string, count: number}>>>({});
@@ -92,6 +99,13 @@ export default function Perks() {
   const [selectedBestFor, setSelectedBestFor] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [filteredPerks, setFilteredPerks] = useState<DisplayPerk[]>([]);
+  
+  // Lead form modal state
+  const [leadFormModal, setLeadFormModal] = useState<{ isOpen: boolean; perkId: string | null }>({
+    isOpen: false,
+    perkId: null,
+  });
+  const { data: currentLeadForm } = useLeadForm(leadFormModal.perkId);
 
   // Transform API perks to display format when data loads
   useEffect(() => {
@@ -249,6 +263,59 @@ export default function Perks() {
     selectedLocations.length + 
     selectedBestFor.length + 
     selectedSubcategories.length;
+
+  const handleGetDeal = (perk: DisplayPerk) => {
+    const dealTypes = perk.dealTypes || [];
+    const hasDealType = (type: string) => {
+      return dealTypes.some(d => d.toLowerCase().includes(type.toLowerCase())) ||
+             (perk as any).deal_type?.toLowerCase().includes(type.toLowerCase());
+    };
+
+    if (hasDealType("lead")) {
+      setLeadFormModal({ isOpen: true, perkId: perk.id });
+    } else if (hasDealType("affiliate")) {
+      toast({
+        title: "Redirecting...",
+        description: "Opening affiliate link",
+      });
+    } else if (hasDealType("coupon")) {
+      toast({
+        title: "Coupon Code",
+        description: "Show coupon code modal or copy to clipboard",
+      });
+    } else {
+      toast({
+        title: "Get Deal",
+        description: "Deal information",
+      });
+    }
+  };
+
+  const handleLeadFormSubmit = async (formData: Record<string, any>) => {
+    if (!leadFormModal.perkId || !currentLeadForm) return;
+
+    try {
+      await submitLeadMutation.mutateAsync({
+        perk_id: leadFormModal.perkId,
+        lead_form_id: currentLeadForm.id,
+        form_data: formData,
+        email_address: formData.email || "",
+      });
+      
+      toast({
+        title: "Success!",
+        description: "Your information has been submitted.",
+      });
+      
+      setLeadFormModal({ isOpen: false, perkId: null });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit form. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <>
@@ -519,7 +586,9 @@ export default function Perks() {
                         </svg>
                         Valid until {perk.validUntil}
                       </span>
-                      <Button className="bg-[#e6b756] text-[#1a2233] font-semibold px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm hover:bg-[#f5d488] transition-colors font-display w-full sm:w-auto">
+                      <Button 
+                        onClick={() => handleGetDeal(perk)}
+                        className="bg-[#e6b756] text-[#1a2233] font-semibold px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm hover:bg-[#f5d488] transition-colors font-display w-full sm:w-auto">
                         Get Deal
                       </Button>
                     </div>
@@ -542,6 +611,23 @@ export default function Perks() {
         </div>
         </section>
       </main>
+      
+      {/* Lead Form Modal */}
+      {leadFormModal.isOpen && (
+        <LeadFormModal
+          isOpen={leadFormModal.isOpen}
+          onClose={() => setLeadFormModal({ isOpen: false, perkId: null })}
+          perkName={mockPerks.find((p) => p.id === leadFormModal.perkId)?.company || "Perk"}
+          formFields={currentLeadForm?.form_fields && currentLeadForm.form_fields.length > 0 
+            ? currentLeadForm.form_fields 
+            : [
+                { id: "1", name: "name", label: "Full Name", type: "text", required: true, placeholder: "Enter your name" },
+                { id: "2", name: "email", label: "Email", type: "email", required: true, placeholder: "you@company.com" },
+              ]}
+          onSubmit={handleLeadFormSubmit}
+        />
+      )}
+      
       <Footer />
     </>
   );

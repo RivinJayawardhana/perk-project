@@ -23,9 +23,25 @@ import { useCreatePerk } from "@/hooks/usePerks";
 import { useCategories } from "@/hooks/useCategories";
 import { useSubcategories } from "@/hooks/useSubcategories";
 import { useImageUpload } from "@/hooks/useImageUpload";
+import { useCreateLeadForm } from "@/hooks/useLeadForms";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+
+interface FormField {
+  id: string;
+  name: string;
+  label: string;
+  type: "text" | "email" | "phone" | "number" | "textarea" | "checkbox";
+  placeholder: string;
+  required: boolean;
+}
+
+const defaultLeadFormFields: FormField[] = [
+  { id: "1", name: "full_name", label: "Full Name", type: "text", placeholder: "Enter your name", required: true },
+  { id: "2", name: "email", label: "Email", type: "email", placeholder: "you@company.com", required: true },
+  { id: "3", name: "phone", label: "Phone", type: "phone", placeholder: "+1234567890", required: false },
+];
 
 export default function AddPerk() {
   const router = useRouter();
@@ -33,6 +49,7 @@ export default function AddPerk() {
   const { data: categories } = useCategories();
   const { data: allSubcategories } = useSubcategories();
   const { mutate: createPerk, isPending } = useCreatePerk();
+  const createLeadFormMutation = useCreateLeadForm();
   const { upload, isUploading } = useImageUpload();
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -53,6 +70,8 @@ export default function AddPerk() {
     best_for: "",
     status: "Active",
   });
+
+  const [leadFormFields, setLeadFormFields] = useState<FormField[]>(defaultLeadFormFields);
 
   const [dealTypeSelection, setDealTypeSelection] = useState("affiliate");
   const [dealType, setDealType] = useState<string[]>([]);
@@ -137,6 +156,15 @@ export default function AddPerk() {
       return;
     }
 
+    // Map dealTypeSelection to the proper format
+    const dealTypeMap: Record<string, string> = {
+      affiliate: "affiliate_link",
+      coupon: "coupon_code",
+      lead: "lead_capture_form",
+    };
+    
+    const selectedDealType = dealTypeMap[dealTypeSelection] || dealTypeSelection;
+
     createPerk(
       {
         name: formData.name,
@@ -147,16 +175,56 @@ export default function AddPerk() {
         location: formData.location,
         image_url: formData.image_url,
         logo_url: formData.logo_url,
-        deal_type: dealType.join(", "),
+        deal_type: selectedDealType,
         best_for: bestFor.join(", "),
         status: formData.status,
       },
       {
-        onSuccess: () => {
-          toast({
-            title: "Success",
-            description: "Perk created successfully!",
-          });
+        onSuccess: async (createdPerk: any) => {
+          console.log("Created perk response:", createdPerk);
+          // If lead capture form is selected, save the form configuration
+          if (dealTypeSelection === "lead") {
+            if (leadFormFields.length === 0) {
+              toast({
+                title: "Warning",
+                description: "Lead form created but no fields configured. Add fields to the lead form.",
+                variant: "destructive",
+              });
+              return;
+            }
+
+            try {
+              const perkId = createdPerk?.id || createdPerk?.[0]?.id;
+              if (!perkId) {
+                throw new Error("Perk created but no ID returned from API");
+              }
+              await createLeadFormMutation.mutateAsync({
+                perk_id: perkId,
+                form_fields: leadFormFields,
+                submit_button_text: "Submit",
+                success_message: "Thank you! We'll contact you soon.",
+              });
+              
+              toast({
+                title: "Success",
+                description: "Perk created with lead form successfully!",
+              });
+            } catch (error: any) {
+              const errorMessage = error?.message || "Unknown error occurred";
+              console.error("Failed to save lead form:", error);
+              toast({
+                title: "Warning",
+                description: `Perk created but lead form failed: ${errorMessage}`,
+                variant: "destructive",
+              });
+            }
+          } else {
+            toast({
+              title: "Success",
+              description: "Perk created successfully!",
+            });
+          }
+
           router.push("/admin/perks");
         },
         onError: (error: any) => {
@@ -578,9 +646,10 @@ export default function AddPerk() {
         {/* LEAD CAPTURE FORM SECTION */}
         {dealTypeSelection === "lead" && (
           <Card className="p-6">
-            <LeadCaptureForm />
+            <h3 className="text-lg font-semibold mb-4">Lead Capture Form Configuration</h3>
+            <LeadCaptureForm value={leadFormFields} onChange={setLeadFormFields} />
             <p className="text-xs text-muted-foreground mt-4">
-              Configure fields to collect from users. Common fields: Budget, Purchase Timeline, etc.
+              Configure fields to collect from users. These fields will appear when users click "Get Deal".
             </p>
           </Card>
         )}
