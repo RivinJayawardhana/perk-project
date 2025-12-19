@@ -25,7 +25,6 @@ import {
   Redo,
   HelpCircle,
   Code,
-  Image,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -109,22 +108,6 @@ export function RichTextEditor({
     <div className="border rounded-lg overflow-hidden">
       {/* Toolbar */}
       <div className="bg-muted/50 border-b p-2 space-y-2">
-        {/* Row 1 */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="gap-2 text-xs"
-            onClick={() => {
-              // Add media functionality
-            }}
-          >
-            <Image className="w-4 h-4" />
-            Add Media
-          </Button>
-        </div>
-
         {/* Row 2 - Formatting */}
         <div className="flex items-center gap-1 flex-wrap border-t border-border pt-2">
           <Select defaultValue="paragraph">
