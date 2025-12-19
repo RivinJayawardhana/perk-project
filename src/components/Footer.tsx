@@ -20,8 +20,7 @@ export default function Footer() {
           />
           <button
             type="submit"
-            className="px-8 py-3 rounded-lg font-semibold text-white whitespace-nowrap"
-            style={{ background: 'linear-gradient(90deg, #e6b756 0%, #7d5f0aff 100%)' }}
+            className="px-8 py-3 rounded-lg font-semibold text-white whitespace-nowrap bg-[#e6b756] hover:bg-[#f5d488]"
           >
             Subscribe
           </button>

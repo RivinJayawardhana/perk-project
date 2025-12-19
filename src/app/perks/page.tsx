@@ -17,6 +17,14 @@ import { LeadFormModal } from "@/components/perks/LeadFormModal";
 import { useLeadForm } from "@/hooks/useLeadForms";
 import { useSubmitLead } from "@/hooks/useLeadForms";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+
+interface PerksPageContent {
+  hero: {
+    title: string;
+    description: string;
+  };
+}
 
 interface DisplayPerk {
   id: string;
@@ -88,6 +96,8 @@ export default function Perks() {
   const { toast } = useToast();
   const submitLeadMutation = useSubmitLead();
   
+  const [pageContent, setPageContent] = useState<PerksPageContent | null>(null);
+  const [contentLoading, setContentLoading] = useState(true);
   const [mockPerks, setMockPerks] = useState<DisplayPerk[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<Array<{label: string, count: number}>>([]);
   const [subcategoryOptions, setSubcategoryOptions] = useState<Record<string, Array<{label: string, count: number}>>>({});
@@ -106,6 +116,24 @@ export default function Perks() {
     perkId: null,
   });
   const { data: currentLeadForm } = useLeadForm(leadFormModal.perkId);
+  
+  useEffect(() => {
+    const fetchPageContent = async () => {
+      try {
+        const res = await fetch("/api/perks-content");
+        if (res.ok) {
+          const data = await res.json();
+          setPageContent(data);
+        }
+      } catch (error) {
+        console.error("Error fetching perks page content:", error);
+      } finally {
+        setContentLoading(false);
+      }
+    };
+
+    fetchPageContent();
+  }, []);
 
   // Transform API perks to display format when data loads
   useEffect(() => {
@@ -324,9 +352,11 @@ export default function Perks() {
         {/* Hero Section */}
         <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6] border-b">
           <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-3 sm:mb-4 font-display">Discover your next perk</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-3 sm:mb-4 font-display">
+              {contentLoading ? "Discover your next perk" : pageContent?.hero.title || "Discover your next perk"}
+            </h1>
             <p className="text-[#6b6f76] text-sm sm:text-base md:text-lg">
-              {isLoading ? "Loading exclusive deals..." : `Browse ${mockPerks.length}+ exclusive deals on tools, services, and experiences for founders and teams.`}
+              {isLoading ? "Loading exclusive deals..." : pageContent?.hero.description || `Browse ${mockPerks.length}+ exclusive deals on tools, services, and experiences for founders and teams.`}
             </p>
           </div>
         </section>

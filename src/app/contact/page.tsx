@@ -1,12 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Loader2 } from "lucide-react";
+
+interface ContactPageContent {
+  hero: {
+    subtitle: string;
+    title: string;
+    description: string;
+  };
+}
 
 export default function Contact() {
+  const [pageContent, setPageContent] = useState<ContactPageContent | null>(null);
+  const [contentLoading, setContentLoading] = useState(true);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -15,6 +26,24 @@ export default function Contact() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    const fetchPageContent = async () => {
+      try {
+        const res = await fetch("/api/contact-content");
+        if (res.ok) {
+          const data = await res.json();
+          setPageContent(data);
+        }
+      } catch (error) {
+        console.error("Error fetching contact page content:", error);
+      } finally {
+        setContentLoading(false);
+      }
+    };
+
+    fetchPageContent();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -35,13 +64,14 @@ export default function Contact() {
       {/* Hero Section */}
       <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6]">
         <div className="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <div className="text-[#e6b756] font-semibold mb-2 text-sm sm:text-base font-display">Contact us</div>
+          <div className="text-[#e6b756] font-semibold mb-2 text-sm sm:text-base font-display">
+            {contentLoading ? "Contact us" : pageContent?.hero.subtitle || "Contact us"}
+          </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 font-display">
-            We'd love to hear from you
+            {contentLoading ? "We'd love to hear from you" : pageContent?.hero.title || "We'd love to hear from you"}
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-[#6b6f76]">
-            Whether you have a question about perks, partnerships, or anything else
-            <br />—our team is ready to help.
+            {contentLoading ? "Loading..." : pageContent?.hero.description || "Whether you have a question about perks, partnerships, or anything else—our team is ready to help."}
           </p>
         </div>
       </section>
