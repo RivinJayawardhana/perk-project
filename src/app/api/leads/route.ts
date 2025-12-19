@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
 
     let query = supabase
       .from("leads")
-      .select("leads.*, perks(name)")
+      .select("*, perks(name)")
       .order("submission_timestamp", { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
     if (error) throw error;
     return NextResponse.json(data);
   } catch (error: any) {
+    console.error("GET /api/leads error:", error);
     return NextResponse.json(
       { error: error.message },
       { status: 500 }

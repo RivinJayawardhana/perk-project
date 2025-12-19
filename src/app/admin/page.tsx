@@ -1,6 +1,12 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import Dashboard from "@/components/admin/Dashboard";
+import AdminLayout from "@/components/AdminLayout";
 
 export default function AdminRoot() {
-  redirect("/admin/journal/new");
-  return null;
+  return (
+    <AdminLayout>
+      <Dashboard />
+    </AdminLayout>
+  );
 }
