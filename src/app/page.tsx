@@ -127,7 +127,7 @@ function HomeContent() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {featuredDeals.map((perk) => (
+          {featuredDeals.map((perk: any) => (
             <div key={perk.id} className="bg-white rounded-2xl border shadow-sm p-4 sm:p-5 flex flex-col h-full relative">
               <img src={perk.image_url || "/images/placeholder.jpg"} alt={perk.name} className="w-full h-28 sm:h-32 object-cover rounded-xl mb-3 sm:mb-4" />
               <div className="flex items-center gap-2 mb-2">

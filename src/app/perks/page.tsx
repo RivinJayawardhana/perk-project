@@ -147,7 +147,7 @@ export default function Perks() {
   // Build dynamic category options from fetched data
   useEffect(() => {
     if (categoriesData && categoriesData.length > 0) {
-      const options = categoriesData.map(cat => ({
+      const options = categoriesData.map((cat: any) => ({
         label: cat.name,
         count: cat.subcategory_count || 0
       }));
@@ -161,10 +161,10 @@ export default function Perks() {
       const grouped: Record<string, Array<{label: string, count: number}>> = {};
       
       // Group subcategories by category name
-      categoriesData.forEach(cat => {
+      categoriesData.forEach((cat: any) => {
         grouped[cat.name] = subcategoriesData
-          .filter(sub => sub.category_id === cat.id)
-          .map(sub => ({
+          .filter((sub: any) => sub.category_id === cat.id)
+          .map((sub: any) => ({
             label: sub.name,
             count: 0 // Set to 0 for now, can be calculated from perks if needed
           }));
