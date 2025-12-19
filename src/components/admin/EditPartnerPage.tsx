@@ -1,242 +1,436 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { Plus, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
-interface Section {
-  id: string;
-  type: string;
-  title: string;
-  subtitle: string;
-  content: string;
-  imageUrl: string;
-  iconUrl: string;
-  ctaText: string;
-  ctaLink: string;
-  items: Array<{ label: string; description: string }>;
+interface PartnerContent {
+  hero: {
+    subtitle: string;
+    title: string;
+    description: string;
+    buttonText: string;
+  };
+  benefits: {
+    subtitle: string;
+    title: string;
+    cards: Array<{ title: string; description: string }>;
+  };
+  process: {
+    subtitle: string;
+    title: string;
+    steps: Array<{ step: string; title: string; description: string }>;
+  };
+  form: {
+    subtitle: string;
+    title: string;
+    description: string;
+  };
 }
 
+type SectionType = "hero" | "benefits" | "process" | "form";
+
 export default function EditPartnerPage() {
-  const [sections, setSections] = useState<Section[]>([
-    {
-      id: "1",
-      type: "Hero",
-      title: "Reach the founders building tomorrow",
-      subtitle: "Partner with us",
-      content: "Join 200+ brands offering exclusive perks to our community of 50,000+ founders, freelancers, and remote teams.",
-      imageUrl: "",
-      iconUrl: "",
-      ctaText: "Become a Partner",
-      ctaLink: "#apply",
-      items: [],
-    },
-    {
-      id: "2",
-      type: "Benefits",
-      title: "Benefits for your brand",
-      subtitle: "Why partner with us",
-      content: "Grow your business by reaching our engaged audience.",
-      imageUrl: "",
-      iconUrl: "",
-      ctaText: "",
-      ctaLink: "",
-      items: [
-        { label: "Reach Decision Makers", description: "Connect with founders and team leads." },
-        { label: "Drive Conversions", description: "Our audience is ready to buy." },
-        { label: "Build Brand Loyalty", description: "Create lasting relationships." },
-        { label: "Global Exposure", description: "Reach a worldwide audience." },
-      ],
-    },
-    {
-      id: "3",
-      type: "Process",
-      title: "Simple partnership process",
-      subtitle: "How it works",
-      content: "Get started in 4 easy steps.",
-      imageUrl: "",
-      iconUrl: "",
-      ctaText: "",
-      ctaLink: "",
-      items: [
-        { label: "Apply", description: "Fill out the form with your offer details." },
-        { label: "Review", description: "We review within 24 hours." },
-        { label: "Launch", description: "Your perk goes live to our audience." },
-        { label: "Grow", description: "Track and optimize performance." },
-      ],
-    },
-  ]);
+  const { toast } = useToast();
+  const [content, setContent] = useState<PartnerContent | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [activeSection, setActiveSection] = useState<SectionType>("hero");
 
-  const addSection = () => {
-    const newSection: Section = {
-      id: Date.now().toString(),
-      type: "Custom",
-      title: "New Section",
-      subtitle: "",
-      content: "",
-      imageUrl: "",
-      iconUrl: "",
-      ctaText: "",
-      ctaLink: "",
-      items: [],
-    };
-    setSections([...sections, newSection]);
+  const sections: { id: SectionType; label: string }[] = [
+    { id: "hero", label: "Hero" },
+    { id: "benefits", label: "Benefits" },
+    { id: "process", label: "Process" },
+    { id: "form", label: "Form" },
+  ];
+
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  const fetchContent = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/partner-content");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      setContent(data);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to load content",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateSection = (id: string, updates: Partial<Section>) => {
-    setSections(
-      sections.map((section) =>
-        section.id === id ? { ...section, ...updates } : section
-      )
+  const handleSave = async () => {
+    if (!content) return;
+
+    try {
+      setSaving(true);
+      const res = await fetch("/api/partner-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(content),
+      });
+
+      if (!res.ok) throw new Error("Failed to save content");
+
+      toast({
+        title: "Success",
+        description: "Partner page updated successfully!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save changes",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading || !content) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="w-8 h-8 animate-spin text-[#e6b756]" />
+          <p className="text-[#6b6f76]">Loading partner page content...</p>
+        </div>
+      </div>
     );
-  };
-
-  const deleteSection = (id: string) => {
-    setSections(sections.filter((section) => section.id !== id));
-  };
+  }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Edit Partner Page</h1>
-        <p className="text-muted-foreground">Manage sections, content, images, icons, and items for your partner page</p>
+    <div className="space-y-6">
+      {/* Section Selection Tabs */}
+      <div className="border-b border-[#e5e7eb] bg-white rounded-t-xl">
+        <div className="flex gap-0">
+          {sections.map((section) => (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(section.id)}
+              className={`px-6 py-3 font-medium text-sm transition-all border-b-2 ${
+                activeSection === section.id
+                  ? "text-[#23272f] border-b-[#23272f]"
+                  : "text-[#9ca3af] border-b-transparent hover:text-[#6b7280]"
+              }`}
+            >
+              {section.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="space-y-4 mb-6">
-        {sections.map((section) => (
-          <Card key={section.id} className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">{section.type}</h3>
-                  <p className="text-sm text-muted-foreground">{section.title}</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => deleteSection(section.id)}
-                >
-                  <Trash2 className="w-4 h-4 text-destructive" />
-                </Button>
-              </div>
+      {/* Hero Section Content */}
+      {activeSection === "hero" && (
+        <div className="bg-white rounded-b-xl shadow-sm p-6 border border-t-0">
+          <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Hero Section</h2>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium mb-1 block">Section Type</label>
-                  <Input
-                    value={section.type}
-                    onChange={(e) => updateSection(section.id, { type: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">Title</label>
-                  <Input
-                    value={section.title}
-                    onChange={(e) => updateSection(section.id, { title: e.target.value })}
-                  />
-                </div>
-              </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Subtitle</label>
+              <Input
+                value={content.hero.subtitle}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    hero: { ...content.hero, subtitle: e.target.value },
+                  })
+                }
+                placeholder="e.g., Partner with us"
+              />
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium mb-1 block">Subtitle</label>
-                  <Input
-                    value={section.subtitle}
-                    onChange={(e) => updateSection(section.id, { subtitle: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">Image URL</label>
-                  <Input
-                    value={section.imageUrl}
-                    placeholder="https://example.com/image.jpg"
-                    onChange={(e) => updateSection(section.id, { imageUrl: e.target.value })}
-                  />
-                </div>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Title</label>
+              <Input
+                value={content.hero.title}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    hero: { ...content.hero, title: e.target.value },
+                  })
+                }
+                placeholder="e.g., Reach the founders building tomorrow"
+              />
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium mb-1 block">Icon URL</label>
-                  <Input
-                    value={section.iconUrl}
-                    placeholder="https://example.com/icon.svg"
-                    onChange={(e) => updateSection(section.id, { iconUrl: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">CTA Button Text</label>
-                  <Input
-                    value={section.ctaText}
-                    onChange={(e) => updateSection(section.id, { ctaText: e.target.value })}
-                  />
-                </div>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Description</label>
+              <Textarea
+                value={content.hero.description}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    hero: { ...content.hero, description: e.target.value },
+                  })
+                }
+                placeholder="Hero section description"
+                rows={3}
+              />
+            </div>
 
-              <div>
-                <label className="text-sm font-medium mb-1 block">CTA Link</label>
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Button Text</label>
+              <Input
+                value={content.hero.buttonText}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    hero: { ...content.hero, buttonText: e.target.value },
+                  })
+                }
+                placeholder="e.g., Become a Partner →"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Benefits Section Content */}
+      {activeSection === "benefits" && (
+        <div className="bg-white rounded-b-xl shadow-sm p-6 border border-t-0">
+          <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Benefits Section</h2>
+
+          <div className="space-y-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Subtitle</label>
+              <Input
+                value={content.benefits.subtitle}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    benefits: { ...content.benefits, subtitle: e.target.value },
+                  })
+                }
+                placeholder="e.g., Why partner with us"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Title</label>
+              <Input
+                value={content.benefits.title}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    benefits: { ...content.benefits, title: e.target.value },
+                  })
+                }
+                placeholder="e.g., Benefits for your brand"
+              />
+            </div>
+          </div>
+
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold text-[#23272f] mb-4">Benefit Cards</h3>
+            {content.benefits.cards.map((card, idx) => (
+              <div key={idx} className="bg-[#f5f3f0] p-4 rounded-lg mb-3 border">
                 <Input
-                  value={section.ctaLink}
-                  onChange={(e) => updateSection(section.id, { ctaLink: e.target.value })}
+                  value={card.title}
+                  onChange={(e) => {
+                    const cards = [...content.benefits.cards];
+                    cards[idx].title = e.target.value;
+                    setContent({
+                      ...content,
+                      benefits: { ...content.benefits, cards },
+                    });
+                  }}
+                  placeholder="Benefit title"
+                  className="mb-2"
                 />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium mb-1 block">Description</label>
                 <Textarea
-                  value={section.content}
-                  onChange={(e) => updateSection(section.id, { content: e.target.value })}
-                  className="min-h-20"
+                  value={card.description}
+                  onChange={(e) => {
+                    const cards = [...content.benefits.cards];
+                    cards[idx].description = e.target.value;
+                    setContent({
+                      ...content,
+                      benefits: { ...content.benefits, cards },
+                    });
+                  }}
+                  placeholder="Benefit description"
+                  rows={2}
                 />
               </div>
+            ))}
+          </div>
+        </div>
+      )}
 
-              {section.items.length > 0 && (
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Items</label>
-                  <div className="space-y-3">
-                    {section.items.map((item, idx) => (
-                      <div key={idx} className="space-y-2 p-3 border rounded">
-                        <Input
-                          placeholder="Item Label"
-                          value={item.label}
-                          onChange={(e) => {
-                            const newItems = [...section.items];
-                            newItems[idx].label = e.target.value;
-                            updateSection(section.id, { items: newItems });
-                          }}
-                        />
-                        <Textarea
-                          placeholder="Item Description"
-                          value={item.description}
-                          onChange={(e) => {
-                            const newItems = [...section.items];
-                            newItems[idx].description = e.target.value;
-                            updateSection(section.id, { items: newItems });
-                          }}
-                          className="min-h-16"
-                        />
-                      </div>
-                    ))}
+      {/* Process Section Content */}
+      {activeSection === "process" && (
+        <div className="bg-white rounded-b-xl shadow-sm p-6 border border-t-0">
+          <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Process Section</h2>
+
+          <div className="space-y-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Subtitle</label>
+              <Input
+                value={content.process.subtitle}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    process: { ...content.process, subtitle: e.target.value },
+                  })
+                }
+                placeholder="e.g., How it works"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Title</label>
+              <Input
+                value={content.process.title}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    process: { ...content.process, title: e.target.value },
+                  })
+                }
+                placeholder="e.g., Simple partnership process"
+              />
+            </div>
+          </div>
+
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold text-[#23272f] mb-4">Process Steps</h3>
+            {content.process.steps.map((step, idx) => (
+              <div key={idx} className="bg-[#f5f3f0] p-4 rounded-lg mb-3 border">
+                <div className="grid grid-cols-2 gap-4 mb-2">
+                  <div>
+                    <label className="block text-xs font-medium text-[#23272f] mb-1">Step Number</label>
+                    <Input
+                      value={step.step}
+                      onChange={(e) => {
+                        const steps = [...content.process.steps];
+                        steps[idx].step = e.target.value;
+                        setContent({
+                          ...content,
+                          process: { ...content.process, steps },
+                        });
+                      }}
+                      placeholder="e.g., 01"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[#23272f] mb-1">Title</label>
+                    <Input
+                      value={step.title}
+                      onChange={(e) => {
+                        const steps = [...content.process.steps];
+                        steps[idx].title = e.target.value;
+                        setContent({
+                          ...content,
+                          process: { ...content.process, steps },
+                        });
+                      }}
+                      placeholder="e.g., Apply"
+                    />
                   </div>
                 </div>
-              )}
+                <Textarea
+                  value={step.description}
+                  onChange={(e) => {
+                    const steps = [...content.process.steps];
+                    steps[idx].description = e.target.value;
+                    setContent({
+                      ...content,
+                      process: { ...content.process, steps },
+                    });
+                  }}
+                  placeholder="Step description"
+                  rows={2}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Form Section Content */}
+      {activeSection === "form" && (
+        <div className="bg-white rounded-b-xl shadow-sm p-6 border border-t-0">
+          <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Form Section</h2>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Subtitle</label>
+              <Input
+                value={content.form.subtitle}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    form: { ...content.form, subtitle: e.target.value },
+                  })
+                }
+                placeholder="e.g., Get started"
+              />
             </div>
-          </Card>
-        ))}
-      </div>
 
-      <Button onClick={addSection} className="gap-2 mb-8">
-        <Plus className="w-4 h-4" />
-        Add Section
-      </Button>
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Title</label>
+              <Input
+                value={content.form.title}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    form: { ...content.form, title: e.target.value },
+                  })
+                }
+                placeholder="e.g., Apply to become a partner"
+              />
+            </div>
 
-      <div className="flex gap-3">
-        <Button variant="outline">Save as Draft</Button>
-        <Button className="bg-amber-400 hover:bg-amber-500 text-black">
-          Publish Changes
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Description</label>
+              <Textarea
+                value={content.form.description}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    form: { ...content.form, description: e.target.value },
+                  })
+                }
+                placeholder="Form section description"
+                rows={3}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex justify-end gap-3 pt-6">
+        <Button
+          variant="outline"
+          onClick={() => window.location.reload()}
+          disabled={saving}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          className="bg-[#e6b756] text-[#1a2233]"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save Changes"
+          )}
         </Button>
       </div>
     </div>
