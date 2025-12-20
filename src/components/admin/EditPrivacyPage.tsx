@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Section {
   id: string;
@@ -15,32 +16,34 @@ interface Section {
 }
 
 export default function EditPrivacyPage() {
-  const [sections, setSections] = useState<Section[]>([
-    {
-      id: "1",
-      heading: "Privacy Policy",
-      slug: "privacy-policy",
-      content: "Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your information.",
-    },
-    {
-      id: "2",
-      heading: "Information We Collect",
-      slug: "information-we-collect",
-      content: "We collect information you provide directly to us, such as when you create an account or contact us.",
-    },
-    {
-      id: "3",
-      heading: "How We Use Your Information",
-      slug: "how-we-use-your-information",
-      content: "We use the information we collect to provide, maintain, and improve our services.",
-    },
-    {
-      id: "4",
-      heading: "Data Security",
-      slug: "data-security",
-      content: "We take reasonable measures to protect your personal information from unauthorized access.",
-    },
-  ]);
+  const [sections, setSections] = useState<Section[]>([]);
+  const [originalSections, setOriginalSections] = useState<Section[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  const fetchContent = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch("/api/privacy-content");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      setSections(data.sections || []);
+      setOriginalSections(data.sections || []);
+    } catch (error) {
+      console.error("Error fetching privacy content:", error);
+      toast({
+        title: "Error loading content",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const generateSlug = (text: string) => {
     return text
@@ -71,6 +74,58 @@ export default function EditPrivacyPage() {
   const deleteSection = (id: string) => {
     setSections(sections.filter((section) => section.id !== id));
   };
+
+  const saveContent = async () => {
+    try {
+      setIsSaving(true);
+      const res = await fetch("/api/privacy-content", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sections }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to save");
+      }
+
+      setOriginalSections(sections);
+      toast({
+        title: "Success",
+        description: "Privacy policy updated successfully!",
+      });
+    } catch (error) {
+      console.error("Error saving privacy content:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update privacy policy",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const resetChanges = () => {
+    setSections(originalSections);
+    toast({
+      title: "Changes reset",
+      description: "Content reverted to last saved version",
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="p-8 flex items-center justify-center h-96">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading content...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
@@ -144,9 +199,26 @@ export default function EditPrivacyPage() {
       </Button>
 
       <div className="flex gap-3">
-        <Button variant="outline">Save as Draft</Button>
-        <Button className="bg-amber-400 hover:bg-amber-500 text-black">
-          Publish Changes
+        <Button 
+          variant="outline"
+          onClick={resetChanges}
+          disabled={isSaving}
+        >
+          Reset Changes
+        </Button>
+        <Button 
+          className="bg-amber-400 hover:bg-amber-500 text-black"
+          onClick={saveContent}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Publishing...
+            </>
+          ) : (
+            "Publish Changes"
+          )}
         </Button>
       </div>
     </div>

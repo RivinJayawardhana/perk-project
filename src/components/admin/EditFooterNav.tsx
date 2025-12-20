@@ -43,11 +43,13 @@ export default function EditFooterNav() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      console.log("Fetching footer content...");
       const res = await fetch("/api/footer-content");
-      if (!res.ok) throw new Error("Failed to fetch");
       const footerData = await res.json();
+      console.log("Fetched footer data:", footerData);
       setData(footerData);
     } catch (error: any) {
+      console.error("Fetch error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to load footer content",
@@ -63,13 +65,20 @@ export default function EditFooterNav() {
 
     try {
       setSaving(true);
+      console.log("Sending data to API:", data);
+      
       const res = await fetch("/api/footer-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
-      if (!res.ok) throw new Error("Failed to save");
+      const responseData = await res.json();
+      console.log("API Response:", responseData);
+
+      if (!res.ok) {
+        throw new Error(responseData.error || "Failed to save");
+      }
 
       toast({
         title: "Success",
@@ -79,6 +88,7 @@ export default function EditFooterNav() {
       // Refresh the data to ensure it's synced with database
       await fetchData();
     } catch (error: any) {
+      console.error("Save error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to save changes",

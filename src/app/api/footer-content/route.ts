@@ -57,20 +57,50 @@ const DEFAULT_DATA: FooterData = {
 
 export async function GET() {
   try {
+    console.log("=== FOOTER FETCH START ===");
+    
+    // Get the latest footer content row (should be only one)
     const { data, error } = await supabase
       .from("footer_content")
-      .select("social_links, footer_links")
-      .single();
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(1);
 
-    if (error || !data) {
+    console.log("GET response:", { error, rowCount: data?.length });
+
+    if (error) {
+      console.error("GET error:", error);
       return NextResponse.json(DEFAULT_DATA);
     }
 
+    if (!data || data.length === 0) {
+      console.log("No footer content found in DB, returning defaults");
+      return NextResponse.json(DEFAULT_DATA);
+    }
+
+    const row = data[0];
+    console.log("Found footer row:", {
+      id: row.id,
+      hasSocialLinks: !!row.social_links,
+      hasFooterLinks: !!row.footer_links,
+    });
+
+    // Check if data exists and has content
+    const socialLinks = row.social_links && Array.isArray(row.social_links) && row.social_links.length > 0
+      ? row.social_links
+      : DEFAULT_DATA.socialLinks;
+      
+    const footerLinks = row.footer_links && Array.isArray(row.footer_links) && row.footer_links.length > 0
+      ? row.footer_links
+      : DEFAULT_DATA.footerLinks;
+
     const footerData: FooterData = {
-      socialLinks: data.social_links || DEFAULT_DATA.socialLinks,
-      footerLinks: data.footer_links || DEFAULT_DATA.footerLinks,
+      socialLinks,
+      footerLinks,
     };
 
+    console.log("Returning footer data with", socialLinks.length, "social links and", footerLinks.length, "footer sections");
+    console.log("=== FOOTER FETCH SUCCESS ===");
     return NextResponse.json(footerData);
   } catch (error) {
     console.error("GET /api/footer-content error:", error);
@@ -81,27 +111,77 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const data: FooterData = await request.json();
+    console.log("=== FOOTER SAVE START ===");
+    console.log("Received footer data:", JSON.stringify(data, null, 2));
 
-    // Delete all existing footer content and insert new
-    await supabase.from("footer_content").delete().gt("id", "");
+    // Get all existing rows
+    const { data: existingData, error: fetchError, count } = await supabase
+      .from("footer_content")
+      .select("id", { count: "exact" });
 
-    // Insert new footer content
-    const { error } = await supabase.from("footer_content").insert({
-      social_links: data.socialLinks,
-      footer_links: data.footerLinks,
-    });
+    console.log("Existing data check:", { count, fetchError });
 
-    if (error) {
-      console.error("Insert error:", error);
+    if (fetchError) {
+      console.error("Fetch error:", fetchError);
       return NextResponse.json(
-        { error: error.message || "Failed to save footer data" },
+        { error: fetchError.message || "Failed to fetch existing data" },
         { status: 500 }
       );
     }
 
+    if (existingData && existingData.length > 0) {
+      console.log("Found existing rows:", existingData.length, "- Deleting all and inserting fresh");
+      
+      // Delete all existing rows
+      const { error: deleteError } = await supabase
+        .from("footer_content")
+        .delete()
+        .not("id", "is", null);
+
+      if (deleteError) {
+        console.error("Delete error:", deleteError);
+        return NextResponse.json(
+          { error: `Delete failed: ${deleteError.message}` },
+          { status: 500 }
+        );
+      }
+
+      console.log("Successfully deleted all old rows");
+    }
+
+    // Insert fresh new row
+    console.log("Inserting new footer content row");
+    const { data: insertData, error: insertError } = await supabase
+      .from("footer_content")
+      .insert({
+        social_links: data.socialLinks,
+        footer_links: data.footerLinks,
+      })
+      .select();
+
+    console.log("Insert response:", { insertData, insertError });
+
+    if (insertError) {
+      console.error("Insert error:", insertError);
+      return NextResponse.json(
+        { error: `Insert failed: ${insertError.message}` },
+        { status: 500 }
+      );
+    }
+
+    if (!insertData || insertData.length === 0) {
+      console.error("Insert returned no rows");
+      return NextResponse.json(
+        { error: "Insert failed: No rows were inserted" },
+        { status: 500 }
+      );
+    }
+
+    console.log("Successfully inserted fresh footer content:", insertData[0]);
+    console.log("=== FOOTER SAVE SUCCESS ===");
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error("Error saving footer:", error);
+    console.error("=== FOOTER SAVE ERROR ===", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to save footer data" },
       { status: 500 }
