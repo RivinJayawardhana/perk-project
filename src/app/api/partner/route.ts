@@ -17,9 +17,16 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
+    // Insert into partner_applications table
     const { data, error } = await supabase
-      .from('contact_submissions')
-      .insert([body])
+      .from('partner_applications')
+      .insert([{
+        company: body.company,
+        contact: body.contact,
+        email: body.email,
+        website: body.website,
+        offer: body.offer,
+      }])
       .select()
 
     if (error) {
@@ -31,14 +38,15 @@ export async function POST(request: Request) {
       await transporter.sendMail({
         from: process.env.SMTP_FROM,
         to: 'hello@venturenext.io',
-        subject: `New Contact Form Submission from ${body.name}`,
+        subject: `New Partner Application from ${body.company}`,
         html: `
-          <h2>New Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${body.name}</p>
+          <h2>New Partner Application</h2>
+          <p><strong>Company:</strong> ${body.company}</p>
+          <p><strong>Contact Name:</strong> ${body.contact}</p>
           <p><strong>Email:</strong> ${body.email}</p>
-          <p><strong>Subject:</strong> ${body.subject}</p>
-          <p><strong>Message:</strong></p>
-          <p>${body.message.replace(/\n/g, '<br>')}</p>
+          <p><strong>Website:</strong> ${body.website}</p>
+          <p><strong>Offer Description:</strong></p>
+          <p>${body.offer.replace(/\n/g, '<br>')}</p>
         `,
       })
     } catch (emailError) {
@@ -46,16 +54,16 @@ export async function POST(request: Request) {
       // Continue even if email fails
     }
 
-    return NextResponse.json({ message: 'Contact submission received', data })
+    return NextResponse.json({ message: 'Partner application received', data })
   } catch (err) {
-    return NextResponse.json({ error: 'Failed to submit contact form' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to submit partner application' }, { status: 500 })
   }
 }
 
 export async function GET() {
   try {
     const { data, error } = await supabase
-      .from('contact_submissions')
+      .from('partner_applications')
       .select('*')
       .order('created_at', { ascending: false })
 
@@ -64,6 +72,6 @@ export async function GET() {
     }
     return NextResponse.json(data)
   } catch (err) {
-    return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch partner applications' }, { status: 500 })
   }
 }

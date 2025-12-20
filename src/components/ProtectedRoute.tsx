@@ -3,10 +3,23 @@
 import React, { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, isSessionExpired } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (isSessionExpired) {
+      toast({
+        title: "Session Expired",
+        description: "Your session has expired due to inactivity. Please log in again.",
+        variant: "destructive",
+      });
+      router.push("/login");
+    }
+  }, [isSessionExpired, router, toast]);
 
   useEffect(() => {
     if (!loading && !user) {

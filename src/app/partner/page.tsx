@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PartnerContent {
   hero: {
@@ -35,6 +36,7 @@ interface PartnerContent {
 export default function Partner() {
   const [content, setContent] = useState<PartnerContent | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   const [form, setForm] = useState({
     company: "",
     contact: "",
@@ -65,10 +67,39 @@ export default function Partner() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 2000);
+    
+    try {
+      const response = await fetch('/api/partner', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit application');
+      }
+
+      toast({
+        title: "Success!",
+        description: "Thank you for your application. We'll review it and get back to you soon.",
+      });
+
+      setSubmitted(true);
+      setForm({ company: '', contact: '', email: '', website: '', offer: '' });
+      setTimeout(() => setSubmitted(false), 2000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit application. Please try again.",
+        variant: "destructive",
+      });
+      setSubmitted(false);
+    }
   };
 
   if (loading || !content) {

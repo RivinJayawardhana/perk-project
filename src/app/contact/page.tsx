@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ContactPageContent {
   hero: {
@@ -18,6 +19,7 @@ interface ContactPageContent {
 export default function Contact() {
   const [pageContent, setPageContent] = useState<ContactPageContent | null>(null);
   const [contentLoading, setContentLoading] = useState(true);
+  const { toast } = useToast();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -51,10 +53,39 @@ export default function Contact() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 2000);
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
+      }
+
+      toast({
+        title: "Success!",
+        description: "Thank you for your message. We'll get back to you soon.",
+      });
+
+      setSubmitted(true);
+      setForm({ name: '', email: '', subject: '', message: '' });
+      setTimeout(() => setSubmitted(false), 2000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit form. Please try again.",
+        variant: "destructive",
+      });
+      setSubmitted(false);
+    }
   };
 
   return (
