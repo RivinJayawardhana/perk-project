@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminLayout from "@/components/AdminLayout";
 import { ImageUpload } from "@/components/perks/ImageUpload";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { Loader2, Upload, X } from "lucide-react";
 
 interface HomePageContent {
   hero: {
@@ -90,9 +91,11 @@ const DEFAULT_CONTENT: HomePageContent = {
 
 export default function EditHomePage() {
   const { toast } = useToast();
+  const { upload, isUploading } = useImageUpload();
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [content, setContent] = useState<HomePageContent>(DEFAULT_CONTENT);
+  const imageInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Load content on mount
   useEffect(() => {
@@ -115,6 +118,36 @@ export default function EditHomePage() {
 
     loadContent();
   }, []);
+
+  const handleHeroImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    idx: number
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const url = await upload(file, "hero-images");
+      if (url) {
+        const newImages = [...content.hero.heroImages];
+        newImages[idx] = url;
+        setContent({
+          ...content,
+          hero: { ...content.hero, heroImages: newImages },
+        });
+        toast({
+          title: "Success",
+          description: "Image uploaded successfully!",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to upload image",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -279,28 +312,79 @@ export default function EditHomePage() {
                         <label className="block text-xs font-medium mb-2">
                           Image {idx + 1}
                         </label>
-                        <div className="flex gap-2">
-                          <Input
-                            value={image}
-                            onChange={(e) => {
-                              const newImages = [...content.hero.heroImages];
-                              newImages[idx] = e.target.value;
-                              setContent({
-                                ...content,
-                                hero: { ...content.hero, heroImages: newImages },
-                              });
+                        <div className="space-y-3">
+                          {/* Image Preview */}
+                          {image && (
+                            <div className="relative h-32 w-full bg-muted rounded-lg overflow-hidden">
+                              <img
+                                src={image}
+                                alt={`Hero ${idx + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                onClick={() => {
+                                  const newImages = [...content.hero.heroImages];
+                                  newImages[idx] = "";
+                                  setContent({
+                                    ...content,
+                                    hero: { ...content.hero, heroImages: newImages },
+                                  });
+                                }}
+                                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded hover:bg-red-600"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Upload Button */}
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => imageInputRefs.current[idx]?.click()}
+                              disabled={isUploading}
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-muted-foreground/25 rounded-lg hover:border-muted-foreground/50 transition-colors disabled:opacity-50"
+                            >
+                              {isUploading ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  Uploading...
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="w-4 h-4" />
+                                  Upload Image
+                                </>
+                              )}
+                            </button>
+
+                            {/* URL Input */}
+                            <Input
+                              value={image}
+                              onChange={(e) => {
+                                const newImages = [...content.hero.heroImages];
+                                newImages[idx] = e.target.value;
+                                setContent({
+                                  ...content,
+                                  hero: { ...content.hero, heroImages: newImages },
+                                });
+                              }}
+                              placeholder="Or paste URL"
+                              className="flex-1"
+                            />
+                          </div>
+
+                          <input
+                            ref={(el) => {
+                              imageInputRefs.current[idx] = el;
                             }}
-                            placeholder="Image URL"
-                            className="flex-1"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleHeroImageUpload(e, idx)}
+                            className="hidden"
+                            disabled={isUploading}
                           />
                         </div>
-                        {image && (
-                          <img
-                            src={image}
-                            alt={`Hero ${idx + 1}`}
-                            className="mt-2 h-20 w-20 object-cover rounded"
-                          />
-                        )}
                       </div>
                     ))}
                   </div>
