@@ -63,31 +63,10 @@ const transformPerkData = (apiPerk: any): DisplayPerk => {
   };
 };
 
-// Static filter options
-const dealTypeOptions = [
-  { label: "Free trial / Trial", count: 45 },
-  { label: "Discount", count: 67 },
-  { label: "Credits included", count: 23 },
-  { label: "Free consultation", count: 19 },
-  { label: "Free perks / Add-ons", count: 28 },
-  { label: "Bundle deal", count: 15 },
-  { label: "Exclusive deal", count: 31 },
-  { label: "Intro / First-time offer", count: 12 },
-];
-
-const locationOptions = [
-  { label: "Malaysia", count: 52 },
-  { label: "Singapore", count: 48 },
-  { label: "Global", count: 155 },
-];
-
-const bestForOptions = [
-  { label: "Solopreneurs", count: 89 },
-  { label: "Startups", count: 76 },
-  { label: "SMEs", count: 54 },
-  { label: "Agencies", count: 32 },
-  { label: "Enterprises", count: 18 },
-];
+// Static filter options - will be replaced with dynamic options
+const dealTypeLabels = ["Free trial", "Discount", "Credits included", "Free consultation", "Free perks / Add-ons", "Bundle deal", "Exclusive deal", "Intro/First-time offer"];
+const locationLabels = ["Malaysia", "Singapore", "Global"];
+const bestForLabels = ["Solopreneurs", "Startups", "SMEs", "Agencies", "Enterprises"];
 
 export default function Perks() {
   const { data: apiPerks = [], isLoading } = usePerks();
@@ -101,6 +80,9 @@ export default function Perks() {
   const [mockPerks, setMockPerks] = useState<DisplayPerk[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<Array<{label: string, count: number}>>([]);
   const [subcategoryOptions, setSubcategoryOptions] = useState<Record<string, Array<{label: string, count: number}>>>({});
+  const [dealTypeOptions, setDealTypeOptions] = useState<Array<{label: string, count: number}>>([]);
+  const [locationOptions, setLocationOptions] = useState<Array<{label: string, count: number}>>([]);
+  const [bestForOptions, setBestForOptions] = useState<Array<{label: string, count: number}>>([]);
   
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDealTypes, setSelectedDealTypes] = useState<string[]>([]);
@@ -146,33 +128,78 @@ export default function Perks() {
 
   // Build dynamic category options from fetched data
   useEffect(() => {
-    if (categoriesData && categoriesData.length > 0) {
-      const options = categoriesData.map((cat: any) => ({
-        label: cat.name,
-        count: cat.subcategory_count || 0
-      }));
+    if (categoriesData && categoriesData.length > 0 && mockPerks.length > 0) {
+      const options = categoriesData.map((cat: any) => {
+        // Count perks in this category
+        const count = mockPerks.filter(perk => perk.category === cat.name).length;
+        return {
+          label: cat.name,
+          count: count
+        };
+      });
       setCategoryOptions(options);
     }
-  }, [categoriesData]);
+  }, [categoriesData, mockPerks]);
 
   // Build dynamic subcategory options grouped by category
   useEffect(() => {
-    if (subcategoriesData && subcategoriesData.length > 0 && categoriesData && categoriesData.length > 0) {
+    if (subcategoriesData && subcategoriesData.length > 0 && categoriesData && categoriesData.length > 0 && mockPerks.length > 0) {
       const grouped: Record<string, Array<{label: string, count: number}>> = {};
       
       // Group subcategories by category name
       categoriesData.forEach((cat: any) => {
         grouped[cat.name] = subcategoriesData
           .filter((sub: any) => sub.category_id === cat.id)
-          .map((sub: any) => ({
-            label: sub.name,
-            count: 0 // Set to 0 for now, can be calculated from perks if needed
-          }));
+          .map((sub: any) => {
+            // Count perks in this subcategory
+            const count = mockPerks.filter(perk => perk.subcategory === sub.id || perk.subcategory === sub.name).length;
+            return {
+              label: sub.name,
+              count: count
+            };
+          });
       });
       
       setSubcategoryOptions(grouped);
     }
-  }, [subcategoriesData, categoriesData]);
+  }, [subcategoriesData, categoriesData, mockPerks]);
+
+  // Build dynamic deal type options
+  useEffect(() => {
+    if (mockPerks.length > 0) {
+      const options = dealTypeLabels.map((label) => {
+        const count = mockPerks.filter(perk => 
+          perk.dealTypes.some(type => type.toLowerCase().includes(label.toLowerCase()))
+        ).length;
+        return { label, count };
+      });
+      setDealTypeOptions(options);
+    }
+  }, [mockPerks]);
+
+  // Build dynamic location options
+  useEffect(() => {
+    if (mockPerks.length > 0) {
+      const options = locationLabels.map((label) => {
+        const count = mockPerks.filter(perk => perk.location === label).length;
+        return { label, count };
+      });
+      setLocationOptions(options);
+    }
+  }, [mockPerks]);
+
+  // Build dynamic best for options
+  useEffect(() => {
+    if (mockPerks.length > 0) {
+      const options = bestForLabels.map((label) => {
+        const count = mockPerks.filter(perk => 
+          perk.bestFor.some(best => best.toLowerCase().includes(label.toLowerCase()))
+        ).length;
+        return { label, count };
+      });
+      setBestForOptions(options);
+    }
+  }, [mockPerks]);
 
   const handleFilter = () => {
     let filtered = mockPerks;
@@ -189,7 +216,12 @@ export default function Perks() {
     // Deal Type filter
     if (selectedDealTypes.length > 0) {
       filtered = filtered.filter(p => 
-        p.dealTypes.some(type => selectedDealTypes.includes(type))
+        p.dealTypes.some(type => 
+          selectedDealTypes.some(selected => 
+            type.toLowerCase().includes(selected.toLowerCase()) || 
+            selected.toLowerCase().includes(type.toLowerCase())
+          )
+        )
       );
     }
 
@@ -206,7 +238,12 @@ export default function Perks() {
     // Best For filter
     if (selectedBestFor.length > 0) {
       filtered = filtered.filter(p => 
-        p.bestFor.some(best => selectedBestFor.includes(best))
+        p.bestFor.some(best => 
+          selectedBestFor.some(selected => 
+            best.toLowerCase().includes(selected.toLowerCase()) || 
+            selected.toLowerCase().includes(best.toLowerCase())
+          )
+        )
       );
     }
 
@@ -241,7 +278,6 @@ export default function Perks() {
         ? prev.filter(t => t !== dealType)
         : [...prev, dealType]
     );
-    setTimeout(handleFilter, 0); // Trigger filter after state update
   };
 
   const handleCategoryChange = (category: string) => {
@@ -254,7 +290,6 @@ export default function Perks() {
     if (!selectedCategories.includes(category)) {
       setSelectedSubcategories([]);
     }
-    setTimeout(handleFilter, 0);
   };
 
   const handleLocationChange = (location: string) => {
@@ -263,7 +298,6 @@ export default function Perks() {
         ? prev.filter(l => l !== location)
         : [...prev, location]
     );
-    setTimeout(handleFilter, 0);
   };
 
   const handleBestForChange = (bestFor: string) => {
@@ -272,7 +306,6 @@ export default function Perks() {
         ? prev.filter(b => b !== bestFor)
         : [...prev, bestFor]
     );
-    setTimeout(handleFilter, 0);
   };
 
   const handleSubcategoryChange = (subcategory: string) => {
@@ -281,7 +314,6 @@ export default function Perks() {
         ? prev.filter(s => s !== subcategory)
         : [...prev, subcategory]
     );
-    setTimeout(handleFilter, 0);
   };
 
   // Get active filters count
