@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,12 @@ interface LeadCaptureFormProps {
 
 export function LeadCaptureForm({ value, onChange }: LeadCaptureFormProps) {
   const [fields, setFields] = useState<FormField[]>(value || defaultFields);
+
+  useEffect(() => {
+    if (value && value.length > 0) {
+      setFields(value);
+    }
+  }, [value]);
 
   const updateFields = (newFields: FormField[]) => {
     setFields(newFields);

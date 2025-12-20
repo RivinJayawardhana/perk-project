@@ -144,6 +144,10 @@ export default function AddPerk() {
     }
   };
 
+  const handleClaimMethodChange = (value: string) => {
+    setDealTypeSelection(value);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -175,8 +179,8 @@ export default function AddPerk() {
         location: formData.location,
         image_url: formData.image_url,
         logo_url: formData.logo_url,
-        deal_type: selectedDealType,
-        deal_url: formData.deal_url,
+        deal_type: dealType.join(", "),
+        deal_url: dealTypeSelection === "lead" ? null : (formData.deal_url || null),
         best_for: bestFor.join(", "),
         status: formData.status,
       },
@@ -502,6 +506,7 @@ export default function AddPerk() {
                 value={formData.expiry}
                 onChange={handleInputChange}
               />
+              <p className="text-xs text-muted-foreground mt-1">Optional - leave empty for no expiry</p>
             </div>
           </div>
         </Card>
@@ -580,7 +585,7 @@ export default function AddPerk() {
                       : "border-border"
                   }`}
                 >
-                  <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
+                  <RadioGroup value={dealTypeSelection} onValueChange={handleClaimMethodChange}>
                     <div className="flex items-start gap-3">
                       <RadioGroupItem value="affiliate" className="mt-1" />
                       <div>
@@ -597,7 +602,7 @@ export default function AddPerk() {
                       : "border-border"
                   }`}
                 >
-                  <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
+                  <RadioGroup value={dealTypeSelection} onValueChange={handleClaimMethodChange}>
                     <div className="flex items-start gap-3">
                       <RadioGroupItem value="coupon" className="mt-1" />
                       <div>
@@ -614,7 +619,7 @@ export default function AddPerk() {
                       : "border-border"
                   }`}
                 >
-                  <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
+                  <RadioGroup value={dealTypeSelection} onValueChange={handleClaimMethodChange}>
                     <div className="flex items-start gap-3">
                       <RadioGroupItem value="lead" className="mt-1" />
                       <div>
@@ -626,20 +631,26 @@ export default function AddPerk() {
                 </label>
               </div>
             </div>
-            <div>
-              <Label className="text-sm font-medium mb-2 block">Deal URL</Label>
-              <Input
-                placeholder="https://..."
-                value={formData.deal_url}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    deal_url: e.target.value,
-                  }))
-                }
-              />
-              <p className="text-xs text-muted-foreground mt-1">Affiliate or partner link</p>
-            </div>
+            {dealTypeSelection !== "lead" && (
+              <div>
+                <Label className="text-sm font-medium mb-2 block">
+                  {dealTypeSelection === "affiliate" ? "Affiliate Link" : "Coupon Code"}
+                </Label>
+                <Input
+                  placeholder={dealTypeSelection === "affiliate" ? "https://example.com/promo" : "e.g., SAVE50"}
+                  value={formData.deal_url}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      deal_url: e.target.value,
+                    }))
+                  }
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {dealTypeSelection === "affiliate" ? "Enter the affiliate or partner URL" : "Enter the coupon/promo code"}
+                </p>
+              </div>
+            )}
           </div>
         </Card>
 

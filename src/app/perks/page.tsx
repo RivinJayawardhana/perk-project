@@ -335,46 +335,30 @@ export default function Perks() {
     selectedSubcategories.length;
 
   const handleGetDeal = (perk: DisplayPerk) => {
-    const dealTypes = perk.dealTypes || [];
-    const hasDealType = (type: string) => {
-      return dealTypes.some(d => d.toLowerCase().includes(type.toLowerCase())) ||
-             (perk as any).deal_type?.toLowerCase().includes(type.toLowerCase());
-    };
-
-    // Handle affiliate link
-    if (hasDealType("affiliate")) {
-      if (perk.deal_url) {
+    // Check if perk is using lead form (no deal_url or deal_url is empty)
+    const isLeadForm = !perk.deal_url || perk.deal_url.trim() === "";
+    
+    if (isLeadForm) {
+      // Handle lead form
+      setLeadFormModal({ isOpen: true, perkId: perk.id });
+    } else if (perk.deal_url) {
+      // Check if it's a URL (affiliate) or a code (coupon)
+      const isUrl = perk.deal_url.startsWith("http://") || perk.deal_url.startsWith("https://");
+      
+      if (isUrl) {
+        // Handle affiliate link
         window.open(perk.deal_url, "_blank");
         toast({
           title: "Opening...",
           description: "Affiliate link opened in a new tab",
         });
       } else {
-        toast({
-          title: "No Link",
-          description: "Affiliate link not available",
-          variant: "destructive",
-        });
-      }
-    } 
-    // Handle coupon code
-    else if (hasDealType("coupon")) {
-      if (perk.deal_url) {
+        // Handle coupon code
         setCouponModal({
           isOpen: true,
           code: perk.deal_url,
         });
-      } else {
-        toast({
-          title: "No Coupon",
-          description: "Coupon code not available",
-          variant: "destructive",
-        });
       }
-    } 
-    // Handle lead form
-    else if (hasDealType("lead")) {
-      setLeadFormModal({ isOpen: true, perkId: perk.id });
     } else {
       toast({
         title: "Get Deal",

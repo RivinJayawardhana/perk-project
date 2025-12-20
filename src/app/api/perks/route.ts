@@ -22,7 +22,6 @@ export async function POST(request: Request) {
     const body = await request.json()
     
     // Only send fields that are guaranteed to exist in the schema
-    // deal_url will be added once the migration is run
     const perkData: any = {
       name: body.name,
       description: body.description,
@@ -37,9 +36,13 @@ export async function POST(request: Request) {
       status: body.status || 'Active',
     }
     
-    // Only add deal_url if it has a value (after migration is run)
-    if (body.deal_url && body.deal_url.trim()) {
-      perkData.deal_url = body.deal_url
+    // Handle deal_url - handle both null and empty string cases
+    if (body.deal_url !== undefined) {
+      if (body.deal_url === null || body.deal_url === "" || body.deal_url?.trim?.() === "") {
+        perkData.deal_url = null
+      } else {
+        perkData.deal_url = body.deal_url
+      }
     }
     
     const { data, error } = await supabase

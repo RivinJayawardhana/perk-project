@@ -34,7 +34,7 @@ export async function PUT(
     // Build update data with known safe fields
     const updateData: any = {}
     
-    const safeFields = ['name', 'description', 'category', 'discount', 'location', 'image_url', 'logo_url', 'deal_type', 'best_for', 'status']
+    const safeFields = ['name', 'description', 'category', 'discount', 'location', 'image_url', 'logo_url', 'deal_type', 'deal_url', 'best_for', 'status']
     
     safeFields.forEach(field => {
       if (body[field] !== undefined && body[field] !== null) {
@@ -47,9 +47,13 @@ export async function PUT(
       updateData.expiry = body.expiry || null
     }
     
-    // Only add deal_url if it has a value (after migration is run)
-    if (body.deal_url !== undefined && body.deal_url !== null && body.deal_url.trim?.()) {
-      updateData.deal_url = body.deal_url
+    // Handle deal_url - handle both null and empty string cases
+    if (body.deal_url !== undefined) {
+      if (body.deal_url === null || body.deal_url === "" || body.deal_url?.trim?.() === "") {
+        updateData.deal_url = null
+      } else {
+        updateData.deal_url = body.deal_url
+      }
     }
     
     const { data, error } = await supabase

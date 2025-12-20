@@ -16,10 +16,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
+import { LeadCaptureForm } from "@/components/perks/LeadCaptureForm";
 import { useUpdatePerk, usePerk } from "@/hooks/usePerks";
 import { useCategories } from "@/hooks/useCategories";
 import { useSubcategories } from "@/hooks/useSubcategories";
 import { useImageUpload } from "@/hooks/useImageUpload";
+import { useLeadForm, useUpdateLeadForm } from "@/hooks/useLeadForms";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
@@ -44,6 +46,15 @@ const BEST_FOR_OPTIONS = [
   "Remote teams",
 ];
 
+interface FormField {
+  id: string;
+  name: string;
+  label: string;
+  type: "text" | "email" | "phone" | "number" | "textarea" | "checkbox";
+  placeholder: string;
+  required: boolean;
+}
+
 interface EditPerkProps {
   perkId: string;
 }
@@ -56,6 +67,8 @@ export default function EditPerk({ perkId }: EditPerkProps) {
   const { data: allSubcategories } = useSubcategories();
   const { mutate: updatePerk, isPending } = useUpdatePerk(perkId);
   const { upload, isUploading } = useImageUpload();
+  const { data: leadFormData } = useLeadForm(perkId);
+  const updateLeadFormMutation = useUpdateLeadForm();
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
@@ -78,6 +91,7 @@ export default function EditPerk({ perkId }: EditPerkProps) {
   const [dealType, setDealType] = useState<string[]>([]);
   const [bestFor, setBestFor] = useState<string[]>([]);
   const [dealTypeSelection, setDealTypeSelection] = useState("affiliate");
+  const [leadFormFields, setLeadFormFields] = useState<FormField[]>([]);
 
   useEffect(() => {
     if (perkData) {
@@ -99,12 +113,43 @@ export default function EditPerk({ perkId }: EditPerkProps) {
 
       if (perkData.deal_type) {
         setDealType(perkData.deal_type.split(", ").filter((t: string) => t));
+      } else {
+        setDealType([]);
       }
       if (perkData.best_for) {
         setBestFor(perkData.best_for.split(", ").filter((b: string) => b));
+      } else {
+        setBestFor([]);
+      }
+
+      // Determine deal type selection based on perk data
+      if (!perkData.deal_url || perkData.deal_url.trim() === "") {
+        // No deal_url means it's a lead form
+        setDealTypeSelection("lead");
+      } else if (perkData.deal_url.startsWith("http://") || perkData.deal_url.startsWith("https://")) {
+        // URL format means it's an affiliate link
+        setDealTypeSelection("affiliate");
+      } else {
+        // Non-URL string means it's a coupon code
+        setDealTypeSelection("coupon");
       }
     }
   }, [perkData]);
+
+  // Load lead form data when perk is lead_capture_form type
+  useEffect(() => {
+    if (leadFormData && dealTypeSelection === "lead") {
+      const fields = (leadFormData.form_fields || []).map((field: any) => ({
+        id: field.id,
+        name: field.name,
+        label: field.label,
+        type: field.type,
+        placeholder: field.placeholder || "",
+        required: field.required,
+      }));
+      setLeadFormFields(fields);
+    }
+  }, [leadFormData, dealTypeSelection]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -181,7 +226,7 @@ export default function EditPerk({ perkId }: EditPerkProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.category || !formData.discount || !formData.expiry) {
+    if (!formData.name || !formData.category || !formData.discount) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -190,27 +235,70 @@ export default function EditPerk({ perkId }: EditPerkProps) {
       return;
     }
 
+    const updatePayload = {
+      name: formData.name,
+      description: formData.description,
+      category: formData.category,
+      discount: formData.discount,
+      expiry: formData.expiry,
+      location: formData.location,
+      image_url: formData.image_url,
+      logo_url: formData.logo_url,
+      deal_type: dealType.join(", "),
+      deal_url: dealTypeSelection === "lead" ? null : (formData.deal_url || null),
+      best_for: bestFor.join(", "),
+      status: formData.status,
+    };
+
     updatePerk(
+      updatePayload,
       {
-        name: formData.name,
-        description: formData.description,
-        category: formData.category,
-        discount: formData.discount,
-        expiry: formData.expiry,
-        location: formData.location,
-        image_url: formData.image_url,
-        logo_url: formData.logo_url,
-        deal_type: dealType.join(", "),
-        deal_url: formData.deal_url,
-        best_for: bestFor.join(", "),
-        status: formData.status,
-      },
-      {
-        onSuccess: () => {
-          toast({
-            title: "Success",
-            description: "Perk updated successfully!",
-          });
+        onSuccess: async () => {
+          // If lead capture form is selected, save the form configuration
+          if (dealTypeSelection === "lead") {
+            if (leadFormFields.length === 0) {
+              toast({
+                title: "Warning",
+                description: "Lead form created but no fields configured. Add fields to the lead form.",
+                variant: "destructive",
+              });
+              return;
+            }
+
+            try {
+              if (leadFormData?.id) {
+                // Update existing lead form
+                await updateLeadFormMutation.mutateAsync({
+                  id: leadFormData.id,
+                  form_fields: leadFormFields,
+                  submit_button_text: "Submit",
+                  success_message: "Thank you! We'll contact you soon.",
+                });
+              } else {
+                // This shouldn't happen if perk was created as lead form, but handle it
+                console.warn("No existing lead form found for update");
+              }
+              
+              toast({
+                title: "Success",
+                description: "Perk updated with lead form successfully!",
+              });
+            } catch (error: any) {
+              const errorMessage = error?.message || "Unknown error occurred";
+              console.error("Failed to save lead form:", error);
+              toast({
+                title: "Warning",
+                description: `Perk updated but lead form failed: ${errorMessage}`,
+                variant: "destructive",
+              });
+            }
+          } else {
+            toast({
+              title: "Success",
+              description: "Perk updated successfully!",
+            });
+          }
+
           router.push("/admin/perks");
         },
         onError: (error: any) => {
@@ -476,15 +564,15 @@ export default function EditPerk({ perkId }: EditPerkProps) {
             </div>
             <div>
               <Label htmlFor="expiry" className="text-sm font-medium mb-2 block">
-                📅 Valid Until <span className="text-destructive">*</span>
+                📅 Valid Until
               </Label>
               <Input
                 id="expiry"
                 type="date"
                 value={formData.expiry}
                 onChange={handleInputChange}
-                required
               />
+              <p className="text-xs text-muted-foreground mt-1">Optional - leave empty for no expiry</p>
             </div>
           </div>
         </Card>
@@ -533,41 +621,61 @@ export default function EditPerk({ perkId }: EditPerkProps) {
           <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium mb-3 block">Claim Method</Label>
-              <div className="space-y-3">
-                <label className="p-3 border-2 rounded-lg cursor-pointer hover:border-amber-400 transition-colors">
-                  <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
-                    <div className="flex items-center gap-3">
-                      <RadioGroupItem value="affiliate" />
-                      <Label className="font-normal cursor-pointer">🔗 Affiliate Link</Label>
-                    </div>
-                  </RadioGroup>
-                </label>
-                <label className="p-3 border-2 rounded-lg cursor-pointer hover:border-amber-400 transition-colors">
-                  <RadioGroup value={dealTypeSelection} onValueChange={setDealTypeSelection}>
-                    <div className="flex items-center gap-3">
-                      <RadioGroupItem value="coupon" />
-                      <Label className="font-normal cursor-pointer">🎟️ Coupon Code</Label>
-                    </div>
-                  </RadioGroup>
-                </label>
+              <RadioGroup 
+                value={dealTypeSelection} 
+                onValueChange={(value) => {
+                  setDealTypeSelection(value);
+                }}
+              >
+                <div className="space-y-3">
+                  <div className="p-3 border-2 rounded-lg cursor-pointer hover:border-amber-400 transition-colors flex items-center gap-3">
+                    <RadioGroupItem value="affiliate" />
+                    <Label className="font-normal cursor-pointer">🔗 Affiliate Link</Label>
+                  </div>
+                  <div className="p-3 border-2 rounded-lg cursor-pointer hover:border-amber-400 transition-colors flex items-center gap-3">
+                    <RadioGroupItem value="coupon" />
+                    <Label className="font-normal cursor-pointer">🎟️ Coupon Code</Label>
+                  </div>
+                  <div className="p-3 border-2 rounded-lg cursor-pointer hover:border-amber-400 transition-colors flex items-center gap-3">
+                    <RadioGroupItem value="lead" />
+                    <Label className="font-normal cursor-pointer">📝 Lead Capture Form</Label>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+            {dealTypeSelection !== "lead" && (
+              <div>
+                <Label className="text-sm font-medium mb-2 block">
+                  {dealTypeSelection === "affiliate" ? "Affiliate Link" : "Coupon Code"}
+                </Label>
+                <Input
+                  placeholder={dealTypeSelection === "affiliate" ? "https://example.com/promo" : "e.g., SAVE50"}
+                  value={formData.deal_url}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      deal_url: e.target.value,
+                    }))
+                  }
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {dealTypeSelection === "affiliate" ? "Enter the affiliate or partner URL" : "Enter the coupon/promo code"}
+                </p>
               </div>
-            </div>
-            <div>
-              <Label className="text-sm font-medium mb-2 block">Deal URL or Code</Label>
-              <Input
-                placeholder="https://... or coupon code"
-                value={formData.deal_url}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    deal_url: e.target.value,
-                  }))
-                }
-              />
-              <p className="text-xs text-muted-foreground mt-1">Affiliate link or coupon code</p>
-            </div>
+            )}
           </div>
         </Card>
+
+        {/* LEAD CAPTURE FORM SECTION */}
+        {dealTypeSelection === "lead" && (
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Lead Capture Form Configuration</h3>
+            <LeadCaptureForm value={leadFormFields} onChange={setLeadFormFields} />
+            <p className="text-xs text-muted-foreground mt-4">
+              Configure fields to collect from users. These fields will appear when users click "Get Deal".
+            </p>
+          </Card>
+        )}
 
         {/* ACTION BUTTONS */}
         <div className="flex justify-end gap-3 pt-4">
