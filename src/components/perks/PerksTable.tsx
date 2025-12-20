@@ -146,11 +146,11 @@ export function PerksTable() {
                     {perk.location || "Global"}
                   </td>
                   <td className="px-4 py-4 text-sm text-muted-foreground">
-                    {new Date(perk.expiry).toLocaleDateString('en-US', { 
+                    {perk.expiry ? new Date(perk.expiry).toLocaleDateString('en-US', { 
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric'
-                    })}
+                    }) : 'none'}
                   </td>
                   <td className="px-4 py-4">
                     <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
