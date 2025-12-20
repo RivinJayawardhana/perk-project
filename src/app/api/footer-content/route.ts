@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 
 interface FooterData {
   socialLinks: Array<{
@@ -54,20 +55,55 @@ const DEFAULT_DATA: FooterData = {
   ],
 };
 
-let footerData: FooterData = DEFAULT_DATA;
-
 export async function GET() {
-  return NextResponse.json(footerData);
+  try {
+    const { data, error } = await supabase
+      .from("footer_content")
+      .select("social_links, footer_links")
+      .single();
+
+    if (error || !data) {
+      return NextResponse.json(DEFAULT_DATA);
+    }
+
+    const footerData: FooterData = {
+      socialLinks: data.social_links || DEFAULT_DATA.socialLinks,
+      footerLinks: data.footer_links || DEFAULT_DATA.footerLinks,
+    };
+
+    return NextResponse.json(footerData);
+  } catch (error) {
+    console.error("GET /api/footer-content error:", error);
+    return NextResponse.json(DEFAULT_DATA);
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json();
-    footerData = data;
-    return NextResponse.json({ success: true, data: footerData });
+    const data: FooterData = await request.json();
+
+    // Delete all existing footer content and insert new
+    await supabase.from("footer_content").delete().gt("id", "");
+
+    // Insert new footer content
+    const { error } = await supabase.from("footer_content").insert({
+      social_links: data.socialLinks,
+      footer_links: data.footerLinks,
+    });
+
+    if (error) {
+      console.error("Insert error:", error);
+      return NextResponse.json(
+        { error: error.message || "Failed to save footer data" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data });
   } catch (error) {
+    console.error("Error saving footer:", error);
     return NextResponse.json(
-      { error: "Failed to save footer data" },
+      { error: error instanceof Error ? error.message : "Failed to save footer data" },
       { status: 500 }
     );
   }

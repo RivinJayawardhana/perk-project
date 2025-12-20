@@ -75,6 +75,9 @@ export default function EditFooterNav() {
         title: "Success",
         description: "Footer and nav content updated successfully!",
       });
+      
+      // Refresh the data to ensure it's synced with database
+      await fetchData();
     } catch (error: any) {
       toast({
         title: "Error",
