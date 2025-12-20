@@ -10,6 +10,7 @@ import { Plus, Trash2 } from "lucide-react";
 interface Section {
   id: string;
   heading: string;
+  slug: string;
   content: string;
 }
 
@@ -18,29 +19,42 @@ export default function EditPrivacyPage() {
     {
       id: "1",
       heading: "Privacy Policy",
+      slug: "privacy-policy",
       content: "Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your information.",
     },
     {
       id: "2",
       heading: "Information We Collect",
+      slug: "information-we-collect",
       content: "We collect information you provide directly to us, such as when you create an account or contact us.",
     },
     {
       id: "3",
       heading: "How We Use Your Information",
+      slug: "how-we-use-your-information",
       content: "We use the information we collect to provide, maintain, and improve our services.",
     },
     {
       id: "4",
       heading: "Data Security",
+      slug: "data-security",
       content: "We take reasonable measures to protect your personal information from unauthorized access.",
     },
   ]);
+
+  const generateSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+  };
 
   const addSection = () => {
     const newSection: Section = {
       id: Date.now().toString(),
       heading: "New Section",
+      slug: "",
       content: "",
     };
     setSections([...sections, newSection]);
@@ -86,6 +100,29 @@ export default function EditPrivacyPage() {
                   value={section.heading}
                   onChange={(e) => updateSection(section.id, { heading: e.target.value })}
                 />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-1 block">URL Slug</label>
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="section-slug"
+                      value={section.slug}
+                      onChange={(e) => updateSection(section.id, { slug: e.target.value })}
+                      className="mb-1"
+                    />
+                    <p className="text-xs text-muted-foreground">Edit manually or auto-generate from heading</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updateSection(section.id, { slug: generateSlug(section.heading) })}
+                    className="whitespace-nowrap"
+                  >
+                    Auto-generate
+                  </Button>
+                </div>
               </div>
 
               <div>

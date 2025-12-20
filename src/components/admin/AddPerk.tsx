@@ -147,7 +147,7 @@ export default function AddPerk() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.category || !formData.discount || !formData.expiry) {
+    if (!formData.name || !formData.category || !formData.discount) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -493,14 +493,13 @@ export default function AddPerk() {
             </div>
             <div>
               <Label htmlFor="expiry" className="text-sm font-medium mb-2 block">
-                📅 Valid Until <span className="text-destructive">*</span>
+                📅 Valid Until
               </Label>
               <Input
                 id="expiry"
                 type="date"
                 value={formData.expiry}
                 onChange={handleInputChange}
-                required
               />
             </div>
           </div>

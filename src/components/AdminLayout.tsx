@@ -16,7 +16,8 @@ import {
   Tag,
   Phone,
   Handshake,
-  Shield
+  Shield,
+  Users as UsersIcon
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -36,6 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <nav className="flex-1">
             <ul className="space-y-1">
               <li><a href="/admin" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><LayoutDashboard className="w-5 h-5" />Dashboard</span></a></li>
+              <li><a href="/admin/leads" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><UsersIcon className="w-5 h-5" />Leads</span></a></li>
               <li><a href="/admin/perks" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Gift className="w-5 h-5" />All Perks</span></a></li>
               <li><a href="/admin/perks/add" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Plus className="w-5 h-5" />Add Perk</span></a></li>
               <li><a href="/admin/categories" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><FolderOpen className="w-5 h-5" />Categories</span></a></li>
