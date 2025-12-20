@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface PartnerContent {
   hero: {
@@ -37,6 +38,7 @@ export default function Partner() {
   const [content, setContent] = useState<PartnerContent | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { getToken } = useRecaptcha();
   const [form, setForm] = useState({
     company: "",
     contact: "",
@@ -45,8 +47,14 @@ export default function Partner() {
     offer: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // Load reCAPTCHA script
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
+    document.head.appendChild(script);
+
     fetchContent();
   }, []);
 
@@ -69,18 +77,29 @@ export default function Partner() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     try {
+      // Get reCAPTCHA token (optional for development)
+      let token = 'dev-token';
+      if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
+        token = await getToken('partner_form');
+        if (!token) {
+          throw new Error('reCAPTCHA verification failed');
+        }
+      }
+
       const response = await fetch('/api/partner', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, recaptchaToken: token }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit application');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit application');
       }
 
       toast({
@@ -95,10 +114,11 @@ export default function Partner() {
       console.error('Error submitting form:', error);
       toast({
         title: "Error",
-        description: "Failed to submit application. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to submit application. Please try again.",
         variant: "destructive",
       });
-      setSubmitted(false);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -184,9 +204,24 @@ export default function Partner() {
               <Input name="website" placeholder="Website" value={form.website} onChange={handleChange} required className="flex-1" />
             </div>
             <Textarea name="offer" placeholder="Describe your product and the perk you'd like to offer..." value={form.offer} onChange={handleChange} required rows={4} />
-            <Button type="submit" className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 sm:px-8 py-2 sm:py-3 rounded-full hover:bg-[#f5d488] font-display w-full sm:w-auto" disabled={submitted}>
-              {submitted ? "Submitting..." : "Submit Application"}
+            <Button type="submit" className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 sm:px-8 py-2 sm:py-3 rounded-full hover:bg-[#f5d488] font-display w-full sm:w-auto" disabled={submitted || isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : submitted ? (
+                "Submitted!"
+              ) : (
+                "Submit Application"
+              )}
             </Button>
+
+            <p className="text-xs text-[#999] text-center">
+              This site is protected by reCAPTCHA and the Google{" "}
+              <a href="https://policies.google.com/privacy" className="underline">Privacy Policy</a> and{" "}
+              <a href="https://policies.google.com/terms" className="underline">Terms of Service</a> apply.
+            </p>
           </form>
         </div>
       </section>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface FormField {
   id: string;
@@ -45,6 +46,18 @@ export function LeadFormModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const { getToken } = useRecaptcha();
+
+  useEffect(() => {
+    // Load reCAPTCHA script when modal opens
+    if (isOpen) {
+      const script = document.createElement('script');
+      script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
+      if (!document.querySelector(`script[src="${script.src}"]`)) {
+        document.head.appendChild(script);
+      }
+    }
+  }, [isOpen]);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -82,14 +95,23 @@ export function LeadFormModal({
 
     setIsSubmitting(true);
     try {
-      await onSubmit(formData);
+      // Get reCAPTCHA token (optional for development)
+      let token = 'dev-token';
+      if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
+        token = await getToken('lead_form');
+        if (!token) {
+          throw new Error('reCAPTCHA verification failed');
+        }
+      }
+
+      await onSubmit({ ...formData, recaptchaToken: token });
       setIsSuccess(true);
       setTimeout(() => {
         handleClose();
       }, 2000);
     } catch (error) {
       console.error("Form submission error:", error);
-      setErrors({ submit: "Failed to submit form. Please try again." });
+      setErrors({ submit: error instanceof Error ? error.message : "Failed to submit form. Please try again." });
     } finally {
       setIsSubmitting(false);
     }
@@ -222,6 +244,12 @@ export function LeadFormModal({
                 )}
               </Button>
             </div>
+
+            <p className="text-xs text-[#999] text-center">
+              This site is protected by reCAPTCHA and the Google{" "}
+              <a href="https://policies.google.com/privacy" className="underline" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and{" "}
+              <a href="https://policies.google.com/terms" className="underline" target="_blank" rel="noopener noreferrer">Terms of Service</a> apply.
+            </p>
           </form>
         )}
       </DialogContent>

@@ -132,13 +132,17 @@ export const useSubmitLead = () => {
       lead_form_id: string;
       form_data: Record<string, any>;
       email_address?: string;
+      recaptchaToken: string;
     }) => {
       const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error("Failed to submit lead");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to submit lead");
+      }
       return res.json();
     },
   });

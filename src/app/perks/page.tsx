@@ -380,6 +380,7 @@ export default function Perks() {
         lead_form_id: currentLeadForm.id,
         form_data: formData,
         email_address: formData.email || "",
+        recaptchaToken: formData.recaptchaToken || "",
       });
       
       toast({
@@ -391,7 +392,7 @@ export default function Perks() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to submit form. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to submit form. Please try again.",
         variant: "destructive",
       });
     }

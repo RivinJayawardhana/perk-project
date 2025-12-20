@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface ContactPageContent {
   hero: {
@@ -20,6 +21,7 @@ export default function Contact() {
   const [pageContent, setPageContent] = useState<ContactPageContent | null>(null);
   const [contentLoading, setContentLoading] = useState(true);
   const { toast } = useToast();
+  const { getToken } = useRecaptcha();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -28,6 +30,7 @@ export default function Contact() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchPageContent = async () => {
@@ -44,6 +47,11 @@ export default function Contact() {
       }
     };
 
+    // Load reCAPTCHA script
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
+    document.head.appendChild(script);
+
     fetchPageContent();
   }, []);
 
@@ -55,18 +63,29 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     try {
+      // Get reCAPTCHA token (optional for development)
+      let token = 'dev-token';
+      if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
+        token = await getToken('contact_form');
+        if (!token) {
+          throw new Error('reCAPTCHA verification failed');
+        }
+      }
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, recaptchaToken: token }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit form');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit form');
       }
 
       toast({
@@ -81,10 +100,11 @@ export default function Contact() {
       console.error('Error submitting form:', error);
       toast({
         title: "Error",
-        description: "Failed to submit form. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to submit form. Please try again.",
         variant: "destructive",
       });
-      setSubmitted(false);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -184,10 +204,25 @@ export default function Contact() {
             <Button
               type="submit"
               className="bg-[#e6b756] text-[#1a2233] font-semibold px-8 py-3 rounded-full hover:bg-[#f5d488] text-lg font-display"
-              disabled={submitted}
+              disabled={submitted || isSubmitting}
             >
-              {submitted ? "Sending..." : "Send Message"}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Sending...
+                </>
+              ) : submitted ? (
+                "Sent!"
+              ) : (
+                "Send Message"
+              )}
             </Button>
+
+            <p className="text-xs text-[#999] text-center">
+              This site is protected by reCAPTCHA and the Google{" "}
+              <a href="https://policies.google.com/privacy" className="underline">Privacy Policy</a> and{" "}
+              <a href="https://policies.google.com/terms" className="underline">Terms of Service</a> apply.
+            </p>
           </form>
         </div>
       </section>

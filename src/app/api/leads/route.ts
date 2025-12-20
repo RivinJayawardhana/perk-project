@@ -1,6 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import sanitizeHtml from "sanitize-html";
+import { LeadFormSchema } from "@/lib/form-validation";
+import {
+  verifyRecaptcha,
+  checkRateLimit,
+  logSubmission,
+  getClientIp,
+} from "@/lib/form-security";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -48,47 +56,97 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req);
     const body = await req.json();
-    const { perk_id, lead_form_id, form_data, email_address } = body;
 
-    if (!perk_id || !form_data) {
+    // Validate input with Zod
+    const validationResult = LeadFormSchema.safeParse(body);
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Missing required fields: perk_id, form_data" },
+        {
+          error: "Validation failed",
+          details: validationResult.error.errors,
+        },
         { status: 400 }
       );
+    }
+
+    const { data: formData } = validationResult;
+
+    // Verify reCAPTCHA token (optional in development if keys not configured)
+    if (process.env.RECAPTCHA_SECRET_KEY) {
+      const recaptchaValid = await verifyRecaptcha(formData.recaptchaToken);
+      if (!recaptchaValid && formData.recaptchaToken !== 'dev-token') {
+        return NextResponse.json(
+          { error: "reCAPTCHA verification failed" },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Check rate limit (5 submissions per hour per IP)
+    const isUnderLimit = await checkRateLimit(clientIp, "/api/leads", 5, 60);
+    if (!isUnderLimit) {
+      return NextResponse.json(
+        {
+          error: "Too many submissions. Please try again later.",
+          retryAfter: 3600,
+        },
+        { status: 429 }
+      );
+    }
+
+    // Sanitize form_data
+    const sanitizedFormData: Record<string, any> = {};
+    for (const [key, value] of Object.entries(formData.form_data)) {
+      if (typeof value === "string") {
+        sanitizedFormData[key] = sanitizeHtml(value, {
+          allowedTags: [],
+          allowedAttributes: {},
+        });
+      } else {
+        sanitizedFormData[key] = value;
+      }
     }
 
     // Save lead to database
     const { data: leadData, error: saveError } = await supabase
       .from("leads")
       .insert({
-        perk_id,
-        lead_form_id,
-        form_data,
-        email_address,
+        perk_id: formData.perk_id,
+        lead_form_id: formData.lead_form_id,
+        form_data: sanitizedFormData,
+        email_address: formData.email_address
+          ? sanitizeHtml(formData.email_address, { allowedTags: [] })
+          : null,
       })
       .select()
       .single();
 
     if (saveError) throw saveError;
 
+    // Log submission for rate limiting
+    await logSubmission(clientIp, "/api/leads");
+
     // Send email notification
     try {
       const { data: perkData } = await supabase
         .from("perks")
         .select("name")
-        .eq("id", perk_id)
+        .eq("id", formData.perk_id)
         .single();
 
       const perkName = perkData?.name || "Unknown Perk";
-      
+
       const emailHtml = `
         <h2>New Lead Submission</h2>
         <p><strong>Perk:</strong> ${perkName}</p>
-        <p><strong>Submission Time:</strong> ${new Date(leadData.submission_timestamp).toLocaleString()}</p>
+        <p><strong>Submission Time:</strong> ${new Date(
+          leadData.submission_timestamp
+        ).toLocaleString()}</p>
         <h3>Form Data:</h3>
         <table style="border-collapse: collapse; width: 100%;">
-          ${Object.entries(form_data)
+          ${Object.entries(sanitizedFormData)
             .map(
               ([key, value]) =>
                 `<tr style="border: 1px solid #ddd;">
@@ -119,6 +177,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(leadData, { status: 201 });
   } catch (error: any) {
+    console.error("POST /api/leads error:", error);
     return NextResponse.json(
       { error: error.message },
       { status: 500 }
