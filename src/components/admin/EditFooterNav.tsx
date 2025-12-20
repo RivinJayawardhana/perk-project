@@ -245,7 +245,6 @@ export default function EditFooterNav() {
                           setData({ ...data, footerLinks: newLinks });
                         }}
                         placeholder="Link label"
-                        size="sm"
                       />
                     </div>
 
@@ -261,7 +260,6 @@ export default function EditFooterNav() {
                           setData({ ...data, footerLinks: newLinks });
                         }}
                         placeholder="/path or http://..."
-                        size="sm"
                       />
                     </div>
 

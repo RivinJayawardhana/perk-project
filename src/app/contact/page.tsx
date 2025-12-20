@@ -67,12 +67,13 @@ export default function Contact() {
     
     try {
       // Get reCAPTCHA token (optional for development)
-      let token = 'dev-token';
+      let token: string = 'dev-token';
       if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
-        token = await getToken('contact_form');
-        if (!token) {
+        const captchaToken = await getToken('contact_form');
+        if (!captchaToken) {
           throw new Error('reCAPTCHA verification failed');
         }
+        token = captchaToken;
       }
 
       const response = await fetch('/api/contact', {

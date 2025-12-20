@@ -81,12 +81,13 @@ export default function Partner() {
     
     try {
       // Get reCAPTCHA token (optional for development)
-      let token = 'dev-token';
+      let token: string = 'dev-token';
       if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
-        token = await getToken('partner_form');
-        if (!token) {
+        const captchaToken = await getToken('partner_form');
+        if (!captchaToken) {
           throw new Error('reCAPTCHA verification failed');
         }
+        token = captchaToken;
       }
 
       const response = await fetch('/api/partner', {

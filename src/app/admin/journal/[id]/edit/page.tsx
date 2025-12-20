@@ -240,7 +240,8 @@ export default function EditPost({ params }: EditPostProps) {
   }
 
   return (
-    <div className="flex items-center gap-2 mb-6 text-gray-500">
+    <>
+      <div className="flex items-center gap-2 mb-6 text-gray-500">
         <span
           className="text-2xl font-bold text-[#23272f] cursor-pointer hover:text-[#e6b756]"
           onClick={() => router.back()}
@@ -554,6 +555,6 @@ export default function EditPost({ params }: EditPostProps) {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

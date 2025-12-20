@@ -180,7 +180,7 @@ export default function AddPerk() {
         image_url: formData.image_url,
         logo_url: formData.logo_url,
         deal_type: dealType.join(", "),
-        deal_url: dealTypeSelection === "lead" ? null : (formData.deal_url || null),
+        deal_url: dealTypeSelection === "lead" ? undefined : (formData.deal_url || undefined),
         best_for: bestFor.join(", "),
         status: formData.status,
       },
