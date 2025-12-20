@@ -51,6 +51,31 @@ GMAIL_PASSWORD=abcd efgh ijkl mnop
 
 ---
 
+## 3. BREVO_API_KEY
+
+**Steps:**
+1. Go to https://app.brevo.com (login with your Brevo account)
+2. Click **Settings** (bottom left)
+3. Click **Account** tab
+4. Scroll to **API Keys** section
+5. Click **Create a new API key** or copy your existing one
+6. Copy the API key (starts with `xkeysib-`)
+7. Paste in `.env.local` as: `BREVO_API_KEY=xkeysib-...`
+
+**In .env.local:**
+```
+BREVO_API_KEY=xkeysib-your-api-key-here
+```
+
+**Purpose:** Newsletter subscription collection. Users can subscribe to emails via the footer subscribe form, and emails are added to your Brevo account.
+
+⚠️ **IMPORTANT:**
+- Keep this API key secret, don't share it
+- Users can now subscribe to newsletters via the footer form
+- Subscriptions are sent to your Brevo account (list ID 2)
+
+---
+
 ## After Updating .env.local
 
 1. Save `.env.local`
@@ -69,5 +94,8 @@ GMAIL_PASSWORD=abcd efgh ijkl mnop
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase Dashboard → Settings → API |
 | `GMAIL_USER` | Your Gmail address |
 | `GMAIL_PASSWORD` | Google Account → Security → App passwords |
+| `BREVO_API_KEY` | Brevo Dashboard → Settings → Account → API Keys |
 
-Once all 4 are filled in, the lead form will save to database!
+Once all are filled in:
+- Lead forms will save to database
+- Newsletter subscriptions will collect emails to Brevo

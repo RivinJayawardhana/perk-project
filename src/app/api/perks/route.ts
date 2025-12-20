@@ -21,16 +21,39 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
+    // Only send fields that are guaranteed to exist in the schema
+    // deal_url will be added once the migration is run
+    const perkData: any = {
+      name: body.name,
+      description: body.description,
+      category: body.category,
+      discount: body.discount,
+      expiry: body.expiry || null, // Convert empty string to null
+      location: body.location || 'Global',
+      image_url: body.image_url || null,
+      logo_url: body.logo_url || null,
+      deal_type: body.deal_type,
+      best_for: body.best_for || null,
+      status: body.status || 'Active',
+    }
+    
+    // Only add deal_url if it has a value (after migration is run)
+    if (body.deal_url && body.deal_url.trim()) {
+      perkData.deal_url = body.deal_url
+    }
+    
     const { data, error } = await supabase
       .from('perks')
-      .insert([body])
+      .insert([perkData])
       .select()
 
     if (error) {
+      console.error('Supabase error:', error)
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
     return NextResponse.json(data)
-  } catch (err) {
-    return NextResponse.json({ error: 'Failed to create perk' }, { status: 500 })
+  } catch (err: any) {
+    console.error('API error:', err)
+    return NextResponse.json({ error: err.message || 'Failed to create perk' }, { status: 500 })
   }
 }

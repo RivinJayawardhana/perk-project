@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import AdminLayout from "@/components/AdminLayout";
 import { RichTextEditor } from "@/components/journal/RichTextEditor";
 import { ImageUpload } from "@/components/journal/ImageUpload";
 import { useJournal, useUpdateJournal } from "@/hooks/useJournals";
@@ -218,35 +217,30 @@ export default function EditPost({ params }: EditPostProps) {
   // Loading state
   if (!isClient || isLoadingJournal) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-96">
-          <div className="flex flex-col items-center gap-2">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            <p className="text-muted-foreground">Loading journal...</p>
-          </div>
+      <div className="flex items-center justify-center h-96">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading journal...</p>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   if (!journal) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center">
-            <p className="text-destructive mb-4">Journal not found</p>
-            <Button onClick={() => router.push("/admin/journal")}>
-              Back to Journals
-            </Button>
-          </div>
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <p className="text-destructive mb-4">Journal not found</p>
+          <Button onClick={() => router.push("/admin/journal")}>
+            Back to Journals
+          </Button>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="flex items-center gap-2 mb-6 text-gray-500">
+    <div className="flex items-center gap-2 mb-6 text-gray-500">
         <span
           className="text-2xl font-bold text-[#23272f] cursor-pointer hover:text-[#e6b756]"
           onClick={() => router.back()}
@@ -560,6 +554,6 @@ export default function EditPost({ params }: EditPostProps) {
           </div>
         </div>
       </div>
-    </AdminLayout>
+    </div>
   );
 }

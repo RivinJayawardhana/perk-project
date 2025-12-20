@@ -36,6 +36,9 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 export default function Footer() {
   const [footerData, setFooterData] = useState<FooterData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<"idle" | "success" | "error">("idle");
 
   useEffect(() => {
     const fetchFooterData = async () => {
@@ -55,6 +58,40 @@ export default function Footer() {
     fetchFooterData();
   }, []);
 
+  const handleNewsletterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      setSubscriptionStatus("error");
+      setTimeout(() => setSubscriptionStatus("idle"), 3000);
+      return;
+    }
+
+    setSubscribing(true);
+    try {
+      const res = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        setSubscriptionStatus("success");
+        setEmail("");
+        setTimeout(() => setSubscriptionStatus("idle"), 3000);
+      } else {
+        setSubscriptionStatus("error");
+        setTimeout(() => setSubscriptionStatus("idle"), 3000);
+      }
+    } catch (error) {
+      console.error("Failed to subscribe:", error);
+      setSubscriptionStatus("error");
+      setTimeout(() => setSubscriptionStatus("idle"), 3000);
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
   if (loading) {
     return null;
   }
@@ -69,19 +106,32 @@ export default function Footer() {
         <div className="text-[#b0b4bb] mb-6">
           Get exclusive offers, new experience alerts, and gifting inspiration delivered to your inbox.
         </div>
-        <form className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-2xl mx-auto">
+        <form 
+          onSubmit={handleNewsletterSubmit}
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-2xl mx-auto"
+        >
           <input
             type="email"
             placeholder="Enter your email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="flex-1 w-full sm:w-auto px-4 py-3 rounded-lg bg-[#23272f] text-white border border-[#23272f] focus:outline-none focus:ring-2 focus:ring-[#ff4ecd]"
+            disabled={subscribing}
           />
           <button
             type="submit"
-            className="px-8 py-3 rounded-lg font-semibold text-white whitespace-nowrap bg-[#e6b756] hover:bg-[#f5d488]"
+            disabled={subscribing}
+            className="px-8 py-3 rounded-lg font-semibold text-white whitespace-nowrap bg-[#e6b756] hover:bg-[#f5d488] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Subscribe
+            {subscribing ? "Subscribing..." : "Subscribe"}
           </button>
         </form>
+        {subscriptionStatus === "success" && (
+          <div className="mt-3 text-green-400 text-sm">✓ Successfully subscribed! Check your email.</div>
+        )}
+        {subscriptionStatus === "error" && (
+          <div className="mt-3 text-red-400 text-sm">✗ Failed to subscribe. Please try again.</div>
+        )}
       </div>
 
       {/* Divider */}

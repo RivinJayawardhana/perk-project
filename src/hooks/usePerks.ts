@@ -12,6 +12,7 @@ export interface Perk {
   image_url?: string
   logo_url?: string
   deal_type?: string
+  deal_url?: string
   best_for?: string
   subcategory?: string
   created_at?: string

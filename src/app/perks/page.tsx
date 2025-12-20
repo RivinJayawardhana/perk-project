@@ -41,6 +41,8 @@ interface DisplayPerk {
   dealTypes: string[];
   bestFor: string[];
   featured?: boolean;
+  deal_type?: string;
+  deal_url?: string;
 }
 
 // Transform API perk data to display format
@@ -60,6 +62,8 @@ const transformPerkData = (apiPerk: any): DisplayPerk => {
     dealTypes: apiPerk.deal_type ? apiPerk.deal_type.split(", ").filter((t: string) => t) : [],
     bestFor: apiPerk.best_for ? apiPerk.best_for.split(", ").filter((b: string) => b) : [],
     featured: false,
+    deal_type: apiPerk.deal_type,
+    deal_url: apiPerk.deal_url,
   };
 };
 
@@ -98,6 +102,12 @@ export default function Perks() {
     perkId: null,
   });
   const { data: currentLeadForm } = useLeadForm(leadFormModal.perkId);
+  
+  const [couponModal, setCouponModal] = useState<{ isOpen: boolean; code: string }>({
+    isOpen: false,
+    code: "",
+  });
+  const [copiedCoupon, setCopiedCoupon] = useState(false);
   
   useEffect(() => {
     const fetchPageContent = async () => {
@@ -331,18 +341,40 @@ export default function Perks() {
              (perk as any).deal_type?.toLowerCase().includes(type.toLowerCase());
     };
 
-    if (hasDealType("lead")) {
+    // Handle affiliate link
+    if (hasDealType("affiliate")) {
+      if (perk.deal_url) {
+        window.open(perk.deal_url, "_blank");
+        toast({
+          title: "Opening...",
+          description: "Affiliate link opened in a new tab",
+        });
+      } else {
+        toast({
+          title: "No Link",
+          description: "Affiliate link not available",
+          variant: "destructive",
+        });
+      }
+    } 
+    // Handle coupon code
+    else if (hasDealType("coupon")) {
+      if (perk.deal_url) {
+        setCouponModal({
+          isOpen: true,
+          code: perk.deal_url,
+        });
+      } else {
+        toast({
+          title: "No Coupon",
+          description: "Coupon code not available",
+          variant: "destructive",
+        });
+      }
+    } 
+    // Handle lead form
+    else if (hasDealType("lead")) {
       setLeadFormModal({ isOpen: true, perkId: perk.id });
-    } else if (hasDealType("affiliate")) {
-      toast({
-        title: "Redirecting...",
-        description: "Opening affiliate link",
-      });
-    } else if (hasDealType("coupon")) {
-      toast({
-        title: "Coupon Code",
-        description: "Show coupon code modal or copy to clipboard",
-      });
     } else {
       toast({
         title: "Get Deal",
@@ -688,6 +720,45 @@ export default function Perks() {
               ]}
           onSubmit={handleLeadFormSubmit}
         />
+      )}
+      
+      {/* Coupon Code Modal */}
+      {couponModal.isOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h2 className="text-xl font-semibold text-[#181c23] mb-4">Coupon Code</h2>
+            <div className="bg-[#f5f5f5] rounded-lg p-4 mb-4">
+              <p className="text-sm text-[#6b6f76] mb-2">Use this code to claim your deal:</p>
+              <p className="text-2xl font-bold text-[#e6b756] font-display break-all">{couponModal.code}</p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => {
+                  navigator.clipboard.writeText(couponModal.code);
+                  setCopiedCoupon(true);
+                  setTimeout(() => setCopiedCoupon(false), 2000);
+                }}
+                className="flex-1 bg-[#e6b756] text-[#1a2233] font-semibold hover:bg-[#f5d488]"
+              >
+                {copiedCoupon ? "✓ Copied!" : "Copy Code"}
+              </Button>
+              <Button
+                onClick={() => window.open(couponModal.code.startsWith('http') ? couponModal.code : '#', '_blank')}
+                variant="outline"
+                className="flex-1"
+              >
+                Open Link
+              </Button>
+            </div>
+            <Button
+              onClick={() => setCouponModal({ isOpen: false, code: "" })}
+              variant="ghost"
+              className="w-full mt-3"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
       )}
       
       <Footer />

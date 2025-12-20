@@ -176,6 +176,7 @@ export default function AddPerk() {
         image_url: formData.image_url,
         logo_url: formData.logo_url,
         deal_type: selectedDealType,
+        deal_url: formData.deal_url,
         best_for: bestFor.join(", "),
         status: formData.status,
       },

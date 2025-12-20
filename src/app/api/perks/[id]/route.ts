@@ -31,18 +31,41 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
     
+    // Build update data with known safe fields
+    const updateData: any = {}
+    
+    const safeFields = ['name', 'description', 'category', 'discount', 'location', 'image_url', 'logo_url', 'deal_type', 'best_for', 'status']
+    
+    safeFields.forEach(field => {
+      if (body[field] !== undefined && body[field] !== null) {
+        updateData[field] = body[field]
+      }
+    })
+    
+    // Handle expiry - convert empty string to null
+    if (body.expiry !== undefined) {
+      updateData.expiry = body.expiry || null
+    }
+    
+    // Only add deal_url if it has a value (after migration is run)
+    if (body.deal_url !== undefined && body.deal_url !== null && body.deal_url.trim?.()) {
+      updateData.deal_url = body.deal_url
+    }
+    
     const { data, error } = await supabase
       .from('perks')
-      .update(body)
+      .update(updateData)
       .eq('id', id)
       .select()
 
     if (error) {
+      console.error('Supabase error:', error)
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
     return NextResponse.json(data)
-  } catch (err) {
-    return NextResponse.json({ error: 'Failed to update perk' }, { status: 500 })
+  } catch (err: any) {
+    console.error('API error:', err)
+    return NextResponse.json({ error: err.message || 'Failed to update perk' }, { status: 500 })
   }
 }
 

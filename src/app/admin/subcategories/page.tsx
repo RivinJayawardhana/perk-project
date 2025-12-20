@@ -1,13 +1,8 @@
 "use client";
 
 import React from "react";
-import AdminLayout from "@/components/AdminLayout";
 import Subcategories from "@/components/admin/Subcategories";
 
 export default function SubcategoriesPage() {
-  return (
-    <AdminLayout>
-      <Subcategories />
-    </AdminLayout>
-  );
+  return <Subcategories />;
 }

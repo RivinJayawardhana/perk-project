@@ -201,6 +201,7 @@ export default function EditPerk({ perkId }: EditPerkProps) {
         image_url: formData.image_url,
         logo_url: formData.logo_url,
         deal_type: dealType.join(", "),
+        deal_url: formData.deal_url,
         best_for: bestFor.join(", "),
         status: formData.status,
       },
