@@ -20,7 +20,8 @@ import {
   Shield,
   Users as UsersIcon,
   LogOut,
-  Lock
+  Lock,
+  Navigation
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -82,6 +83,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <ul className="space-y-1 mt-6">
               <li><a href="/admin/journal" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><BookOpen className="w-5 h-5" />Journal</span></a></li>
+              <li><a href="/admin/footer-nav" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Navigation className="w-5 h-5" />Footer & Nav</span></a></li>
               <li><a href="/admin/settings" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Settings className="w-5 h-5" />Settings</span></a></li>
             </ul>
           </nav>

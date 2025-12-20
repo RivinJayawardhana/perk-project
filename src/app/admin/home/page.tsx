@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AdminLayout from "@/components/AdminLayout";
 import { ImageUpload } from "@/components/perks/ImageUpload";
 import { useToast } from "@/hooks/use-toast";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -179,37 +178,34 @@ export default function EditHomePage() {
 
   if (isLoading) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-96">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
-      </AdminLayout>
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Homepage Editor
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Edit all homepage sections and content
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Homepage Editor
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          Edit all homepage sections and content
+        </p>
+      </div>
 
-        <Tabs defaultValue="hero" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="hero">Hero</TabsTrigger>
-            <TabsTrigger value="howItWorks">How It Works</TabsTrigger>
-            <TabsTrigger value="sections">Other Sections</TabsTrigger>
-            <TabsTrigger value="cta">CTA Cards</TabsTrigger>
-            <TabsTrigger value="preview">Preview</TabsTrigger>
-          </TabsList>
+      <Tabs defaultValue="hero" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="hero">Hero</TabsTrigger>
+          <TabsTrigger value="howItWorks">How It Works</TabsTrigger>
+          <TabsTrigger value="sections">Other Sections</TabsTrigger>
+          <TabsTrigger value="cta">CTA Cards</TabsTrigger>
+          <TabsTrigger value="preview">Preview</TabsTrigger>
+        </TabsList>
 
-          {/* HERO SECTION */}
-          <TabsContent value="hero" className="space-y-6">
+        {/* HERO SECTION */}
+        <TabsContent value="hero" className="space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-bold mb-4">Hero Section</h2>
 
@@ -391,10 +387,10 @@ export default function EditHomePage() {
                 </div>
               </div>
             </Card>
-          </TabsContent>
+        </TabsContent>
 
-          {/* HOW IT WORKS SECTION */}
-          <TabsContent value="howItWorks" className="space-y-6">
+        {/* HOW IT WORKS SECTION */}
+        <TabsContent value="howItWorks" className="space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-bold mb-4">How It Works Section</h2>
 
@@ -482,10 +478,10 @@ export default function EditHomePage() {
                 </div>
               </div>
             </Card>
-          </TabsContent>
+        </TabsContent>
 
-          {/* OTHER SECTIONS */}
-          <TabsContent value="sections" className="space-y-6">
+        {/* OTHER SECTIONS */}
+        <TabsContent value="sections" className="space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-bold mb-4">Featured Deals Section</h2>
               <div>
@@ -523,10 +519,10 @@ export default function EditHomePage() {
                 />
               </div>
             </Card>
-          </TabsContent>
+        </TabsContent>
 
-          {/* CTA CARDS SECTION */}
-          <TabsContent value="cta" className="space-y-6">
+        {/* CTA CARDS SECTION */}
+        <TabsContent value="cta" className="space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-bold mb-4">CTA Card 1 - For Founders</h2>
               <div className="space-y-4">
@@ -654,26 +650,26 @@ export default function EditHomePage() {
                 </div>
               </div>
             </Card>
-          </TabsContent>
+        </TabsContent>
 
-          {/* PREVIEW */}
-          <TabsContent value="preview" className="space-y-6">
+        {/* PREVIEW */}
+        <TabsContent value="preview" className="space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-bold mb-4">Content Preview</h2>
               <pre className="bg-muted p-4 rounded overflow-auto max-h-96 text-xs">
                 {JSON.stringify(content, null, 2)}
               </pre>
             </Card>
-          </TabsContent>
+        </TabsContent>
         </Tabs>
 
         <div className="flex justify-end gap-4">
-          <Button variant="outline">Reset to Defaults</Button>
-          <Button
+        <Button variant="outline">Reset to Defaults</Button>
+        <Button
             onClick={handleSave}
             disabled={isSaving}
             className="bg-primary hover:bg-primary/90"
-          >
+        >
             {isSaving ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -682,9 +678,8 @@ export default function EditHomePage() {
             ) : (
               "Save Changes"
             )}
-          </Button>
+        </Button>
         </div>
       </div>
-    </AdminLayout>
-  );
+    );
 }

@@ -1,7 +1,64 @@
+"use client";
+
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
+
+interface SocialLink {
+  platform: string;
+  url: string;
+  icon: string;
+}
+
+interface FooterLink {
+  label: string;
+  url: string;
+}
+
+interface FooterSection {
+  section: string;
+  links: FooterLink[];
+}
+
+interface FooterData {
+  socialLinks: SocialLink[];
+  footerLinks: FooterSection[];
+}
+
+const ICON_MAP: Record<string, React.ReactNode> = {
+  Facebook: <Facebook size={20} />,
+  Instagram: <Instagram size={20} />,
+  Linkedin: <Linkedin size={20} />,
+  Twitter: <Twitter size={20} />,
+  Youtube: <Youtube size={20} />,
+};
 
 export default function Footer() {
+  const [footerData, setFooterData] = useState<FooterData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFooterData = async () => {
+      try {
+        const res = await fetch("/api/footer-content");
+        if (res.ok) {
+          const data = await res.json();
+          setFooterData(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch footer data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFooterData();
+  }, []);
+
+  if (loading) {
+    return null;
+  }
+
   return (
     <footer className="bg-[#181c23] text-[#e6e6e6] pt-12 pb-6 px-4 mt-16">
       {/* Newsletter Section */}
@@ -44,42 +101,21 @@ export default function Footer() {
             <p className="text-[#b0b4bb] text-sm">Perks for founders & remote teams.</p>
           </div>
 
-          {/* Product */}
-          <div>
-            <h4 className="font-semibold text-white mb-4">Product</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/perks" className="text-[#b0b4bb] hover:text-[#e6b756]">Explore Perks</Link></li>
-              <li><Link href="/perks" className="text-[#b0b4bb] hover:text-[#e6b756]">For Teams</Link></li>
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="font-semibold text-white mb-4">Company</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/about" className="text-[#b0b4bb] hover:text-[#e6b756]">About Us</Link></li>
-              <li><Link href="/journal" className="text-[#b0b4bb] hover:text-[#e6b756]">Journal</Link></li>
-              <li><Link href="/contact" className="text-[#b0b4bb] hover:text-[#e6b756]">Contact</Link></li>
-            </ul>
-          </div>
-
-          {/* Partners */}
-          <div>
-            <h4 className="font-semibold text-white mb-4">Partners</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/partner" className="text-[#b0b4bb] hover:text-[#e6b756]">Become a Partner</Link></li>
-              <li><Link href="/partner" className="text-[#b0b4bb] hover:text-[#e6b756]">Partner Login</Link></li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h4 className="font-semibold text-white mb-4">Legal</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-[#b0b4bb] hover:text-[#e6b756]">Privacy Policy</Link></li>
-              <li><Link href="#" className="text-[#b0b4bb] hover:text-[#e6b756]">Terms of Service</Link></li>
-            </ul>
-          </div>
+          {/* Dynamic Footer Links */}
+          {footerData?.footerLinks.map((section, idx) => (
+            <div key={idx}>
+              <h4 className="font-semibold text-white mb-4">{section.section}</h4>
+              <ul className="space-y-2 text-sm">
+                {section.links.map((link, linkIdx) => (
+                  <li key={linkIdx}>
+                    <Link href={link.url} className="text-[#b0b4bb] hover:text-[#e6b756]">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -89,17 +125,18 @@ export default function Footer() {
       {/* Social & Copyright */}
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col items-center justify-center gap-6 mb-6">
-          {/* Social Media Icons */}
+          {/* Dynamic Social Media Icons */}
           <div className="flex gap-4">
-            <a href="#" className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center text-[#1a2233] hover:opacity-80 transition">
-              <Facebook size={20} />
-            </a>
-            <a href="#" className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center text-[#1a2233] hover:opacity-80 transition">
-              <Instagram size={20} />
-            </a>
-            <a href="#" className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center text-[#1a2233] hover:opacity-80 transition">
-              <Linkedin size={20} />
-            </a>
+            {footerData?.socialLinks.map((link, idx) => (
+              <a
+                key={idx}
+                href={link.url}
+                className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center text-[#1a2233] hover:opacity-80 transition"
+                title={link.platform}
+              >
+                {ICON_MAP[link.icon] || ICON_MAP["Facebook"]}
+              </a>
+            ))}
           </div>
         </div>
 
