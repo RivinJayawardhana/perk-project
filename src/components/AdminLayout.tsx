@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   Gift,
@@ -17,14 +18,28 @@ import {
   Phone,
   Handshake,
   Shield,
-  Users as UsersIcon
+  Users as UsersIcon,
+  LogOut,
+  Lock
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [frontendOpen, setFrontendOpen] = useState(true);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
 
   const isActive = (href: string) => pathname === href;
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-[#fcfaf7]">
@@ -71,12 +86,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </ul>
           </nav>
         </div>
-        <div className="flex items-center gap-3 px-3 py-2 mt-8 border-t border-[#23272f] pt-4">
-          <div className="w-8 h-8 rounded-full bg-[#23272f] flex items-center justify-center"><User className="w-5 h-5 text-[#e6b756]" /></div>
-          <div>
-            <div className="text-sm font-semibold">Admin</div>
-            <div className="text-xs text-[#b0b4bb]">admin@perks.io</div>
-          </div>
+        <div className="flex items-center gap-3 px-3 py-2 mt-8 border-t border-[#23272f] pt-4 relative">
+          <button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="flex items-center gap-3 flex-1 hover:bg-[#23272f] rounded-lg p-2 transition duration-150 cursor-pointer"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#23272f] flex items-center justify-center"><User className="w-5 h-5 text-[#e6b756]" /></div>
+            <div className="text-left flex-1">
+              <div className="text-sm font-semibold">Admin</div>
+              <div className="text-xs text-[#b0b4bb] truncate">{user?.email || "admin@perks.io"}</div>
+            </div>
+          </button>
+
+          {/* User Menu Dropdown */}
+          {showUserMenu && (
+            <div className="absolute bottom-full left-4 right-4 mb-2 bg-[#23272f] border border-[#2d3139] rounded-lg shadow-lg z-50">
+              <button
+                onClick={() => {
+                  router.push("/admin/settings");
+                  setShowUserMenu(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2 text-white hover:bg-[#2d3139] transition duration-150 text-sm rounded-t-lg"
+              >
+                <Lock className="w-4 h-4" />
+                Change Password
+              </button>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-2 text-red-400 hover:bg-[#2d3139] transition duration-150 text-sm rounded-b-lg border-t border-[#2d3139]"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </aside>
       <div className="flex-1 p-8">
