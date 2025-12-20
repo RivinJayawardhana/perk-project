@@ -95,6 +95,8 @@ export default function Perks() {
   const [selectedBestFor, setSelectedBestFor] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [filteredPerks, setFilteredPerks] = useState<DisplayPerk[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const ITEMS_PER_PAGE = 12;
   
   // Lead form modal state
   const [leadFormModal, setLeadFormModal] = useState<{ isOpen: boolean; perkId: string | null }>({
@@ -265,6 +267,7 @@ export default function Perks() {
     }
 
     setFilteredPerks(filtered);
+    setCurrentPage(0); // Reset to first page when filters change
   };
 
   const handleClearFilters = () => {
@@ -274,6 +277,7 @@ export default function Perks() {
     setSelectedLocations([]);
     setSelectedBestFor([]);
     setSelectedSubcategories([]);
+    setCurrentPage(0);
     setFilteredPerks(mockPerks);
   };
 
@@ -602,8 +606,8 @@ export default function Perks() {
               </div>
             ) : (
               <div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                  {filteredPerks.slice(0, 12).map((perk) => (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredPerks.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((perk) => (
                 <div key={perk.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <img src={perk.image} alt={perk.title} className="w-full h-40 sm:h-48 object-cover" />
@@ -620,14 +624,14 @@ export default function Perks() {
                       <Badge variant="outline" className="text-xs">
                         {perk.category}
                       </Badge>
-                      {perk.dealTypes.slice(0, 2).map((type, idx) => (
+                      {perk.dealTypes.filter((type) => !["lead_capture_form", "coupon_code", "affiliate_link"].includes(type)).slice(0, 2).map((type, idx) => (
                         <Badge key={idx} variant="secondary" className="text-xs bg-blue-50 text-blue-700">
                           {type}
                         </Badge>
                       ))}
-                      {perk.dealTypes.length > 2 && (
+                      {perk.dealTypes.filter((type) => !["lead_capture_form", "coupon_code", "affiliate_link"].includes(type)).length > 2 && (
                         <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600">
-                          +{perk.dealTypes.length - 2}
+                          +{perk.dealTypes.filter((type) => !["lead_capture_form", "coupon_code", "affiliate_link"].includes(type)).length - 2}
                         </Badge>
                       )}
                     </div>
@@ -666,7 +670,7 @@ export default function Perks() {
                       </span>
                       <Button 
                         onClick={() => handleGetDeal(perk)}
-                        className="bg-[#e6b756] text-[#1a2233] font-semibold px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm hover:bg-[#f5d488] transition-colors font-display w-full sm:w-auto">
+                        className="bg-[#e6b756] text-[#1a2233] font-semibold px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:text-base hover:bg-[#f5d488] transition-colors font-display w-full sm:w-auto">
                         Get Deal
                       </Button>
                     </div>
@@ -675,11 +679,23 @@ export default function Perks() {
               ))}
             </div>
 
-            {/* Load More Button */}
-            {filteredPerks.length > 12 && (
-              <div className="text-center mt-8 sm:mt-10">
-                <Button className="bg-white border border-[#e6b756] text-[#e6b756] font-semibold px-6 sm:px-8 py-2 rounded-full hover:bg-[#fffbe6] transition-colors font-display text-sm sm:text-base">
-                  Load More
+            {/* Pagination */}
+            {filteredPerks.length > ITEMS_PER_PAGE && (
+              <div className="flex justify-center items-center gap-4 mt-8 sm:mt-10">
+                <Button 
+                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                  disabled={currentPage === 0}
+                  className="bg-white border border-[#e6b756] text-[#e6b756] font-semibold px-6 sm:px-8 py-2 rounded-full hover:bg-[#fffbe6] transition-colors font-display text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed">
+                  Previous
+                </Button>
+                <span className="text-sm sm:text-base text-[#6b6f76] font-medium">
+                  Page {currentPage + 1} of {Math.ceil(filteredPerks.length / ITEMS_PER_PAGE)}
+                </span>
+                <Button 
+                  onClick={() => setCurrentPage(Math.min(Math.ceil(filteredPerks.length / ITEMS_PER_PAGE) - 1, currentPage + 1))}
+                  disabled={currentPage >= Math.ceil(filteredPerks.length / ITEMS_PER_PAGE) - 1}
+                  className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 sm:px-8 py-2 rounded-full hover:bg-[#f5d488] transition-colors font-display text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed">
+                  Next
                 </Button>
               </div>
             )}

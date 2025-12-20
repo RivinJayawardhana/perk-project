@@ -353,21 +353,6 @@ export default function EditHomePage() {
                                 </>
                               )}
                             </button>
-
-                            {/* URL Input */}
-                            <Input
-                              value={image}
-                              onChange={(e) => {
-                                const newImages = [...content.hero.heroImages];
-                                newImages[idx] = e.target.value;
-                                setContent({
-                                  ...content,
-                                  hero: { ...content.hero, heroImages: newImages },
-                                });
-                              }}
-                              placeholder="Or paste URL"
-                              className="flex-1"
-                            />
                           </div>
 
                           <input

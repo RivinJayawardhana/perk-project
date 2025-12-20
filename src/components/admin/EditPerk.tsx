@@ -364,20 +364,6 @@ export default function EditPerk({ perkId }: EditPerkProps) {
                   disabled={isUploading}
                 />
               </div>
-              <div className="mt-3">
-                <Label className="text-xs font-medium mb-2 block text-muted-foreground">Or paste URL:</Label>
-                <Input
-                  type="url"
-                  placeholder="https://..."
-                  value={formData.image_url}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      image_url: e.target.value,
-                    }))
-                  }
-                />
-              </div>
             </div>
             <div>
               <Label className="text-sm font-medium mb-2 block">Company Logo</Label>
@@ -402,20 +388,6 @@ export default function EditPerk({ perkId }: EditPerkProps) {
                       onChange={handleLogoUpload}
                       className="hidden"
                       disabled={isUploading}
-                    />
-                  </div>
-                  <div className="mt-3">
-                    <Label className="text-xs font-medium mb-2 block text-muted-foreground">Or paste URL:</Label>
-                    <Input
-                      type="url"
-                      placeholder="https://..."
-                      value={formData.logo_url}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          logo_url: e.target.value,
-                        }))
-                      }
                     />
                   </div>
                 </div>
