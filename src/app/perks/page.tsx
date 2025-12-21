@@ -662,8 +662,8 @@ export default function Perks() {
                     </div>
 
                     {/* Footer */}
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 pt-2 sm:pt-3 border-t border-gray-100">
-                      <span className="text-xs text-[#6b6f76] flex items-center gap-1 flex-shrink-0">
+                    <div className="flex flex-col items-center justify-center gap-3 pt-4 border-t border-gray-100">
+                      <span className="text-xs text-[#6b6f76] flex items-center gap-1">
                         <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
                           <path d="M8 2v2M16 2v2M3 8.5h18M4 21h16a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1Z" stroke="#b48a1e" strokeWidth="1.5"/>
                         </svg>
@@ -671,7 +671,7 @@ export default function Perks() {
                       </span>
                       <Button 
                         onClick={() => handleGetDeal(perk)}
-                        className="bg-[#e6b756] text-[#1a2233] font-semibold px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:text-base hover:bg-[#f5d488] transition-colors font-display w-full sm:w-auto">
+                        className="bg-[#e6b756] text-[#1a2233] font-semibold px-8 py-3 rounded-full text-base hover:bg-[#f5d488] transition-colors font-display w-full">
                         Get Deal
                       </Button>
                     </div>
