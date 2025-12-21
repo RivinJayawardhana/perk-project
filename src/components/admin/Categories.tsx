@@ -34,6 +34,20 @@ export default function Categories() {
   const [editSlug, setEditSlug] = useState("");
   const [openEditDialog, setOpenEditDialog] = useState(false);
 
+  const generateSlug = (text: string) => {
+    return text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+  };
+
+  const handleNewCategoryNameChange = (value: string) => {
+    setNewCategoryName(value);
+    setNewCategorySlug(generateSlug(value));
+  };
+
+  const handleEditNameChange = (value: string) => {
+    setEditName(value);
+    setEditSlug(generateSlug(value));
+  };
+
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) {
       toast({
@@ -45,7 +59,7 @@ export default function Categories() {
     }
 
     createCategory(
-      { name: newCategoryName, slug: newCategorySlug || newCategoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') },
+      { name: newCategoryName, slug: newCategorySlug },
       {
         onSuccess: () => {
           toast({ title: "Category created successfully" });
@@ -62,7 +76,7 @@ export default function Categories() {
         },
       }
     );
-  };
+  };;
 
   const handleDeleteCategoryClick = (id: string) => {
     deleteCategory(id, {
@@ -102,7 +116,7 @@ export default function Categories() {
           id: editingId,
           data: {
             name: editName,
-            slug: editSlug || editName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, ''),
+            slug: editSlug,
           },
         },
         {
@@ -161,28 +175,25 @@ export default function Categories() {
                 <DialogTitle>Add New Category</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium block">
                     Category Name *
                   </label>
                   <Input
                     placeholder="e.g., SaaS Tools"
                     value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    onChange={(e) => handleNewCategoryNameChange(e.target.value)}
                   />
                 </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Slug (optional)
+                <div className="space-y-2">
+                  <label className="text-sm font-medium block">
+                    Slug
                   </label>
                   <Input
-                    placeholder="auto-generated from name if empty"
+                    placeholder="auto-generated"
                     value={newCategorySlug}
                     onChange={(e) => setNewCategorySlug(e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {newCategorySlug || newCategoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') || 'slug-preview'}
-                  </p>
                 </div>
                 <div className="flex gap-2 justify-end pt-4">
                   <Button
@@ -295,8 +306,8 @@ export default function Categories() {
               <DialogTitle>Edit Category</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">
+              <div className="space-y-2">
+                <label className="text-sm font-medium block">
                   Category Name *
                 </label>
                 <Input
@@ -305,18 +316,15 @@ export default function Categories() {
                   onChange={(e) => setEditName(e.target.value)}
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Slug (optional)
+              <div className="spacehandleEditNameChangeY-2">
+                <label className="text-sm font-medium block">
+                  Slug
                 </label>
                 <Input
-                  placeholder="auto-generated from name if empty"
+                  placeholder="auto-generated"
                   value={editSlug}
                   onChange={(e) => setEditSlug(e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {editSlug || editName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') || 'slug-preview'}
-                </p>
               </div>
               <div className="flex gap-2 justify-end pt-4">
                 <Button
