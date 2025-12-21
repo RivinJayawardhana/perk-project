@@ -1,9 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { Color } from "@tiptap/extension-color";
+import { Highlight } from "@tiptap/extension-highlight";
+import ImageExtension from "@tiptap/extension-image";
+import Underline from "@tiptap/extension-underline";
+import LinkExtension from "@tiptap/extension-link";
 import {
   Bold,
   Italic,
@@ -19,14 +26,11 @@ import {
   Strikethrough,
   Type,
   Eraser,
-  IndentDecrease,
-  IndentIncrease,
-  Undo,
-  Redo,
-  HelpCircle,
-  Code,
+  X,
+  Palette,
+  Image,
+  Underline as UnderlineIcon,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -34,6 +38,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface RichTextEditorProps {
   value?: string;
@@ -46,6 +59,12 @@ export function RichTextEditor({
   onChange,
   placeholder = "Start typing...",
 }: RichTextEditorProps) {
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkText, setLinkText] = useState("");
+  const [isLinkOpen, setIsLinkOpen] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isImageOpen, setIsImageOpen] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -54,6 +73,16 @@ export function RichTextEditor({
       }),
       Placeholder.configure({
         placeholder,
+      }),
+      TextStyle,
+      Color,
+      Highlight.configure({
+        multicolor: true,
+      }),
+      ImageExtension,
+      Underline,
+      LinkExtension.configure({
+        openOnClick: false,
       }),
     ],
     content: value,
@@ -70,15 +99,41 @@ export function RichTextEditor({
   const handleHeadingChange = (value: string) => {
     if (value === "paragraph") {
       editor.chain().focus().setParagraph().run();
-    } else if (value === "code") {
-      editor.chain().focus().toggleCodeBlock().run();
     } else {
-      const level = parseInt(value) as 1 | 2 | 3 | 4 | 5 | 6;
+      const level = parseInt(value) as 1 | 2 | 3;
       editor.chain().focus().toggleHeading({ level }).run();
     }
   };
 
-  const ToolbarButton = ({
+  const handleAddLink = () => {
+    if (linkUrl) {
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: linkUrl })
+        .insertContent(linkText || linkUrl)
+        .run();
+      setLinkUrl("");
+      setLinkText("");
+      setIsLinkOpen(false);
+    }
+  };
+
+  const handleAddImage = () => {
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const src = e.target?.result as string;
+        editor.chain().focus().setImage({ src }).run();
+        setImageFile(null);
+        setIsImageOpen(false);
+      };
+      reader.readAsDataURL(imageFile);
+    }
+  };
+
+  const ToolbarIconButton = ({
     onClick,
     active,
     icon: Icon,
@@ -87,31 +142,63 @@ export function RichTextEditor({
   }: {
     onClick: () => void;
     active: boolean;
-    icon: React.ComponentType<{ className?: string }>;
+    icon: any;
     title: string;
     disabled?: boolean;
-  }) => (
-    <Button
-      type="button"
-      variant={active ? "default" : "outline"}
-      size="icon"
-      className="w-8 h-8"
-      onClick={onClick}
-      title={title}
-      disabled={disabled}
-    >
-      <Icon className="w-4 h-4" />
-    </Button>
-  );
+  }) => {
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onClick();
+      // Ensure editor stays focused
+      setTimeout(() => {
+        editor?.view.focus();
+      }, 0);
+    };
+
+    return (
+      <button
+        type="button"
+        onMouseDown={handleClick}
+        title={title}
+        disabled={disabled}
+        className={`inline-flex items-center justify-center w-8 h-8 text-sm font-medium rounded transition-colors ${
+          active
+            ? "bg-gray-200 text-gray-900"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        } ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
+      >
+        {typeof Icon === "string" || typeof Icon === "function" ? (
+          typeof Icon === "function" ? Icon() : <span>{Icon}</span>
+        ) : (
+          <Icon className="w-4 h-4" />
+        )}
+      </button>
+    );
+  };
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      {/* Toolbar */}
-      <div className="bg-muted/50 border-b p-2 space-y-2">
-        {/* Row 2 - Formatting */}
-        <div className="flex items-center gap-1 flex-wrap border-t border-border pt-2">
-          <Select defaultValue="paragraph">
-            <SelectTrigger className="w-32 h-8 text-xs">
+    <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+      {/* Toolbar Header */}
+      <div className="bg-gray-100 border-b border-gray-300 px-4 py-2.5">
+        {/* Top Row */}
+        <div className="flex items-center justify-between mb-2.5 pb-2.5 border-b border-gray-300">
+          <button 
+            type="button"
+            className="text-xs text-gray-700 px-3 py-1.5 border border-gray-300 rounded bg-white hover:bg-gray-50 flex items-center gap-1.5 font-medium"
+          >
+            <span className="text-sm">📎</span> Add Media
+          </button>
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-medium text-gray-700 cursor-pointer">Visual</span>
+            <span className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">Text</span>
+          </div>
+        </div>
+
+        {/* Toolbar Row 1 */}
+        <div className="flex items-center gap-0.5 flex-wrap mb-1.5">
+          <Select onValueChange={handleHeadingChange}>
+            <SelectTrigger className="w-28 h-7 text-xs border-0 bg-white hover:bg-gray-50 text-gray-700 font-medium focus:ring-0">
               <SelectValue placeholder="Paragraph" />
             </SelectTrigger>
             <SelectContent>
@@ -119,131 +206,188 @@ export function RichTextEditor({
               <SelectItem value="1">Heading 1</SelectItem>
               <SelectItem value="2">Heading 2</SelectItem>
               <SelectItem value="3">Heading 3</SelectItem>
-              <SelectItem value="4">Heading 4</SelectItem>
-              <SelectItem value="5">Heading 5</SelectItem>
-              <SelectItem value="6">Heading 6</SelectItem>
-              <SelectItem value="code">Code Block</SelectItem>
             </SelectContent>
           </Select>
 
-          <div className="h-6 w-px bg-border mx-1" />
+          <div className="h-5 w-px bg-gray-300 mx-0.5" />
 
-          <ToolbarButton
+          <ToolbarIconButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             active={editor.isActive("bold")}
             icon={Bold}
             title="Bold"
           />
-          <ToolbarButton
+          <ToolbarIconButton
             onClick={() => editor.chain().focus().toggleItalic().run()}
             active={editor.isActive("italic")}
             icon={Italic}
             title="Italic"
           />
-          <ToolbarButton
+          <ToolbarIconButton
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+            active={editor.isActive("underline")}
+            icon={UnderlineIcon}
+            title="Underline"
+          />
+          <ToolbarIconButton
             onClick={() => editor.chain().focus().toggleStrike().run()}
             active={editor.isActive("strike")}
             icon={Strikethrough}
             title="Strikethrough"
           />
 
-          <div className="h-6 w-px bg-border mx-1" />
+          <div className="h-5 w-px bg-gray-300 mx-0.5" />
 
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            active={editor.isActive("bulletList")}
+          <ToolbarIconButton
+            onClick={() => {
+              if (editor) {
+                editor.chain().focus().toggleBulletList().run();
+              }
+            }}
+            active={editor?.isActive("bulletList") || false}
             icon={List}
             title="Bullet List"
           />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            active={editor.isActive("orderedList")}
+          <ToolbarIconButton
+            onClick={() => {
+              if (editor) {
+                editor.chain().focus().toggleOrderedList().run();
+              }
+            }}
+            active={editor?.isActive("orderedList") || false}
             icon={ListOrdered}
             title="Ordered List"
           />
-          <ToolbarButton
+
+          <div className="h-5 w-px bg-gray-300 mx-0.5" />
+
+          <ToolbarIconButton
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
             active={editor.isActive("blockquote")}
             icon={Quote}
             title="Blockquote"
           />
 
-          <div className="h-6 w-px bg-border mx-1" />
+          <div className="h-5 w-px bg-gray-300 mx-0.5" />
 
-          <ToolbarButton
+          <ToolbarIconButton
             onClick={() => editor.chain().focus().setTextAlign("left").run()}
             active={editor.isActive({ textAlign: "left" })}
             icon={AlignLeft}
             title="Align Left"
           />
-          <ToolbarButton
+          <ToolbarIconButton
             onClick={() => editor.chain().focus().setTextAlign("center").run()}
             active={editor.isActive({ textAlign: "center" })}
             icon={AlignCenter}
             title="Align Center"
           />
-          <ToolbarButton
+          <ToolbarIconButton
             onClick={() => editor.chain().focus().setTextAlign("right").run()}
             active={editor.isActive({ textAlign: "right" })}
             icon={AlignRight}
             title="Align Right"
           />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().setTextAlign("justify").run()}
-            active={editor.isActive({ textAlign: "justify" })}
-            icon={AlignJustify}
-            title="Align Justify"
-          />
 
-          <div className="h-6 w-px bg-border mx-1" />
+          <div className="h-5 w-px bg-gray-300 mx-0.5" />
 
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            active={editor.isActive("codeBlock")}
-            icon={Code}
-            title="Code Block"
-          />
+          <div className="flex items-center gap-1 ml-1">
+            <input
+              type="color"
+              onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+              title="Text Color"
+              className="w-6 h-6 border border-gray-300 rounded cursor-pointer"
+            />
+          </div>
+
+          <div className="ml-auto flex items-center gap-0.5">
+            <ToolbarIconButton
+              onClick={() => editor.chain().focus().undo().run()}
+              active={false}
+              icon={() => <span className="text-sm font-bold">↶</span>}
+              title="Undo"
+              disabled={!editor.can().undo()}
+            />
+            <ToolbarIconButton
+              onClick={() => editor.chain().focus().redo().run()}
+              active={false}
+              icon={() => <span className="text-sm font-bold">↷</span>}
+              title="Redo"
+              disabled={!editor.can().redo()}
+            />
+          </div>
         </div>
 
-        {/* Row 3 - Additional Actions */}
-        <div className="flex items-center gap-1 flex-wrap border-t border-border pt-2">
-          <ToolbarButton
-            onClick={() => editor.chain().focus().setHorizontalRule().run()}
-            active={false}
-            icon={Minus}
-            title="Horizontal Rule"
+        {/* Advanced Toolbar Row 2 */}
+        <div className="flex items-center gap-0.5 flex-wrap">
+          <Dialog open={isLinkOpen} onOpenChange={setIsLinkOpen}>
+            <DialogTrigger asChild>
+              <button
+                type="button"
+                className={`w-8 h-8 inline-flex items-center justify-center rounded hover:bg-gray-100 ${editor.isActive("link") ? "bg-gray-200" : ""}`}
+              >
+                <Link className="w-4 h-4" />
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Insert Link</DialogTitle></DialogHeader>
+              <div className="space-y-3">
+                <Input value={linkText} onChange={(e) => setLinkText(e.target.value)} placeholder="Display Text" />
+                <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="https://example.com" />
+                <div className="flex gap-2 justify-end">
+                  <Button onClick={handleAddLink}>Insert</Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isImageOpen} onOpenChange={setIsImageOpen}>
+            <DialogTrigger asChild>
+              <button type="button" className="w-8 h-8 inline-flex items-center justify-center rounded hover:bg-gray-100">
+                <Image className="w-4 h-4" />
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Insert Image</DialogTitle></DialogHeader>
+              <div className="space-y-3">
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+                {imageFile && <p className="text-sm text-gray-600">Selected: {imageFile.name}</p>}
+                <Button onClick={handleAddImage} disabled={!imageFile} className="w-full">Upload Image</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <ToolbarIconButton
+            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+            active={editor.isActive("codeBlock")}
+            icon={Type}
+            title="Code Block"
           />
-          <ToolbarButton
+          
+          <ToolbarIconButton
             onClick={() => editor.chain().focus().clearNodes().run()}
             active={false}
             icon={Eraser}
             title="Clear Formatting"
           />
 
-          <div className="ml-auto flex items-center gap-1">
-            <ToolbarButton
-              onClick={() => editor.chain().focus().undo().run()}
-              active={false}
-              icon={Undo}
-              title="Undo"
-              disabled={!editor.can().undo()}
-            />
-            <ToolbarButton
-              onClick={() => editor.chain().focus().redo().run()}
-              active={false}
-              icon={Redo}
-              title="Redo"
-              disabled={!editor.can().redo()}
-            />
+          <div className="ml-auto">
+            <button type="button" className="w-8 h-8 inline-flex items-center justify-center text-gray-400 hover:text-gray-600">
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Editor Area */}
-      <div className="bg-background p-4 min-h-[300px]">
+      <div className="bg-white p-4 min-h-[400px]">
         <EditorContent
           editor={editor}
-          className="prose prose-sm max-w-none focus:outline-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-[300px]"
+          className="prose prose-sm max-w-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-[400px]"
         />
       </div>
     </div>
