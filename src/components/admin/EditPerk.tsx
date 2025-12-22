@@ -343,9 +343,11 @@ export default function EditPerk({ perkId }: EditPerkProps) {
           <div className="space-y-6">
             <div>
               <Label className="text-sm font-medium mb-3 block">Banner Image</Label>
-              {formData.image_url && (
+              {formData.image_url && formData.image_url.trim() !== "" && (
                 <div className="mb-3 relative w-full h-40 bg-muted rounded-lg overflow-hidden">
-                  <img src={formData.image_url} alt="Banner" className="w-full h-full object-cover" />
+                  <img src={formData.image_url} alt="Banner" className="w-full h-full object-cover" onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }} />
                 </div>
               )}
               <div 
@@ -368,9 +370,11 @@ export default function EditPerk({ perkId }: EditPerkProps) {
             <div>
               <Label className="text-sm font-medium mb-2 block">Company Logo</Label>
               <div className="flex items-start gap-4">
-                {formData.logo_url && (
+                {formData.logo_url && formData.logo_url.trim() !== "" && (
                   <div className="relative w-24 h-24 bg-muted rounded-lg overflow-hidden flex-shrink-0">
-                    <img src={formData.logo_url} alt="Logo" className="w-full h-full object-cover" />
+                    <img src={formData.logo_url} alt="Logo" className="w-full h-full object-cover" onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }} />
                   </div>
                 )}
                 <div className="flex-1">
