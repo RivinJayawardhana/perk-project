@@ -27,7 +27,8 @@ const defaultFields: FormField[] = [
   { id: "1", name: "full_name", label: "Full Name", type: "text", placeholder: "Enter your name", required: true },
   { id: "2", name: "company", label: "Company", type: "text", placeholder: "Your company name", required: true },
   { id: "3", name: "email", label: "Email", type: "email", placeholder: "you@company.com", required: true },
-  { id: "4", name: "phone", label: "Phone", type: "phone", placeholder: "+60 123 456 789", required: false },
+  { id: "4", name: "phone", label: "Phone", type: "phone", placeholder: "Placeholder text", required: false },
+  { id: "5", name: "budget", label: "Budget", type: "text", placeholder: "Enter value", required: true },
 ];
 
 interface LeadCaptureFormProps {
