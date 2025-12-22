@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
@@ -79,7 +79,10 @@ export function RichTextEditor({
       Highlight.configure({
         multicolor: true,
       }),
-      ImageExtension,
+      ImageExtension.configure({
+        allowBase64: true,
+        inline: false,
+      }),
       Underline,
       LinkExtension.configure({
         openOnClick: false,
@@ -91,6 +94,12 @@ export function RichTextEditor({
     },
     immediatelyRender: false,
   });
+
+  useEffect(() => {
+    if (editor && value && editor.getHTML() !== value) {
+      editor.commands.setContent(value);
+    }
+  }, [value, editor]);
 
   if (!editor) {
     return null;
@@ -387,7 +396,7 @@ export function RichTextEditor({
       <div className="bg-white p-4 min-h-[400px]">
         <EditorContent
           editor={editor}
-          className="prose prose-sm max-w-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-[400px]"
+          className="prose prose-sm max-w-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-[400px] [&_img]:max-w-full [&_img]:h-auto [&_img]:block"
         />
       </div>
     </div>

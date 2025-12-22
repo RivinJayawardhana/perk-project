@@ -90,7 +90,7 @@ export const useUpdateJournal = (id: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journals"] });
-      queryClient.invalidateQueries({ queryKey: ["journal", id] });
+      queryClient.invalidateQueries({ queryKey: ["journal"] });
     },
   });
 };
