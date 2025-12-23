@@ -52,6 +52,9 @@ const DEFAULT_CONTENT: HomePageContent = {
       "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80",
       "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80",
       "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80",
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80",
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=400&q=80",
     ],
   },
   featuredDeals: {
@@ -359,7 +362,7 @@ export default function EditHomePage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-4">
-                    Hero Images (3)
+                    Hero Images (6)
                   </label>
                   <div className="space-y-4">
                     {content.hero.heroImages.map((image, idx) => (

@@ -50,6 +50,9 @@ const defaultContent: HomePageContent = {
       "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80",
       "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80",
       "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80",
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80",
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=400&q=80",
     ],
   },
   featuredDeals: {
@@ -109,7 +112,7 @@ export async function GET(request: NextRequest) {
 
     if (data && data.length > 0) {
       content = {
-        hero: { badge: "", title: "", description: "", buttonText1: "", buttonText2: "", heroImages: ["", "", ""] },
+        hero: { badge: "", title: "", description: "", buttonText1: "", buttonText2: "", heroImages: ["", "", "", "", "", ""] },
         featuredDeals: { title: "" },
         howItWorks: { title: "", subtitle: "", steps: [] },
         insights: { title: "" },
@@ -118,13 +121,18 @@ export async function GET(request: NextRequest) {
 
       data.forEach((row: any) => {
         if (row.section_type === "hero") {
+          const heroImages = row.metadata?.heroImages || defaultContent.hero.heroImages;
+          // Ensure heroImages array has 6 items
+          while (heroImages.length < 6) {
+            heroImages.push("");
+          }
           content.hero = {
             badge: row.title || defaultContent.hero.badge,
             title: row.description || defaultContent.hero.title,
             description: row.content || defaultContent.hero.description,
             buttonText1: row.cta_text || defaultContent.hero.buttonText1,
             buttonText2: row.metadata?.buttonText2 || defaultContent.hero.buttonText2,
-            heroImages: row.metadata?.heroImages || defaultContent.hero.heroImages,
+            heroImages: heroImages,
           };
         } else if (row.section_type === "featured_deals") {
           content.featuredDeals.title = row.title || defaultContent.featuredDeals.title;

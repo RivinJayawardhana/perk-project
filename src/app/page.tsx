@@ -59,19 +59,18 @@ function HomeContent() {
                 alt="Team work" 
                 className="w-32 h-24 object-cover rounded-2xl shadow-lg transform -rotate-3 ml-4"
               />
-              {/* Middle Left Images Stack */}
-              <div className="flex flex-col gap-3">
-                <img 
-                  src={content.hero.heroImages[1]} 
-                  alt="Workspace" 
-                  className="w-28 h-32 object-cover rounded-2xl shadow-lg transform rotate-2"
-                />
-                <img 
-                  src={content.hero.heroImages[2]} 
-                  alt="Collaboration" 
-                  className="w-32 h-28 object-cover rounded-2xl shadow-lg transform -rotate-2 ml-4"
-                />
-              </div>
+              {/* Middle Left Image */}
+              <img 
+                src={content.hero.heroImages[1]} 
+                alt="Workspace" 
+                className="w-28 h-32 object-cover rounded-2xl shadow-lg transform rotate-2"
+              />
+              {/* Bottom Left Image */}
+              <img 
+                src={content.hero.heroImages[2]} 
+                alt="Collaboration" 
+                className="w-32 h-28 object-cover rounded-2xl shadow-lg transform -rotate-2 ml-4"
+              />
             </div>
 
             {/* Center Content */}
@@ -108,17 +107,23 @@ function HomeContent() {
 
             {/* Right Images - Hidden on mobile */}
             <div className="hidden lg:grid lg:col-span-3 gap-4 items-start">
-              {/* Top Right Small Image */}
+              {/* Top Right Image */}
               <img 
-                src={content.hero.heroImages[0]} 
+                src={content.hero.heroImages[3]} 
                 alt="Office space" 
                 className="w-32 h-24 object-cover rounded-2xl shadow-lg transform rotate-3 ml-auto mr-4"
               />
-              {/* Bottom Right Larger Image */}
+              {/* Middle Right Image */}
               <img 
-                src={content.hero.heroImages[2]} 
+                src={content.hero.heroImages[4]} 
+                alt="Creative workspace" 
+                className="w-28 h-32 object-cover rounded-2xl shadow-lg transform -rotate-3 ml-auto"
+              />
+              {/* Bottom Right Image */}
+              <img 
+                src={content.hero.heroImages[5]} 
                 alt="Remote work setup" 
-                className="w-36 h-40 object-cover rounded-2xl shadow-lg transform -rotate-2 ml-auto"
+                className="w-32 h-28 object-cover rounded-2xl shadow-lg transform rotate-2 ml-auto mr-4"
               />
             </div>
           </div>

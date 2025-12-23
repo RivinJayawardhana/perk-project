@@ -11,6 +11,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
+    // Check file size (5MB limit)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: 'File size exceeds 5MB limit' }, { status: 400 })
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ error: 'File must be an image' }, { status: 400 })
+    }
+
+    // Convert file to buffer
+    const buffer = await file.arrayBuffer()
+
     // Generate unique filename
     const timestamp = Date.now()
     const random = Math.random().toString(36).substring(7)
@@ -19,12 +33,14 @@ export async function POST(request: Request) {
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
       .from('perk-images')
-      .upload(`${folder}/${filename}`, file, {
+      .upload(`${folder}/${filename}`, buffer, {
+        contentType: file.type,
         cacheControl: '3600',
         upsert: false,
       })
 
     if (error) {
+      console.error('Supabase upload error:', error)
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
@@ -38,6 +54,7 @@ export async function POST(request: Request) {
       path: data.path,
     })
   } catch (err) {
+    console.error('Upload error:', err)
     return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 })
   }
 }
