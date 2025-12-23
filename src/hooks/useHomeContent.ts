@@ -24,6 +24,10 @@ export interface HomePageContent {
     card1: { title: string; description: string; buttonText: string };
     card2: { title: string; description: string; buttonText: string };
   };
+  seo?: {
+    metaTitle: string;
+    metaDescription: string;
+  };
 }
 
 const DEFAULT_CONTENT: HomePageContent = {

@@ -355,12 +355,8 @@ export default function Perks() {
       const isUrl = perk.deal_url.startsWith("http://") || perk.deal_url.startsWith("https://");
       
       if (isUrl) {
-        // Handle affiliate link
+        // Handle affiliate link - open in new tab without popup
         window.open(perk.deal_url, "_blank");
-        toast({
-          title: "Opening...",
-          description: "Affiliate link opened in a new tab",
-        });
       } else {
         // Handle coupon code
         setCouponModal({
@@ -612,74 +608,50 @@ export default function Perks() {
               </div>
             ) : (
               <div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
                   {filteredPerks.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((perk) => (
                 <div key={perk.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <img src={perk.image} alt={perk.title} className="w-full h-40 sm:h-48 object-cover" />
-                    <span className="absolute top-3 right-3 bg-[#e6b756] text-[#1a2233] text-xs font-semibold px-3 py-1 rounded-full font-display">
+                    <span className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-[#f8eac7] text-[#23272f] px-3 sm:px-4 py-1 sm:py-2 rounded-full font-bold text-sm sm:text-base font-display">
                       {perk.discount}
                     </span>
-                    <span className="absolute bottom-3 left-3 bg-black/70 text-white text-xs px-2 py-0.5 rounded-full">
-                      {perk.location}
-                    </span>
                   </div>
-                  <div className="p-3 sm:p-4 flex-1 flex flex-col">
-                    {/* Category & Deal Type Badges */}
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      <Badge variant="outline" className="text-xs">
-                        {perk.category}
-                      </Badge>
-                      {perk.dealTypes.filter((type) => !["lead_capture_form", "coupon_code", "affiliate_link"].includes(type)).slice(0, 2).map((type, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs bg-blue-50 text-blue-700">
-                          {type}
-                        </Badge>
-                      ))}
-                      {perk.dealTypes.filter((type) => !["lead_capture_form", "coupon_code", "affiliate_link"].includes(type)).length > 2 && (
-                        <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600">
-                          +{perk.dealTypes.filter((type) => !["lead_capture_form", "coupon_code", "affiliate_link"].includes(type)).length - 2}
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Company & Title */}
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold font-display">
+                  <div className="p-4 sm:p-5 flex flex-col h-full">
+                    {/* Company & Category */}
+                    <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                      <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold font-display flex-shrink-0">
                         {perk.company.charAt(0)}
                       </div>
-                      <span className="text-xs sm:text-sm text-[#6b6f76]">{perk.company}</span>
-                    </div>
-                    <h3 className="font-semibold text-[#23272f] mb-2 text-base sm:text-lg font-display">{perk.title}</h3>
-                    <p className="text-[#6b6f76] text-xs sm:text-sm mb-3 sm:mb-4 flex-1">{perk.description}</p>
-
-                    {/* Best For Badges */}
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {perk.bestFor.slice(0, 3).map((best, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          {best}
-                        </Badge>
-                      ))}
-                      {perk.bestFor.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{perk.bestFor.length - 3}
-                        </Badge>
-                      )}
+                      <div className="flex flex-col">
+                        <span className="text-xs sm:text-sm text-[#6b6f76]">{perk.company}</span>
+                        <span className="text-xs text-[#6b6f76]">{perk.category}{perk.subcategory ? ` • ${perk.subcategory}` : ""}</span>
+                      </div>
                     </div>
 
-                    {/* Footer */}
-                    <div className="flex flex-col items-center justify-center gap-3 pt-4 border-t border-gray-100">
-                      <span className="text-xs text-[#6b6f76] flex items-center gap-1">
+                    {/* Title */}
+                    <h3 className="font-semibold text-[#23272f] mb-2 text-sm sm:text-base font-display line-clamp-2">{perk.title}</h3>
+
+                    {/* Description */}
+                    <p className="text-[#6b6f76] text-xs sm:text-sm mb-4 sm:mb-6 flex-1">{perk.description}</p>
+
+                    {/* Valid Until Date */}
+                    {perk.validUntil && (
+                      <div className="text-xs sm:text-sm text-[#6b6f76] mb-4 flex items-center gap-2">
                         <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                          <path d="M8 2v2M16 2v2M3 8.5h18M4 21h16a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1Z" stroke="#b48a1e" strokeWidth="1.5"/>
+                          <rect x="3" y="4" width="18" height="18" rx="2"/>
+                          <path d="M16 2v4M8 2v4M3 10h18"/>
                         </svg>
                         Valid until {perk.validUntil}
-                      </span>
-                      <Button 
-                        onClick={() => handleGetDeal(perk)}
-                        className="bg-[#e6b756] text-[#1a2233] font-semibold px-8 py-3 rounded-full text-base hover:bg-[#f5d488] transition-colors font-display w-full">
-                        Get Deal
-                      </Button>
-                    </div>
+                      </div>
+                    )}
+
+                    {/* Get Deal Button */}
+                    <Button 
+                      onClick={() => handleGetDeal(perk)}
+                      className="bg-[#e6b756] text-[#1a2233] font-semibold py-2.5 sm:py-3 rounded-full text-sm sm:text-base hover:bg-[#f5d488] transition-colors font-display w-full">
+                      Get Deal
+                    </Button>
                   </div>
                 </div>
               ))}
