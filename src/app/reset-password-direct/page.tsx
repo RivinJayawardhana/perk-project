@@ -54,7 +54,7 @@ export default function DirectPasswordResetPage() {
       // First verify the current password by attempting to sign in
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
-        currentPassword,
+        password: currentPassword,
       });
 
       if (signInError) {
