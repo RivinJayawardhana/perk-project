@@ -31,6 +31,10 @@ interface AboutPageContent {
     description: string;
     buttonText: string;
   };
+  seo?: {
+    metaTitle: string;
+    metaDescription: string;
+  };
 }
 
 type SectionType = "hero" | "stats" | "whatWeDo" | "whoWeServe" | "cta";
@@ -40,9 +44,10 @@ export default function EditAboutPage() {
   const [content, setContent] = useState<AboutPageContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<SectionType>("hero");
+  const [activeSection, setActiveSection] = useState<SectionType | "seo">("seo");
 
-  const sections: { id: SectionType; label: string }[] = [
+  const sections: { id: SectionType | "seo"; label: string }[] = [
+    { id: "seo", label: "SEO" },
     { id: "hero", label: "Hero" },
     { id: "stats", label: "Statistics" },
     { id: "whatWeDo", label: "What We Do" },
@@ -127,6 +132,46 @@ export default function EditAboutPage() {
           ))}
         </div>
       </div>
+
+      {/* SEO Section Content */}
+      {activeSection === "seo" && (
+        <div className="bg-white rounded-b-xl shadow-sm p-6 border border-t-0">
+          <h2 className="text-2xl font-bold text-[#23272f] mb-6">SEO Settings</h2>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Meta Title</label>
+              <Input
+                value={content.seo?.metaTitle || ""}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    seo: { ...content.seo, metaTitle: e.target.value } as any,
+                  })
+                }
+                placeholder="e.g., About VentureNext - Empowering Founders"
+              />
+              <p className="text-xs text-[#6b7280] mt-1">Recommended: 30-60 characters</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#23272f] mb-2">Meta Description</label>
+              <Textarea
+                value={content.seo?.metaDescription || ""}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    seo: { ...content.seo, metaDescription: e.target.value } as any,
+                  })
+                }
+                placeholder="e.g., Learn about VentureNext and how we're connecting founders..."
+                rows={3}
+              />
+              <p className="text-xs text-[#6b7280] mt-1">Recommended: 120-160 characters</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section Content */}
       {activeSection === "hero" && (

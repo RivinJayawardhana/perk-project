@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { setMetaTags } from "@/lib/meta-tags";
 
 interface PartnerContent {
   hero: {
@@ -64,6 +65,10 @@ export default function Partner() {
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setContent(data);
+      // Set meta tags when content loads
+      if (data.seo) {
+        setMetaTags(data.seo.metaTitle, data.seo.metaDescription);
+      }
     } catch (error) {
       console.error("Error fetching partner content:", error);
     } finally {

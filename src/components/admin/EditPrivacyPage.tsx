@@ -15,8 +15,14 @@ interface Section {
   content: string;
 }
 
+interface SEOData {
+  metaTitle: string;
+  metaDescription: string;
+}
+
 export default function EditPrivacyPage() {
   const [sections, setSections] = useState<Section[]>([]);
+  const [seo, setSeo] = useState<SEOData>({ metaTitle: "", metaDescription: "" });
   const [originalSections, setOriginalSections] = useState<Section[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +39,7 @@ export default function EditPrivacyPage() {
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setSections(data.sections || []);
+      setSeo(data.seo || { metaTitle: "", metaDescription: "" });
       setOriginalSections(data.sections || []);
     } catch (error) {
       console.error("Error fetching privacy content:", error);
@@ -83,7 +90,7 @@ export default function EditPrivacyPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ sections }),
+        body: JSON.stringify({ sections, seo }),
       });
 
       if (!res.ok) {
@@ -131,8 +138,45 @@ export default function EditPrivacyPage() {
     <div className="p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">Edit Privacy Policy Page</h1>
-        <p className="text-muted-foreground">Manage sections and content for your privacy policy page</p>
+        <p className="text-muted-foreground">Manage sections, content, and SEO settings for your privacy policy page</p>
       </div>
+
+      {/* SEO Settings */}
+      <Card className="p-6 mb-8 border border-[#e5e7eb]">
+        <h2 className="text-2xl font-bold text-[#23272f] mb-6">SEO Settings</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Meta Title
+            </label>
+            <Input
+              value={seo.metaTitle}
+              onChange={(e) => setSeo({ ...seo, metaTitle: e.target.value })}
+              placeholder="e.g., Privacy Policy | VentureNext"
+              className="w-full"
+            />
+            <p className="text-xs text-[#6b7280] mt-1">
+              Recommended: 30-60 characters
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Meta Description
+            </label>
+            <Textarea
+              value={seo.metaDescription}
+              onChange={(e) => setSeo({ ...seo, metaDescription: e.target.value })}
+              placeholder="e.g., Learn about how VentureNext collects, uses, and protects your personal information."
+              rows={2}
+              className="w-full"
+            />
+            <p className="text-xs text-[#6b7280] mt-1">
+              Recommended: 120-160 characters
+            </p>
+          </div>
+        </div>
+      </Card>
 
       <div className="space-y-4 mb-6">
         {sections.map((section) => (

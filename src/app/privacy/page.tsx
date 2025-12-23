@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { setMetaTags } from "@/lib/meta-tags";
 
 interface PrivacySection {
   id: string;
@@ -12,6 +13,10 @@ interface PrivacySection {
 
 interface PrivacyContent {
   sections: PrivacySection[];
+  seo?: {
+    metaTitle: string;
+    metaDescription: string;
+  };
 }
 
 export default function Privacy() {
@@ -25,6 +30,10 @@ export default function Privacy() {
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
         setContent(data);
+        // Set meta tags when content loads
+        if (data.seo) {
+          setMetaTags(data.seo.metaTitle, data.seo.metaDescription);
+        }
       } catch (error) {
         console.error("Error loading privacy content:", error);
         setContent(null);

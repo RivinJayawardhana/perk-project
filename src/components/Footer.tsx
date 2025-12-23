@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter, Youtube, Music } from "lucide-react";
 
 interface SocialLink {
   platform: string;
@@ -31,6 +31,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Linkedin: <Linkedin size={20} />,
   Twitter: <Twitter size={20} />,
   Youtube: <Youtube size={20} />,
+  TikTok: <Music size={20} />,
 };
 
 export default function Footer() {

@@ -6,6 +6,11 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 );
 
+interface SEOData {
+  metaTitle: string;
+  metaDescription: string;
+}
+
 interface AboutPageContent {
   hero: {
     subtitle: string;
@@ -30,6 +35,7 @@ interface AboutPageContent {
     description: string;
     buttonText: string;
   };
+  seo?: SEOData;
 }
 
 const DEFAULT_CONTENT: AboutPageContent = {
@@ -102,6 +108,10 @@ const DEFAULT_CONTENT: AboutPageContent = {
       "Join thousands of founders already using VentureNext to unlock exclusive perks.",
     buttonText: "Explore Perks",
   },
+  seo: {
+    metaTitle: "About VentureNext - Empowering Founders",
+    metaDescription: "Learn about VentureNext and how we're connecting founders with premium perks and exclusive deals to help businesses grow.",
+  },
 };
 
 export async function GET() {
@@ -150,6 +160,11 @@ export async function GET() {
           title: row.title || DEFAULT_CONTENT.cta.title,
           description: row.description || DEFAULT_CONTENT.cta.description,
           buttonText: row.cta_text || DEFAULT_CONTENT.cta.buttonText,
+        };
+      } else if (row.section_type === "seo") {
+        content.seo = {
+          metaTitle: row.title || DEFAULT_CONTENT.seo?.metaTitle || "",
+          metaDescription: row.description || DEFAULT_CONTENT.seo?.metaDescription || "",
         };
       }
     }
@@ -214,6 +229,18 @@ export async function POST(request: NextRequest) {
         section_order: 5,
       },
     ];
+
+    // Add SEO row if present
+    if (content.seo) {
+      rows.push({
+        page_name: "about",
+        section_type: "seo",
+        title: content.seo.metaTitle || "",
+        description: content.seo.metaDescription || "",
+        content: "",
+        section_order: 0,
+      });
+    }
 
     const { error } = await supabase
       .from("page_content")

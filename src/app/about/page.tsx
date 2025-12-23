@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
+import { setMetaTags } from "@/lib/meta-tags";
 
 interface AboutContent {
   hero: {
@@ -43,6 +44,10 @@ export default function About() {
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
         setContent(data);
+        // Set meta tags when content loads
+        if (data.seo) {
+          setMetaTags(data.seo.metaTitle, data.seo.metaDescription);
+        }
       } catch (error) {
         console.error("Error loading about content:", error);
       } finally {

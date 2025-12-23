@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+interface SEOData {
+  metaTitle: string;
+  metaDescription: string;
+}
+
 interface HomePageContent {
   hero: {
     badge: string;
@@ -25,6 +30,7 @@ interface HomePageContent {
     card1: { title: string; description: string; buttonText: string };
     card2: { title: string; description: string; buttonText: string };
   };
+  seo?: SEOData;
 }
 
 const supabase = createClient(
@@ -82,6 +88,10 @@ const defaultContent: HomePageContent = {
       buttonText: "Partner With Us",
     },
   },
+  seo: {
+    metaTitle: "VentureNext - Exclusive Perks for Founders & Remote Teams",
+    metaDescription: "Discover 500+ exclusive perks and deals for founders, freelancers, and remote teams. Save money on premium tools and services.",
+  },
 };
 
 export async function GET(request: NextRequest) {
@@ -137,6 +147,11 @@ export async function GET(request: NextRequest) {
             title: row.title || defaultContent.ctaCards.card2.title,
             buttonText: row.cta_text || defaultContent.ctaCards.card2.buttonText,
             description: row.description || defaultContent.ctaCards.card2.description,
+          };
+        } else if (row.section_type === "seo") {
+          content.seo = {
+            metaTitle: row.title || defaultContent.seo?.metaTitle || "",
+            metaDescription: row.description || defaultContent.seo?.metaDescription || "",
           };
         }
       });
@@ -222,6 +237,19 @@ export async function POST(request: NextRequest) {
 
     // Delete existing home content
     await supabase.from("page_content").delete().eq("page_name", "home");
+
+    // Add SEO row if present
+    if (body.seo) {
+      (sections as any[]).push({
+        page_name: "home",
+        section_type: "seo",
+        title: body.seo.metaTitle || "",
+        description: body.seo.metaDescription || "",
+        content: "",
+        section_order: 0,
+        is_active: true,
+      });
+    }
 
     // Insert new content
     const { data, error } = await supabase

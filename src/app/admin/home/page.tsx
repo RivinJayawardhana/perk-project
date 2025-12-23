@@ -35,6 +35,10 @@ interface HomePageContent {
     card1: { title: string; description: string; buttonText: string };
     card2: { title: string; description: string; buttonText: string };
   };
+  seo?: {
+    metaTitle: string;
+    metaDescription: string;
+  };
 }
 
 const DEFAULT_CONTENT: HomePageContent = {
@@ -85,6 +89,10 @@ const DEFAULT_CONTENT: HomePageContent = {
       description: "Reach thousands of decision-makers at startups and growing businesses.",
       buttonText: "Partner With Us",
     },
+  },
+  seo: {
+    metaTitle: "VentureNext - Exclusive Perks for Founders & Remote Teams",
+    metaDescription: "Discover 500+ exclusive perks and deals for founders, freelancers, and remote teams. Save money on premium tools and services.",
   },
 };
 
@@ -195,14 +203,65 @@ export default function EditHomePage() {
         </p>
       </div>
 
-      <Tabs defaultValue="hero" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+      <Tabs defaultValue="seo" className="w-full">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="seo">SEO</TabsTrigger>
           <TabsTrigger value="hero">Hero</TabsTrigger>
           <TabsTrigger value="howItWorks">How It Works</TabsTrigger>
           <TabsTrigger value="sections">Other Sections</TabsTrigger>
           <TabsTrigger value="cta">CTA Cards</TabsTrigger>
           <TabsTrigger value="preview">Preview</TabsTrigger>
         </TabsList>
+
+        {/* SEO SECTION */}
+        <TabsContent value="seo" className="space-y-6">
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">SEO Settings</h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Meta Title
+                </label>
+                <Input
+                  value={content.seo?.metaTitle || ""}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      seo: {
+                        metaTitle: e.target.value,
+                        metaDescription: content.seo?.metaDescription || "",
+                      },
+                    })
+                  }
+                  placeholder="e.g., VentureNext - Exclusive Perks for Founders"
+                />
+                <p className="text-xs text-[#6b7280] mt-1">Recommended: 30-60 characters</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Meta Description
+                </label>
+                <Textarea
+                  value={content.seo?.metaDescription || ""}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      seo: {
+                        metaTitle: content.seo?.metaTitle || "",
+                        metaDescription: e.target.value,
+                      },
+                    })
+                  }
+                  placeholder="e.g., Discover 500+ exclusive perks and deals for founders..."
+                  rows={3}
+                />
+                <p className="text-xs text-[#6b7280] mt-1">Recommended: 120-160 characters</p>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
 
         {/* HERO SECTION */}
         <TabsContent value="hero" className="space-y-6">

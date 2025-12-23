@@ -6,6 +6,11 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 );
 
+interface SEOData {
+  metaTitle: string;
+  metaDescription: string;
+}
+
 interface PartnerContent {
   hero: {
     subtitle: string;
@@ -28,6 +33,7 @@ interface PartnerContent {
     title: string;
     description: string;
   };
+  seo?: SEOData;
 }
 
 const DEFAULT_CONTENT: PartnerContent = {
@@ -74,6 +80,10 @@ const DEFAULT_CONTENT: PartnerContent = {
     title: "Apply to become a partner",
     description: "Fill out the form below and we'll get back to you within 24 hours.",
   },
+  seo: {
+    metaTitle: "Partner With VentureNext - Reach Founders & Remote Teams",
+    metaDescription: "Become a VentureNext partner and reach 50,000+ founders, freelancers, and remote teams. Drive conversions with exclusive perks.",
+  },
 };
 
 export async function GET(request: NextRequest) {
@@ -118,6 +128,11 @@ export async function GET(request: NextRequest) {
           subtitle: row.title || DEFAULT_CONTENT.form.subtitle,
           title: row.description || DEFAULT_CONTENT.form.title,
           description: row.content || DEFAULT_CONTENT.form.description,
+        };
+      } else if (row.section_type === "seo") {
+        content.seo = {
+          metaTitle: row.title || DEFAULT_CONTENT.seo?.metaTitle || "",
+          metaDescription: row.description || DEFAULT_CONTENT.seo?.metaDescription || "",
         };
       }
     }
@@ -174,6 +189,18 @@ export async function POST(request: NextRequest) {
         section_order: 4,
       },
     ];
+
+    // Add SEO row if present
+    if (content.seo) {
+      rows.push({
+        page_name: "partner",
+        section_type: "seo",
+        title: content.seo.metaTitle || "",
+        description: content.seo.metaDescription || "",
+        content: "",
+        section_order: 0,
+      });
+    }
 
     const { error } = await supabase
       .from("page_content")

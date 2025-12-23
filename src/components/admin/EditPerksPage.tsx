@@ -7,7 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
+interface SEOData {
+  metaTitle: string;
+  metaDescription: string;
+}
+
 interface PerksPageContent {
+  seo?: SEOData;
   hero: {
     title: string;
     description: string;
@@ -83,6 +89,43 @@ export default function EditPerksPage() {
 
   return (
     <div className="space-y-6">
+      <div className="bg-white rounded-xl shadow-sm p-6 border">
+        <h2 className="text-2xl font-bold text-[#23272f] mb-6">SEO Settings</h2>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">Meta Title</label>
+            <Input
+              value={content.seo?.metaTitle || ""}
+              onChange={(e) =>
+                setContent({
+                  ...content,
+                  seo: { ...content.seo, metaTitle: e.target.value } as any,
+                })
+              }
+              placeholder="e.g., Exclusive Perks for Founders | VentureNext"
+            />
+            <p className="text-xs text-[#6b7280] mt-1">Recommended: 30-60 characters</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">Meta Description</label>
+            <Textarea
+              value={content.seo?.metaDescription || ""}
+              onChange={(e) =>
+                setContent({
+                  ...content,
+                  seo: { ...content.seo, metaDescription: e.target.value } as any,
+                })
+              }
+              placeholder="e.g., Discover 500+ exclusive perks..."
+              rows={2}
+            />
+            <p className="text-xs text-[#6b7280] mt-1">Recommended: 120-160 characters</p>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white rounded-xl shadow-sm p-6 border">
         <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Hero Section</h2>
 

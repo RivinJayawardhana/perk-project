@@ -18,6 +18,7 @@ import { useLeadForm } from "@/hooks/useLeadForms";
 import { useSubmitLead } from "@/hooks/useLeadForms";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { setMetaTags } from "@/lib/meta-tags";
 
 interface PerksPageContent {
   hero: {
@@ -118,6 +119,10 @@ export default function Perks() {
         if (res.ok) {
           const data = await res.json();
           setPageContent(data);
+          // Set meta tags when content loads
+          if (data.seo) {
+            setMetaTags(data.seo.metaTitle, data.seo.metaDescription);
+          }
         }
       } catch (error) {
         console.error("Error fetching perks page content:", error);

@@ -6,12 +6,18 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 );
 
+interface SEOData {
+  metaTitle: string;
+  metaDescription: string;
+}
+
 interface ContactPageContent {
   hero: {
     subtitle: string;
     title: string;
     description: string;
   };
+  seo?: SEOData;
 }
 
 const DEFAULT_CONTENT: ContactPageContent = {
@@ -19,6 +25,10 @@ const DEFAULT_CONTENT: ContactPageContent = {
     subtitle: "Contact us",
     title: "We'd love to hear from you",
     description: "Whether you have a question about perks, partnerships, or anything else—our team is ready to help.",
+  },
+  seo: {
+    metaTitle: "Contact VentureNext - Get in Touch",
+    metaDescription: "Have questions about VentureNext? Contact our team and we'll be happy to help with any inquiries.",
   },
 };
 
@@ -28,21 +38,29 @@ export async function GET(request: NextRequest) {
       .from("page_content")
       .select("*")
       .eq("page_name", "contact")
-      .eq("section_type", "hero")
-      .single();
+      .order("section_order", { ascending: true });
 
-    if (error) {
-      console.log("No contact hero content found, returning defaults");
+    if (error || !data || data.length === 0) {
+      console.log("No contact content found, returning defaults");
       return NextResponse.json(DEFAULT_CONTENT);
     }
 
-    const content: ContactPageContent = {
-      hero: {
-        subtitle: data.title || DEFAULT_CONTENT.hero.subtitle,
-        title: data.description || DEFAULT_CONTENT.hero.title,
-        description: data.content || DEFAULT_CONTENT.hero.description,
-      },
-    };
+    const content: ContactPageContent = DEFAULT_CONTENT;
+
+    for (const row of data) {
+      if (row.section_type === "hero") {
+        content.hero = {
+          subtitle: row.title || DEFAULT_CONTENT.hero.subtitle,
+          title: row.description || DEFAULT_CONTENT.hero.title,
+          description: row.content || DEFAULT_CONTENT.hero.description,
+        };
+      } else if (row.section_type === "seo") {
+        content.seo = {
+          metaTitle: row.title || DEFAULT_CONTENT.seo?.metaTitle || "",
+          metaDescription: row.description || DEFAULT_CONTENT.seo?.metaDescription || "",
+        };
+      }
+    }
 
     return NextResponse.json(content);
   } catch (error) {
@@ -59,20 +77,34 @@ export async function POST(request: NextRequest) {
     await supabase
       .from("page_content")
       .delete()
-      .eq("page_name", "contact")
-      .eq("section_type", "hero");
+      .eq("page_name", "contact");
 
-    // Insert new hero section
-    const { error } = await supabase
-      .from("page_content")
-      .insert({
+    const rows: any[] = [
+      {
         page_name: "contact",
         section_type: "hero",
         title: content.hero.subtitle,
         description: content.hero.title,
         content: content.hero.description,
         section_order: 1,
+      },
+    ];
+
+    // Add SEO row if present
+    if (content.seo) {
+      rows.push({
+        page_name: "contact",
+        section_type: "seo",
+        title: content.seo.metaTitle || "",
+        description: content.seo.metaDescription || "",
+        content: "",
+        section_order: 0,
       });
+    }
+
+    const { error } = await supabase
+      .from("page_content")
+      .insert(rows);
 
     if (error) throw error;
 

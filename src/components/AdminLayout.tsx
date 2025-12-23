@@ -79,7 +79,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <li><a href="/admin/pages/perks" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Tag className="w-5 h-5" />Perks Page</span></a></li>
                   <li><a href="/admin/pages/contact" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Phone className="w-5 h-5" />Contact</span></a></li>
                   <li><a href="/admin/pages/partner" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Handshake className="w-5 h-5" />Partner With Us</span></a></li>
-                  <li><a href="/admin/pages/privacy" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Shield className="w-5 h-5" />Privacy/TOS</span></a></li>
+                  <li><a href="/admin/pages/privacy" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Shield className="w-5 h-5" />Privacy Policy</span></a></li>
+                  <li><a href="/admin/pages/terms" className="block px-3 py-2 rounded-lg transition duration-150 font-medium text-white hover:bg-[#23272f] hover:text-white"><span className="flex items-center gap-3"><Shield className="w-5 h-5" />Terms of Service</span></a></li>
                 </ul>
               )}
             </div>

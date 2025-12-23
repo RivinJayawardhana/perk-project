@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { setMetaTags } from "@/lib/meta-tags";
 
 interface ContactPageContent {
   hero: {
@@ -39,6 +40,10 @@ export default function Contact() {
         if (res.ok) {
           const data = await res.json();
           setPageContent(data);
+          // Set meta tags when content loads
+          if (data.seo) {
+            setMetaTags(data.seo.metaTitle, data.seo.metaDescription);
+          }
         }
       } catch (error) {
         console.error("Error fetching contact page content:", error);

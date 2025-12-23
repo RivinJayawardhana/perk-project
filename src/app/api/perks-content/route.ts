@@ -6,17 +6,27 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 );
 
+interface SEOData {
+  metaTitle: string;
+  metaDescription: string;
+}
+
 interface PerksPageContent {
   hero: {
     title: string;
     description: string;
   };
+  seo?: SEOData;
 }
 
 const DEFAULT_CONTENT: PerksPageContent = {
   hero: {
     title: "Discover your next perk",
     description: "Browse 500+ exclusive deals on tools, services, and experiences for founders and teams.",
+  },
+  seo: {
+    metaTitle: "Exclusive Perks for Founders | VentureNext",
+    metaDescription: "Browse 500+ exclusive perks and deals tailored for founders, freelancers, and remote teams. Save on the tools you need.",
   },
 };
 
@@ -26,20 +36,28 @@ export async function GET(request: NextRequest) {
       .from("page_content")
       .select("*")
       .eq("page_name", "perks")
-      .eq("section_type", "hero")
-      .single();
+      .order("section_order", { ascending: true });
 
-    if (error) {
-      console.log("No perks hero content found, returning defaults");
+    if (error || !data || data.length === 0) {
+      console.log("No perks content found, returning defaults");
       return NextResponse.json(DEFAULT_CONTENT);
     }
 
-    const content: PerksPageContent = {
-      hero: {
-        title: data.title || DEFAULT_CONTENT.hero.title,
-        description: data.description || DEFAULT_CONTENT.hero.description,
-      },
-    };
+    const content: PerksPageContent = DEFAULT_CONTENT;
+
+    for (const row of data) {
+      if (row.section_type === "hero") {
+        content.hero = {
+          title: row.title || DEFAULT_CONTENT.hero.title,
+          description: row.description || DEFAULT_CONTENT.hero.description,
+        };
+      } else if (row.section_type === "seo") {
+        content.seo = {
+          metaTitle: row.title || DEFAULT_CONTENT.seo?.metaTitle || "",
+          metaDescription: row.description || DEFAULT_CONTENT.seo?.metaDescription || "",
+        };
+      }
+    }
 
     return NextResponse.json(content);
   } catch (error) {
@@ -52,24 +70,38 @@ export async function POST(request: NextRequest) {
   try {
     const content: PerksPageContent = await request.json();
 
-    // Delete existing perks hero content
+    // Delete existing perks content
     await supabase
       .from("page_content")
       .delete()
-      .eq("page_name", "perks")
-      .eq("section_type", "hero");
+      .eq("page_name", "perks");
 
-    // Insert new hero section
-    const { error } = await supabase
-      .from("page_content")
-      .insert({
+    const rows: any[] = [
+      {
         page_name: "perks",
         section_type: "hero",
         title: content.hero.title,
         description: content.hero.description,
         content: "",
         section_order: 1,
+      },
+    ];
+
+    // Add SEO row if present
+    if (content.seo) {
+      rows.push({
+        page_name: "perks",
+        section_type: "seo",
+        title: content.seo.metaTitle || "",
+        description: content.seo.metaDescription || "",
+        content: "",
+        section_order: 0,
       });
+    }
+
+    const { error } = await supabase
+      .from("page_content")
+      .insert(rows);
 
     if (error) throw error;
 

@@ -31,6 +31,10 @@ interface HomeContent {
     card1: { title: string; description: string; buttonText: string };
     card2: { title: string; description: string; buttonText: string };
   };
+  seo?: {
+    metaTitle: string;
+    metaDescription: string;
+  };
 }
 
 export default function EditHomePage() {
@@ -102,6 +106,50 @@ export default function EditHomePage() {
 
   return (
     <div className="space-y-6">
+      {/* SEO Section */}
+      <div className="bg-white rounded-xl shadow-sm p-6 border">
+        <h2 className="text-2xl font-bold text-[#23272f] mb-6">SEO Settings</h2>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">Meta Title</label>
+            <Input
+              value={content.seo?.metaTitle || ""}
+              onChange={(e) =>
+                setContent({
+                  ...content,
+                  seo: {
+                    metaTitle: e.target.value,
+                    metaDescription: content.seo?.metaDescription || "",
+                  },
+                })
+              }
+              placeholder="e.g., VentureNext - Exclusive Perks for Founders"
+            />
+            <p className="text-xs text-[#6b7280] mt-1">Recommended: 30-60 characters</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">Meta Description</label>
+            <Textarea
+              value={content.seo?.metaDescription || ""}
+              onChange={(e) =>
+                setContent({
+                  ...content,
+                  seo: {
+                    metaTitle: content.seo?.metaTitle || "",
+                    metaDescription: e.target.value,
+                  },
+                })
+              }
+              placeholder="e.g., Discover 500+ exclusive perks and deals for founders..."
+              rows={3}
+            />
+            <p className="text-xs text-[#6b7280] mt-1">Recommended: 120-160 characters</p>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <div className="bg-white rounded-xl shadow-sm p-6 border">
         <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Hero Section</h2>

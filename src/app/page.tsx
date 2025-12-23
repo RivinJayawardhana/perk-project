@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
@@ -10,11 +10,19 @@ import Footer from "@/components/Footer";
 import { useHomeContent } from "@/hooks/useHomeContent";
 import { usePerks } from "@/hooks/usePerks";
 import { useJournals } from "@/hooks/useJournals";
+import { setMetaTags } from "@/lib/meta-tags";
 
 function HomeContent() {
   const { content, isLoading } = useHomeContent();
   const { data: allPerks = [] } = usePerks();
   const { data: allJournals = [] } = useJournals("published", 3);
+
+  // Set meta tags when content loads
+  useEffect(() => {
+    if (content.seo) {
+      setMetaTags(content.seo.metaTitle, content.seo.metaDescription);
+    }
+  }, [content.seo]);
 
   // Get first 4 perks as featured deals
   const featuredDeals = allPerks.slice(0, 4);

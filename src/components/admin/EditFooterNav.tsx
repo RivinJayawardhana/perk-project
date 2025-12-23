@@ -28,7 +28,7 @@ interface FooterData {
   footerLinks: FooterSection[];
 }
 
-const ICON_OPTIONS = ["Facebook", "Instagram", "Linkedin", "Twitter", "Youtube"];
+const ICON_OPTIONS = ["Facebook", "Instagram", "Linkedin", "Twitter", "Youtube", "TikTok"];
 
 export default function EditFooterNav() {
   const { toast } = useToast();

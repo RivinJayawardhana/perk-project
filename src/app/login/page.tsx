@@ -3,13 +3,14 @@
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
@@ -34,10 +35,10 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-12">
           <div className="w-12 h-12 rounded-full bg-[#e6b756] flex items-center justify-center text-2xl font-bold text-[#1a2233]">
-            P
+            V
           </div>
           <span className="text-3xl font-bold text-white">
-            Perks<span className="text-[#e6b756]">Admin</span>
+            VentureNext<span className="text-[#e6b756]">Admin</span>
           </span>
         </div>
 
@@ -74,18 +75,37 @@ export default function LoginPage() {
 
             {/* Password Input */}
             <div>
-              <label className="block text-sm font-medium text-[#181c23] mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e6b756] focus:border-transparent bg-white text-[#181c23] placeholder-[#9ca3af] disabled:bg-[#f3f4f6] disabled:cursor-not-allowed"
-              />
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-[#181c23]">
+                  Password
+                </label>
+                <a href="/forgot-password" className="text-sm text-[#e6b756] hover:text-[#d4a543] font-medium">
+                  Forgot password?
+                </a>
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e6b756] focus:border-transparent bg-white text-[#181c23] placeholder-[#9ca3af] disabled:bg-[#f3f4f6] disabled:cursor-not-allowed"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] hover:text-[#181c23] disabled:cursor-not-allowed"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Submit Button */}
@@ -104,6 +124,20 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+        </div>
+
+        {/* Password Reset Options */}
+        <div className="space-y-2 text-center mb-6">
+          <p className="text-sm text-[#9ca3af]">
+            <a href="/reset-password-direct" className="text-[#e6b756] hover:text-[#d4a543] font-medium">
+              Reset Password (Direct)
+            </a>
+          </p>
+          <p className="text-sm text-[#9ca3af]">
+            <a href="/forgot-password" className="text-[#e6b756] hover:text-[#d4a543] font-medium">
+              Reset Password (Email)
+            </a>
+          </p>
         </div>
 
         {/* Footer */}
