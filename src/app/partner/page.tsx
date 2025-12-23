@@ -164,15 +164,28 @@ export default function Partner() {
       <section className="bg-[#1a2233] py-12 sm:py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-[#e6b756] font-semibold text-center mb-2 text-sm sm:text-base font-display">{content.benefits.subtitle}</div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-8 sm:mb-10 font-display">{content.benefits.title}</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#e6b756] text-center mb-8 sm:mb-10 font-display">{content.benefits.title}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {content.benefits.cards.map((card, idx) => (
-              <div key={idx} className="bg-[#232b3b] rounded-2xl p-4 sm:p-6 lg:p-8 flex flex-col items-start">
-                <span className="mb-4"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#e6b756" strokeWidth="1.5"/><path d="M12 8v4l2 2" stroke="#e6b756" strokeWidth="1.5"/></svg></span>
-                <div className="text-base sm:text-lg font-semibold text-white mb-2 font-display">{card.title}</div>
-                <div className="text-sm sm:text-base text-[#b3b8c5]">{card.description}</div>
-              </div>
-            ))}
+            {content.benefits.cards.map((card, idx) => {
+              const icons = [
+                // Reach Decision Makers - people/target icon
+                <svg key="icon-0" width="32" height="32" fill="none" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3" stroke="#b48a1e" strokeWidth="1.5"/><path d="M2 22s1.5-4 6-4 6 4 6 4M18 20a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 22s1.5-2.5 1.5-5" stroke="#b48a1e" strokeWidth="1.5"/></svg>,
+                // Acquire Lifelong Customers - heart icon
+                <svg key="icon-1" width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="#b48a1e" strokeWidth="1.5" fill="none"/></svg>,
+                // Zero Cost To You - zap/free icon
+                <svg key="icon-2" width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#b48a1e" strokeWidth="1.5" fill="none"/></svg>,
+                // Simple Setup - check/easy icon
+                <svg key="icon-3" width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#b48a1e" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+              ];
+              
+              return (
+                <div key={idx} className="bg-[#f8eac7] rounded-2xl p-4 sm:p-6 lg:p-8 flex flex-col items-start">
+                  <span className="mb-4">{icons[idx] || icons[0]}</span>
+                  <div className="text-base sm:text-lg font-semibold text-[#23272f] mb-2 font-display">{card.title}</div>
+                  <div className="text-sm sm:text-base text-[#6b6f76]">{card.description}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
