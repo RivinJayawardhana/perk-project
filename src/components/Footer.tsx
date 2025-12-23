@@ -23,6 +23,7 @@ interface FooterSection {
 interface FooterData {
   socialLinks: SocialLink[];
   footerLinks: FooterSection[];
+  copyrightText?: string;
 }
 
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -193,10 +194,9 @@ export default function Footer() {
 
         {/* Copyright & Links */}
         <div className="flex flex-col items-center gap-4 text-xs text-[#b0b4bb]">
-          <div>© 2025 VentureNext. All rights reserved.</div>
+          <div>{footerData?.copyrightText || "© 2025 VentureNext. All rights reserved."}</div>
           <div className="flex gap-6 flex-wrap justify-center">
-            <a href="#" className="hover:text-[#e6b756]">Privacy Policy</a>
-            <a href="#" className="hover:text-[#e6b756]">Terms of Service</a>
+            
           </div>
         </div>
       </div>

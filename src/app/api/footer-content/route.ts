@@ -14,6 +14,10 @@ interface FooterData {
       url: string;
     }>;
   }>;
+  copyrightText?: string;
+  metadata?: {
+    copyrightText?: string;
+  };
 }
 
 const DEFAULT_DATA: FooterData = {
@@ -53,6 +57,7 @@ const DEFAULT_DATA: FooterData = {
       ],
     },
   ],
+  copyrightText: "© 2025 VentureNext. All rights reserved.",
 };
 
 export async function GET() {
@@ -94,9 +99,17 @@ export async function GET() {
       ? row.footer_links
       : DEFAULT_DATA.footerLinks;
 
+    // Try to get copyright text from metadata column or fallback to default
+    const metadata = row.metadata && typeof row.metadata === 'object' ? row.metadata : {};
+    const copyrightText = metadata.copyrightText || row.copyright_text || DEFAULT_DATA.copyrightText;
+
     const footerData: FooterData = {
       socialLinks,
       footerLinks,
+      copyrightText,
+      metadata: {
+        copyrightText,
+      },
     };
 
     console.log("Returning footer data with", socialLinks.length, "social links and", footerLinks.length, "footer sections");
@@ -156,6 +169,9 @@ export async function POST(request: NextRequest) {
       .insert({
         social_links: data.socialLinks,
         footer_links: data.footerLinks,
+        metadata: {
+          copyrightText: data.copyrightText,
+        },
       })
       .select();
 

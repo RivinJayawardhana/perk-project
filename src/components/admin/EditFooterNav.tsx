@@ -26,6 +26,7 @@ interface FooterSection {
 interface FooterData {
   socialLinks: SocialLink[];
   footerLinks: FooterSection[];
+  copyrightText?: string;
 }
 
 const ICON_OPTIONS = ["Facebook", "Instagram", "Linkedin", "Twitter", "Youtube", "TikTok"];
@@ -292,6 +293,27 @@ export default function EditFooterNav() {
               </div>
             </div>
           ))}
+        </div>
+      </Card>
+
+      {/* Copyright Text Section */}
+      <Card className="p-6 border border-[#e5e7eb]">
+        <h2 className="text-2xl font-bold text-[#23272f] mb-6">Copyright Text</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Copyright Text
+            </label>
+            <Input
+              value={data.copyrightText || ""}
+              onChange={(e) => {
+                setData({ ...data, copyrightText: e.target.value });
+              }}
+              placeholder="e.g., © 2025 VentureNext. All rights reserved."
+              className="w-full"
+            />
+            <p className="text-xs text-[#6b7280] mt-2">This text appears in the footer below the social links.</p>
+          </div>
         </div>
       </Card>
 
