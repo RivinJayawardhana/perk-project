@@ -92,7 +92,7 @@ export function LeadCaptureForm({ value, onChange }: LeadCaptureFormProps) {
       <div className="space-y-3">
         {fields.map((field) => (
           <div key={field.id} className="flex items-center gap-3 p-3 border rounded-lg bg-background">
-            <div className="flex-1 grid grid-cols-4 gap-2">
+            <div className="flex-1 grid grid-cols-3 gap-2">
               <div>
                 <Label className="text-xs">Field Name</Label>
                 <Input
@@ -100,16 +100,6 @@ export function LeadCaptureForm({ value, onChange }: LeadCaptureFormProps) {
                   onChange={(e) => updateField(field.id, { name: e.target.value })}
                   onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
                   placeholder="e.g., email"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Label</Label>
-                <Input
-                  value={field.label}
-                  onChange={(e) => updateField(field.id, { label: e.target.value })}
-                  onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
-                  placeholder="e.g., Email Address"
                   className="mt-1"
                 />
               </div>
