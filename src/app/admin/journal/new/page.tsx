@@ -398,7 +398,9 @@ export default function NewPost() {
               <label className="block text-sm font-medium mb-1">Author</label>
               <Input
                 value={formData.author}
-                readOnly
+                onChange={(e) =>
+                  setFormData({ ...formData, author: e.target.value })
+                }
               />
             </div>
 
