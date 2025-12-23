@@ -97,18 +97,18 @@ export default function JournalPage() {
           <section className="bg-[#faf8f6] py-12 sm:py-16 lg:py-20 border-b">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid md:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
-                <div className="relative">
+                <Link href={`/journal/${featuredPost.id}`} className="block relative">
                   <img
                     src={featuredPost.featured_image_url || "/api/placeholder/600/400"}
                     alt={featuredPost.title}
-                    className="rounded-xl object-cover w-full h-64 sm:h-72 md:h-80 lg:h-96 shadow-lg"
+                    className="rounded-xl object-cover w-full h-64 sm:h-72 md:h-80 lg:h-96 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
                   />
                   <div className="absolute top-4 left-4">
                     <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-amber-400 text-black">
                       Featured
                     </span>
                   </div>
-                </div>
+                </Link>
 
                 <div className="space-y-4 sm:space-y-5">
                   <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
@@ -121,9 +121,11 @@ export default function JournalPage() {
                     </span>
                   </div>
                   
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-slate-900">
-                    {featuredPost.title}
-                  </h1>
+                  <Link href={`/journal/${featuredPost.id}`} className="block hover:text-amber-500 transition-colors">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-slate-900 cursor-pointer">
+                      {featuredPost.title}
+                    </h1>
+                  </Link>
                   
                   <p className="text-base sm:text-lg text-gray-700 leading-relaxed line-clamp-3">
                     {featuredPost.excerpt}
