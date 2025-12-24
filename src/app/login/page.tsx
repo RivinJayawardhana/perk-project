@@ -134,9 +134,7 @@ export default function LoginPage() {
             </a>
           </p>
           <p className="text-sm text-[#9ca3af]">
-            <a href="/forgot-password" className="text-[#e6b756] hover:text-[#d4a543] font-medium">
-              Reset Password (Email)
-            </a>
+           
           </p>
         </div>
 
