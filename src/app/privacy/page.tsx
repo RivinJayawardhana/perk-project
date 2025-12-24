@@ -4,15 +4,15 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { setMetaTags } from "@/lib/meta-tags";
 
-interface PrivacySection {
+interface Section {
   id: string;
   heading: string;
   slug: string;
   content: string;
 }
 
-interface PrivacyContent {
-  sections: PrivacySection[];
+interface ContentData {
+  sections: Section[];
   seo?: {
     metaTitle: string;
     metaDescription: string;
@@ -20,23 +20,31 @@ interface PrivacyContent {
 }
 
 export default function Privacy() {
-  const [content, setContent] = useState<PrivacyContent | null>(null);
+  const [privacyContent, setPrivacyContent] = useState<ContentData | null>(null);
+  const [termsContent, setTermsContent] = useState<ContentData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"privacy" | "terms">("privacy");
 
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const res = await fetch("/api/privacy-content");
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        setContent(data);
-        // Set meta tags when content loads
-        if (data.seo) {
-          setMetaTags(data.seo.metaTitle, data.seo.metaDescription);
+        setLoading(true);
+        const [privacyRes, termsRes] = await Promise.all([
+          fetch("/api/privacy-content"),
+          fetch("/api/terms-content"),
+        ]);
+
+        if (privacyRes.ok) {
+          const privacyData = await privacyRes.json();
+          setPrivacyContent(privacyData);
+        }
+
+        if (termsRes.ok) {
+          const termsData = await termsRes.json();
+          setTermsContent(termsData);
         }
       } catch (error) {
-        console.error("Error loading privacy content:", error);
-        setContent(null);
+        console.error("Error loading content:", error);
       } finally {
         setLoading(false);
       }
@@ -44,6 +52,18 @@ export default function Privacy() {
 
     fetchContent();
   }, []);
+
+  useEffect(() => {
+    const currentContent = activeTab === "privacy" ? privacyContent : termsContent;
+    if (currentContent?.seo) {
+      setMetaTags(
+        currentContent.seo.metaTitle,
+        currentContent.seo.metaDescription
+      );
+    }
+  }, [activeTab, privacyContent, termsContent]);
+
+  const currentContent = activeTab === "privacy" ? privacyContent : termsContent;
 
   if (loading) {
     return (
@@ -56,38 +76,127 @@ export default function Privacy() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-amber-50 to-white">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-12 md:py-20">
-          <div className="max-w-3xl mx-auto">
-            <div className="mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-                Privacy Policy & Terms of Service
+        {/* Hero Section */}
+        <div className="bg-gradient-to-b from-gray-50 to-white border-b border-gray-200">
+          <div className="container mx-auto px-4 py-12 md:py-20">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Legal & Privacy Center
               </h1>
-              <p className="text-lg text-muted-foreground">
-                Your privacy and trust are important to us. Please read our policies carefully.
+              <p className="text-xl text-gray-600 mb-8">
+                Understand how we protect your information and your rights
               </p>
+              <div className="flex justify-center gap-4">
+                <div className="text-center">
+                  <p className="text-sm text-gray-500 mb-2">Choose a policy</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-4xl mx-auto">
+            {/* Tab Navigation */}
+            <div className="flex gap-3 mb-8">
+              {/* Terms of Service Tab */}
+              <button
+                onClick={() => setActiveTab("terms")}
+                className={`px-8 py-3 font-semibold rounded-lg transition-all duration-300 ${
+                  activeTab === "terms"
+                    ? "bg-gray-900 text-white shadow-lg"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-900 hover:text-white"
+                }`}
+              >
+                Terms of Service
+              </button>
+
+              {/* Privacy Policy Tab */}
+              <button
+                onClick={() => setActiveTab("privacy")}
+                className={`px-8 py-3 font-semibold rounded-lg transition-all duration-300 ${
+                  activeTab === "privacy"
+                    ? "bg-yellow-400 text-gray-900 shadow-lg"
+                    : "bg-gray-100 text-gray-700 hover:bg-yellow-400 hover:text-gray-900"
+                }`}
+              >
+                Privacy Policy
+              </button>
             </div>
 
-            <div className="space-y-12">
-              {content?.sections && content.sections.length > 0 ? (
-                content.sections.map((section) => (
-                  <div key={section.id} className="prose prose-lg max-w-none">
-                    <h2 className="text-2xl font-bold text-foreground mb-4">
-                      {section.heading}
+            {/* Content Card */}
+            {currentContent?.sections && currentContent.sections.length > 0 ? (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                {/* Content */}
+                <div className="p-8 md:p-12">
+                  <div className="mb-8 pb-8 border-b border-gray-200">
+                    <p className="text-sm font-semibold text-yellow-600 uppercase tracking-wider mb-2">
+                      {activeTab === "privacy" ? "Privacy Policy" : "Terms of Service"}
+                    </p>
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                      {activeTab === "privacy" 
+                        ? "Your Privacy Matters"
+                        : "Our Terms & Conditions"
+                      }
                     </h2>
-                    <div className="text-foreground/80 whitespace-pre-wrap leading-relaxed">
-                      {section.content}
-                    </div>
+                    <p className="text-lg text-gray-600">
+                      {activeTab === "privacy"
+                        ? "Learn how we collect, use, and protect your personal information"
+                        : "Please review these terms carefully before using our services"
+                      }
+                    </p>
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">No privacy policy content available.</p>
+
+                  {/* Sections */}
+                  <div className="space-y-8">
+                    {currentContent.sections.map((section, index) => (
+                      <div key={section.id} className="scroll-mt-20">
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="flex-shrink-0">
+                            <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-yellow-100">
+                              <span className="text-yellow-600 font-bold">{index + 1}</span>
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                              {section.heading}
+                            </h3>
+                            {section.slug && (
+                              <p className="text-base text-gray-600 mb-4 font-medium">
+                                {section.slug}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="ml-14 text-gray-700 whitespace-pre-wrap leading-relaxed space-y-4">
+                          {section.content}
+                        </div>
+                        {index < currentContent.sections.length - 1 && (
+                          <div className="mt-8 pt-8 border-t border-gray-100" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer Info */}
+                  <div className="mt-12 pt-8 border-t border-gray-200">
+                    <p className="text-sm text-gray-500">
+                      Last updated: {new Date().toLocaleDateString()} • If you have any questions, please contact us
+                    </p>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+                <p className="text-muted-foreground">
+                  No {activeTab === "privacy" ? "privacy policy" : "terms of service"} content available.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </main>

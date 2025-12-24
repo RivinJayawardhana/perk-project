@@ -205,15 +205,15 @@ export default function EditTermsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-[#23272f] mb-2">
-                    Slug
+                    Subtitle
                   </label>
                   <Input
                     value={section.slug}
                     onChange={(e) => updateSection(section.id, { slug: e.target.value })}
-                    placeholder="e.g., acceptance-of-terms"
+                    placeholder="e.g., Optional subtitle for this section"
                   />
                   <p className="text-xs text-[#6b7280] mt-1">
-                    Auto-generate from heading
+                    Optional subtitle displayed under heading
                   </p>
                 </div>
               </div>
