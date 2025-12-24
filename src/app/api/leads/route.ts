@@ -17,10 +17,12 @@ const supabase = createClient(
 
 // Configure email transporter
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT || "465"),
+  secure: process.env.SMTP_SECURE === "true",
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASSWORD,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
   },
 });
 
@@ -159,7 +161,7 @@ export async function POST(req: NextRequest) {
       `;
 
       await transporter.sendMail({
-        from: process.env.GMAIL_USER,
+        from: process.env.SMTP_FROM,
         to: "hello@venturenext.io",
         subject: `New Lead: ${perkName}`,
         html: emailHtml,
@@ -202,7 +204,7 @@ export async function POST(req: NextRequest) {
         `;
 
         await transporter.sendMail({
-          from: process.env.GMAIL_USER,
+          from: process.env.SMTP_FROM,
           to: formData.email_address,
           subject: `Thank You - ${perkName} Application Received`,
           html: confirmationHtml,
