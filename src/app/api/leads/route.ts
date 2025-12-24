@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
     // Log submission for rate limiting
     await logSubmission(clientIp, "/api/leads");
 
-    // Send email notification
+    // Send email notification to admin
     try {
       const { data: perkData } = await supabase
         .from("perks")
@@ -173,6 +173,44 @@ export async function POST(req: NextRequest) {
     } catch (emailError: any) {
       console.error("Email sending failed, but lead was saved:", emailError);
       // Don't fail the request if email fails - lead is already saved
+    }
+
+    // Send confirmation email to user
+    if (formData.email_address) {
+      try {
+        const { data: perkData } = await supabase
+          .from("perks")
+          .select("name")
+          .eq("id", formData.perk_id)
+          .single();
+
+        const perkName = perkData?.name || "Unknown Perk";
+
+        const confirmationHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">Thank You for Your Interest</h2>
+            <p style="color: #666; font-size: 16px;">We have received your submission for <strong>${perkName}</strong>.</p>
+            <p style="color: #666; font-size: 16px;">Our team will review your information and contact you soon with next steps.</p>
+            <div style="background-color: #f5f5f5; padding: 15px; margin: 20px 0; border-radius: 5px;">
+              <p style="color: #666; font-size: 14px; margin: 0;"><strong>Perk:</strong> ${perkName}</p>
+              <p style="color: #666; font-size: 14px; margin: 5px 0;"><strong>Submission Time:</strong> ${new Date(
+          leadData.submission_timestamp
+        ).toLocaleString()}</p>
+            </div>
+            <p style="color: #666; font-size: 14px; margin-top: 30px;">Best regards,<br/>The Team</p>
+          </div>
+        `;
+
+        await transporter.sendMail({
+          from: process.env.GMAIL_USER,
+          to: formData.email_address,
+          subject: `Thank You - ${perkName} Application Received`,
+          html: confirmationHtml,
+        });
+      } catch (emailError: any) {
+        console.error("Confirmation email error, but lead was saved:", emailError);
+        // Continue even if confirmation email fails
+      }
     }
 
     return NextResponse.json(leadData, { status: 201 });

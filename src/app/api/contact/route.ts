@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     // Log submission for rate limiting
     await logSubmission(clientIp, '/api/contact')
 
-    // Send email notification
+    // Send email notification to admin
     try {
       await transporter.sendMail({
         from: process.env.SMTP_FROM,
@@ -108,6 +108,31 @@ export async function POST(request: Request) {
     } catch (emailError) {
       console.error('Email send error:', emailError)
       // Continue even if email fails
+    }
+
+    // Send confirmation email to user
+    try {
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM,
+        to: sanitizedData.email,
+        subject: 'We Received Your Message',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">Thank You for Contacting Us</h2>
+            <p style="color: #666; font-size: 16px;">Hi ${sanitizedData.name},</p>
+            <p style="color: #666; font-size: 16px;">We have received your message and appreciate you reaching out to us.</p>
+            <p style="color: #666; font-size: 16px;">Our team will review your message and get back to you as soon as possible.</p>
+            <div style="background-color: #f5f5f5; padding: 15px; margin: 20px 0; border-radius: 5px;">
+              <p style="color: #666; font-size: 14px; margin: 0;"><strong>Your Message Details:</strong></p>
+              <p style="color: #666; font-size: 14px; margin: 5px 0;"><strong>Subject:</strong> ${sanitizedData.subject}</p>
+            </div>
+            <p style="color: #666; font-size: 14px; margin-top: 30px;">Best regards,<br/>The Team</p>
+          </div>
+        `,
+      })
+    } catch (emailError) {
+      console.error('Confirmation email error:', emailError)
+      // Continue even if confirmation email fails
     }
 
     return NextResponse.json({ message: 'Contact submission received', data })

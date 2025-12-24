@@ -1,4 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+
+// Configure email transporter
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT || "587"),
+  secure: process.env.SMTP_SECURE === "true",
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,6 +65,26 @@ export async function POST(request: NextRequest) {
         { error: "Failed to subscribe to newsletter" },
         { status: response.status }
       );
+    }
+
+    // Send confirmation email to user
+    try {
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM,
+        to: email,
+        subject: "Welcome to Our Newsletter",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">Welcome to Our Newsletter!</h2>
+            <p style="color: #666; font-size: 16px;">Thank you for subscribing to our newsletter.</p>
+            <p style="color: #666; font-size: 16px;">You'll now receive updates, news, and exclusive content delivered straight to your inbox.</p>
+            <p style="color: #666; font-size: 14px; margin-top: 30px;">Best regards,<br/>The Team</p>
+          </div>
+        `,
+      });
+    } catch (emailError) {
+      console.error("Confirmation email error:", emailError);
+      // Continue even if confirmation email fails
     }
 
     return NextResponse.json(
