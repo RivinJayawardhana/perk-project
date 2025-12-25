@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -47,8 +48,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="bg-[#181c23] text-white w-64 min-h-screen flex flex-col py-6 px-4 border-r border-[#23272f] justify-between">
         <div>
           <div className="flex items-center gap-2 mb-10 px-2">
-            <div className="w-8 h-8 rounded-full bg-[#e6b756] flex items-center justify-center text-lg font-bold text-[#1a2233]">P</div>
-            <span className="text-xl font-bold text-white">Perks<span className="text-[#e6b756]">Admin</span></span>
+            <Image src="/logo.png" alt="VentureNext" width={32} height={32} />
+            <span className="text-xl font-bold text-white">enture<span className="text-[#e6b756]">Next</span></span>
           </div>
           <nav className="flex-1">
             <ul className="space-y-1">

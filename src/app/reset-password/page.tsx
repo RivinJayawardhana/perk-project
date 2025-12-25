@@ -24,6 +24,19 @@ function ResetPasswordContent() {
   useEffect(() => {
     const validateToken = async () => {
       try {
+        // Check if we have a hash (Supabase already handled it)
+        const hash = window.location.hash;
+        console.log("[Reset Password] Hash:", hash);
+        
+        if (hash && hash.includes("access_token")) {
+          // Supabase has already created a session
+          console.log("[Reset Password] Session created by Supabase");
+          setIsValidToken(true);
+          setValidating(false);
+          return;
+        }
+
+        // Fallback: check for type and code query parameters
         const type = searchParams.get("type");
         const code = searchParams.get("code");
 

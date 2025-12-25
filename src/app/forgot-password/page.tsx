@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, CheckCircle, Mail } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function ForgotPasswordPage() {
@@ -46,11 +47,9 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-12">
-          <div className="w-12 h-12 rounded-full bg-[#e6b756] flex items-center justify-center text-2xl font-bold text-[#1a2233]">
-            V
-          </div>
+          <Image src="/logo.png" alt="VentureNext" width={48} height={48} />
           <span className="text-3xl font-bold text-white">
-            VentureNext<span className="text-[#e6b756]">Admin</span>
+            entureNext<span className="text-[#e6b756]">Admin</span>
           </span>
         </div>
 
