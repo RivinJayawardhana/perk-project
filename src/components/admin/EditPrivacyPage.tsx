@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { RichTextEditor } from "@/components/journal/RichTextEditor";
 
 interface Section {
   id: string;
@@ -20,9 +21,22 @@ interface SEOData {
   metaDescription: string;
 }
 
+interface HeroData {
+  subtitle: string;
+  heading: string;
+  description: string;
+}
+
+interface PrivacyContent {
+  sections: Section[];
+  seo: SEOData;
+  hero?: HeroData;
+}
+
 export default function EditPrivacyPage() {
   const [sections, setSections] = useState<Section[]>([]);
   const [seo, setSeo] = useState<SEOData>({ metaTitle: "", metaDescription: "" });
+  const [hero, setHero] = useState<HeroData>({ subtitle: "Legal", heading: "Privacy & Terms", description: "Read our privacy policy and terms of service." });
   const [originalSections, setOriginalSections] = useState<Section[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,9 +51,10 @@ export default function EditPrivacyPage() {
       setIsLoading(true);
       const res = await fetch("/api/privacy-content");
       if (!res.ok) throw new Error("Failed to fetch");
-      const data = await res.json();
+      const data: PrivacyContent = await res.json();
       setSections(data.sections || []);
       setSeo(data.seo || { metaTitle: "", metaDescription: "" });
+      setHero(data.hero || { subtitle: "Legal", heading: "Privacy & Terms", description: "Read our privacy policy and terms of service." });
       setOriginalSections(data.sections || []);
     } catch (error) {
       console.error("Error fetching privacy content:", error);
@@ -90,7 +105,7 @@ export default function EditPrivacyPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ sections, seo }),
+        body: JSON.stringify({ sections, seo, hero }),
       });
 
       if (!res.ok) {
@@ -178,6 +193,49 @@ export default function EditPrivacyPage() {
         </div>
       </Card>
 
+      {/* Hero Section */}
+      <Card className="p-6 mb-8 border border-[#e5e7eb]">
+        <h2 className="text-2xl font-bold text-[#23272f] mb-6">Hero Section</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Subtitle
+            </label>
+            <Input
+              value={hero.subtitle}
+              onChange={(e) => setHero({ ...hero, subtitle: e.target.value })}
+              placeholder="e.g., Legal"
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Heading
+            </label>
+            <Input
+              value={hero.heading}
+              onChange={(e) => setHero({ ...hero, heading: e.target.value })}
+              placeholder="e.g., Privacy & Terms"
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Description
+            </label>
+            <Textarea
+              value={hero.description}
+              onChange={(e) => setHero({ ...hero, description: e.target.value })}
+              placeholder="e.g., Read our privacy policy and terms of service."
+              rows={2}
+              className="w-full"
+            />
+          </div>
+        </div>
+      </Card>
+
       <div className="space-y-4 mb-6">
         {sections.map((section) => (
           <Card key={section.id} className="p-6">
@@ -202,34 +260,11 @@ export default function EditPrivacyPage() {
               </div>
 
               <div>
-                <label className="text-sm font-medium mb-1 block">URL Slug</label>
-                <div className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    <Input
-                      placeholder="section-slug"
-                      value={section.slug}
-                      onChange={(e) => updateSection(section.id, { slug: e.target.value })}
-                      className="mb-1"
-                    />
-                    <p className="text-xs text-muted-foreground">Edit manually or auto-generate from heading</p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => updateSection(section.id, { slug: generateSlug(section.heading) })}
-                    className="whitespace-nowrap"
-                  >
-                    Auto-generate
-                  </Button>
-                </div>
-              </div>
-
-              <div>
                 <label className="text-sm font-medium mb-1 block">Content</label>
-                <Textarea
+                <RichTextEditor
                   value={section.content}
-                  onChange={(e) => updateSection(section.id, { content: e.target.value })}
-                  className="min-h-32"
+                  onChange={(content) => updateSection(section.id, { content })}
+                  placeholder="Enter section content..."
                 />
               </div>
             </div>

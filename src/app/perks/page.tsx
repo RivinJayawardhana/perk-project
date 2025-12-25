@@ -345,6 +345,10 @@ export default function Perks() {
     selectedSubcategories.length;
 
   const handleGetDeal = (perk: DisplayPerk) => {
+    // Update browser title with perk details
+    const title = `${perk.company} | ${perk.category} | VentureNext`;
+    document.title = title;
+    
     // Check if perk is using lead form (no deal_url or deal_url is empty)
     const isLeadForm = !perk.deal_url || perk.deal_url.trim() === "";
     
@@ -390,6 +394,8 @@ export default function Perks() {
         description: "Your information has been submitted.",
       });
       
+      // Reset title when modal closes
+      document.title = "VentureNext - Exclusive Perks for Ambitious Founders";
       setLeadFormModal({ isOpen: false, perkId: null });
     } catch (error) {
       toast({
@@ -692,7 +698,10 @@ export default function Perks() {
       {leadFormModal.isOpen && (
         <LeadFormModal
           isOpen={leadFormModal.isOpen}
-          onClose={() => setLeadFormModal({ isOpen: false, perkId: null })}
+          onClose={() => {
+            document.title = "VentureNext - Exclusive Perks for Ambitious Founders";
+            setLeadFormModal({ isOpen: false, perkId: null });
+          }}
           perkName={mockPerks.find((p) => p.id === leadFormModal.perkId)?.company || "Perk"}
           formFields={currentLeadForm?.form_fields && currentLeadForm.form_fields.length > 0 
             ? currentLeadForm.form_fields 

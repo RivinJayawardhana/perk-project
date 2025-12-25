@@ -18,6 +18,11 @@ interface ContentData {
     metaTitle: string;
     metaDescription: string;
   };
+  hero?: {
+    subtitle: string;
+    heading: string;
+    description: string;
+  };
 }
 
 export default function Privacy() {
@@ -71,7 +76,7 @@ export default function Privacy() {
       <>
         <Header />
         <main className="bg-[#fcfaf7] min-h-screen">
-          <StaticPrivacyHero />
+          <StaticPrivacyHero data={privacyContent?.hero} />
           <section className="py-12 sm:py-16 bg-[#f5f3f0]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[#6b6f76]">
               Loading privacy information...
@@ -86,40 +91,20 @@ export default function Privacy() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
-      <StaticPrivacyHero />
-      <Header />
+      <StaticPrivacyHero data={privacyContent?.hero} />
       <main className="flex-1">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-b from-gray-50 to-white border-b border-gray-200">
-          <div className="container mx-auto px-4 py-12 md:py-20">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                Legal & Privacy Center
-              </h1>
-              <p className="text-xl text-gray-600 mb-8">
-                Understand how we protect your information and your rights
-              </p>
-              <div className="flex justify-center gap-4">
-                <div className="text-center">
-                  <p className="text-sm text-gray-500 mb-2">Choose a policy</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Main Content */}
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-4xl mx-auto">
             {/* Tab Navigation */}
-            <div className="flex gap-3 mb-8">
+            <div className="grid grid-cols-2 gap-0 mb-8 rounded-lg overflow-hidden border border-[#e6b756]">
               {/* Terms of Service Tab */}
               <button
                 onClick={() => setActiveTab("terms")}
-                className={`px-8 py-3 font-semibold rounded-lg transition-all duration-300 ${
+                className={`py-3 font-semibold transition-all duration-300 ${
                   activeTab === "terms"
-                    ? "bg-gray-900 text-white shadow-lg"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-900 hover:text-white"
+                    ? "bg-[#e6b756] text-[#1a2233]"
+                    : "bg-white text-[#1a2233] hover:bg-[#f5d488]"
                 }`}
               >
                 Terms of Service
@@ -128,10 +113,10 @@ export default function Privacy() {
               {/* Privacy Policy Tab */}
               <button
                 onClick={() => setActiveTab("privacy")}
-                className={`px-8 py-3 font-semibold rounded-lg transition-all duration-300 ${
+                className={`py-3 font-semibold transition-all duration-300 border-l border-[#e6b756] ${
                   activeTab === "privacy"
-                    ? "bg-yellow-400 text-gray-900 shadow-lg"
-                    : "bg-gray-100 text-gray-700 hover:bg-yellow-400 hover:text-gray-900"
+                    ? "bg-[#e6b756] text-[#1a2233]"
+                    : "bg-white text-[#1a2233] hover:bg-[#f5d488]"
                 }`}
               >
                 Privacy Policy
@@ -175,15 +160,10 @@ export default function Privacy() {
                             <h3 className="text-2xl font-bold text-gray-900 mb-2">
                               {section.heading}
                             </h3>
-                            {section.slug && (
-                              <p className="text-base text-gray-600 mb-4 font-medium">
-                                {section.slug}
-                              </p>
-                            )}
                           </div>
                         </div>
-                        <div className="ml-14 text-gray-700 whitespace-pre-wrap leading-relaxed space-y-4">
-                          {section.content}
+                        <div className="ml-14 text-gray-700 leading-relaxed space-y-4 prose prose-sm max-w-none">
+                          <div dangerouslySetInnerHTML={{ __html: section.content }} />
                         </div>
                         {index < currentContent.sections.length - 1 && (
                           <div className="mt-8 pt-8 border-t border-gray-100" />

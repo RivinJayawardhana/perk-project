@@ -7,7 +7,6 @@ import { ChevronLeft, ChevronRight, Clock, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useJournals } from "@/hooks/useJournals";
-import StaticJournalHero from "@/components/StaticJournalHero";
 
 const getCategoryColor = (category: string) => {
   const colors: { [key: string]: string } = {
@@ -70,7 +69,6 @@ export default function JournalPage() {
       <>
         <Header />
         <main className="bg-[#fcfaf7] min-h-screen">
-          <StaticJournalHero />
           <section className="py-12 sm:py-16 bg-[#f5f3f0]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[#6b6f76]">
               Loading articles...
@@ -87,7 +85,6 @@ export default function JournalPage() {
     return (
       <>
         <Header />
-        <StaticJournalHero />
         <div className="flex flex-col items-center justify-center min-h-[60vh] bg-[#f5f3f0]">
           <h2 className="text-2xl font-bold text-slate-900">No articles found</h2>
           <p className="text-gray-600 mt-2">Check back later for new stories.</p>
@@ -103,9 +100,6 @@ export default function JournalPage() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="flex-grow">
-        {/* Hero Section */}
-        <StaticJournalHero />
-
         {/* Dynamic Featured Article Section */}
         {featuredPost && (
           <section className="bg-[#faf8f6] py-12 sm:py-16 lg:py-20 border-b">

@@ -12,6 +12,11 @@ interface TermsContent {
     metaTitle: string;
     metaDescription: string;
   };
+  hero?: {
+    subtitle: string;
+    heading: string;
+    description: string;
+  };
 }
 
 const DEFAULT_CONTENT: TermsContent = {
@@ -51,6 +56,11 @@ const DEFAULT_CONTENT: TermsContent = {
     metaTitle: "Terms of Service | VentureNext",
     metaDescription: "Read our Terms of Service to understand the rules and guidelines for using VentureNext.",
   },
+  hero: {
+    subtitle: "Legal",
+    heading: "Privacy & Terms",
+    description: "Read our privacy policy and terms of service.",
+  },
 };
 
 export async function GET(request: NextRequest) {
@@ -69,7 +79,7 @@ export async function GET(request: NextRequest) {
 
     // Transform database rows into TermsContent interface
     const sections = data
-      .filter((row) => row.section_type !== "seo")
+      .filter((row) => row.section_type !== "seo" && row.section_type !== "hero")
       .map((row) => ({
         id: row.id || row.section_order.toString(),
         heading: row.title || "Section",
@@ -86,7 +96,17 @@ export async function GET(request: NextRequest) {
         }
       : DEFAULT_CONTENT.seo;
 
-    return NextResponse.json({ sections, seo });
+    // Get hero data if available
+    const heroRow = data.find((row) => row.section_type === "hero");
+    const hero = heroRow
+      ? {
+          subtitle: heroRow.title || DEFAULT_CONTENT.hero?.subtitle || "",
+          heading: heroRow.description || DEFAULT_CONTENT.hero?.heading || "",
+          description: heroRow.content || DEFAULT_CONTENT.hero?.description || "",
+        }
+      : DEFAULT_CONTENT.hero;
+
+    return NextResponse.json({ sections, seo, hero });
   } catch (error) {
     console.error("Error fetching terms content:", error);
     return NextResponse.json(DEFAULT_CONTENT);
@@ -121,6 +141,19 @@ export async function POST(request: NextRequest) {
         content: "",
         section_order: 0,
         metadata: { id: "seo" },
+      });
+    }
+
+    // Add hero row
+    if (body.hero) {
+      rows.push({
+        page_name: "terms",
+        section_type: "hero",
+        title: body.hero.subtitle,
+        description: body.hero.heading,
+        content: body.hero.description,
+        section_order: -1,
+        metadata: { id: "hero" },
       });
     }
 

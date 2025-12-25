@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { RichTextEditor } from "@/components/journal/RichTextEditor";
 
 interface Section {
   id: string;
@@ -20,14 +21,22 @@ interface SEOData {
   metaDescription: string;
 }
 
+interface HeroData {
+  subtitle: string;
+  heading: string;
+  description: string;
+}
+
 interface TermsContent {
   sections: Section[];
   seo: SEOData;
+  hero?: HeroData;
 }
 
 export default function EditTermsPage() {
   const [sections, setSections] = useState<Section[]>([]);
   const [seo, setSeo] = useState<SEOData>({ metaTitle: "", metaDescription: "" });
+  const [hero, setHero] = useState<HeroData>({ subtitle: "Legal", heading: "Privacy & Terms", description: "Read our privacy policy and terms of service." });
   const [originalSections, setOriginalSections] = useState<Section[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,6 +54,7 @@ export default function EditTermsPage() {
       const data: TermsContent = await res.json();
       setSections(data.sections || []);
       setSeo(data.seo || { metaTitle: "", metaDescription: "" });
+      setHero(data.hero || { subtitle: "Legal", heading: "Privacy & Terms", description: "Read our privacy policy and terms of service." });
       setOriginalSections(data.sections || []);
     } catch (error) {
       console.error("Error fetching terms content:", error);
@@ -93,6 +103,7 @@ export default function EditTermsPage() {
       const payload: TermsContent = {
         sections,
         seo,
+        hero,
       };
 
       const res = await fetch("/api/terms-content", {
@@ -173,6 +184,49 @@ export default function EditTermsPage() {
         </div>
       </Card>
 
+      {/* Hero Section */}
+      <Card className="p-6 border border-[#e5e7eb]">
+        <h2 className="text-2xl font-bold text-[#23272f] mb-6">Hero Section</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Subtitle
+            </label>
+            <Input
+              value={hero.subtitle}
+              onChange={(e) => setHero({ ...hero, subtitle: e.target.value })}
+              placeholder="e.g., Legal"
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Heading
+            </label>
+            <Input
+              value={hero.heading}
+              onChange={(e) => setHero({ ...hero, heading: e.target.value })}
+              placeholder="e.g., Privacy & Terms"
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Description
+            </label>
+            <Textarea
+              value={hero.description}
+              onChange={(e) => setHero({ ...hero, description: e.target.value })}
+              placeholder="e.g., Read our privacy policy and terms of service."
+              rows={2}
+              className="w-full"
+            />
+          </div>
+        </div>
+      </Card>
+
       {/* Terms Sections */}
       <Card className="p-6 border border-[#e5e7eb]">
         <div className="flex items-center justify-between mb-6">
@@ -205,16 +259,15 @@ export default function EditTermsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-[#23272f] mb-2">
-                    Subtitle
+                    Slug (URL-friendly)
                   </label>
                   <Input
                     value={section.slug}
-                    onChange={(e) => updateSection(section.id, { slug: e.target.value })}
-                    placeholder="e.g., Optional subtitle for this section"
+                    onChange={(e) => {
+                      updateSection(section.id, { slug: e.target.value });
+                    }}
+                    placeholder="e.g., acceptance-of-terms"
                   />
-                  <p className="text-xs text-[#6b7280] mt-1">
-                    Optional subtitle displayed under heading
-                  </p>
                 </div>
               </div>
 
@@ -222,14 +275,12 @@ export default function EditTermsPage() {
                 <label className="block text-sm font-medium text-[#23272f] mb-2">
                   Section Content
                 </label>
-                <Textarea
+                <RichTextEditor
                   value={section.content}
-                  onChange={(e) =>
-                    updateSection(section.id, { content: e.target.value })
+                  onChange={(content) =>
+                    updateSection(section.id, { content })
                   }
                   placeholder="Enter section content..."
-                  rows={4}
-                  className="w-full"
                 />
               </div>
 
