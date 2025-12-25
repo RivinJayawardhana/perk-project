@@ -11,6 +11,7 @@ import { useHomeContent } from "@/hooks/useHomeContent";
 import { usePerks } from "@/hooks/usePerks";
 import { useJournals } from "@/hooks/useJournals";
 import { setMetaTags } from "@/lib/meta-tags";
+import StaticHero from "@/components/StaticHero";
 
 function HomeContent() {
   const { content, isLoading } = useHomeContent();
@@ -34,8 +35,9 @@ function HomeContent() {
     return (
       <>
         <Header />
-        <main className="bg-[#fcfaf7] min-h-screen flex items-center justify-center">
-          <div className="text-[#6b6f76]">Loading...</div>
+        <main className="bg-[#fcfaf7] min-h-screen">
+          <StaticHero />
+          <div className="text-center py-10 text-[#6b6f76]">Loading featured deals...</div>
         </main>
         <Footer />
       </>
@@ -141,7 +143,7 @@ function HomeContent() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {featuredDeals.map((perk: any) => (
-            <div key={perk.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col h-full relative">
+            <div key={perk.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col h-full min-h-[420px] relative">
               {/* Image Container */}
               <div className="relative">
                 <img src={perk.image_url || "/images/placeholder.jpg"} alt={perk.name} className="w-full h-40 sm:h-48 object-cover" />

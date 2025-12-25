@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { setMetaTags } from "@/lib/meta-tags";
+import StaticPrivacyHero from "@/components/StaticPrivacyHero";
 
 interface Section {
   id: string;
@@ -67,16 +68,25 @@ export default function Privacy() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
+      <>
+        <Header />
+        <main className="bg-[#fcfaf7] min-h-screen">
+          <StaticPrivacyHero />
+          <section className="py-12 sm:py-16 bg-[#f5f3f0]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[#6b6f76]">
+              Loading privacy information...
+            </div>
+          </section>
+        </main>
+        <Footer />
+      </>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      <Header />
+      <StaticPrivacyHero />
       <Header />
       <main className="flex-1">
         {/* Hero Section */}

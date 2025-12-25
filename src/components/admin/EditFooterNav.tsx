@@ -27,6 +27,10 @@ interface FooterData {
   socialLinks: SocialLink[];
   footerLinks: FooterSection[];
   copyrightText?: string;
+  newsletter?: {
+    title: string;
+    subtitle: string;
+  };
 }
 
 const ICON_OPTIONS = ["Facebook", "Instagram", "Linkedin", "Twitter", "Youtube", "TikTok"];
@@ -48,6 +52,15 @@ export default function EditFooterNav() {
       const res = await fetch("/api/footer-content");
       const footerData = await res.json();
       console.log("Fetched footer data:", footerData);
+      
+      // Ensure newsletter object exists
+      if (!footerData.newsletter) {
+        footerData.newsletter = {
+          title: "Never Miss a Gift Moment",
+          subtitle: "Get exclusive offers, new experience alerts, and gifting inspiration delivered to your inbox.",
+        };
+      }
+      
       setData(footerData);
     } catch (error: any) {
       console.error("Fetch error:", error);
@@ -313,6 +326,55 @@ export default function EditFooterNav() {
               className="w-full"
             />
             <p className="text-xs text-[#6b7280] mt-2">This text appears in the footer below the social links.</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Newsletter Section */}
+      <Card className="p-6 border border-[#e5e7eb]">
+        <h2 className="text-2xl font-bold text-[#23272f] mb-6">Newsletter Signup</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Newsletter Title
+            </label>
+            <Input
+              value={data.newsletter?.title || ""}
+              onChange={(e) => {
+                setData({
+                  ...data,
+                  newsletter: {
+                    ...data.newsletter,
+                    title: e.target.value,
+                    subtitle: data.newsletter?.subtitle || "",
+                  },
+                });
+              }}
+              placeholder="e.g., Never Miss a Gift Moment"
+              className="w-full"
+            />
+            <p className="text-xs text-[#6b7280] mt-2">The main heading above the email input.</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[#23272f] mb-2">
+              Newsletter Subtitle
+            </label>
+            <textarea
+              value={data.newsletter?.subtitle || ""}
+              onChange={(e) => {
+                setData({
+                  ...data,
+                  newsletter: {
+                    title: data.newsletter?.title || "",
+                    subtitle: e.target.value,
+                  },
+                });
+              }}
+              placeholder="e.g., Get exclusive offers, new experience alerts, and gifting inspiration delivered to your inbox."
+              className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e6b756]"
+              rows={3}
+            />
+            <p className="text-xs text-[#6b7280] mt-2">The descriptive text above the email input.</p>
           </div>
         </div>
       </Card>

@@ -15,6 +15,10 @@ interface FooterData {
     }>;
   }>;
   copyrightText?: string;
+  newsletter?: {
+    title: string;
+    subtitle: string;
+  };
   metadata?: {
     copyrightText?: string;
   };
@@ -58,6 +62,10 @@ const DEFAULT_DATA: FooterData = {
     },
   ],
   copyrightText: "© 2025 VentureNext. All rights reserved.",
+  newsletter: {
+    title: "Never Miss a Gift Moment",
+    subtitle: "Get exclusive offers, new experience alerts, and gifting inspiration delivered to your inbox.",
+  },
 };
 
 export async function GET() {
@@ -102,11 +110,15 @@ export async function GET() {
     // Try to get copyright text from metadata column or fallback to default
     const metadata = row.metadata && typeof row.metadata === 'object' ? row.metadata : {};
     const copyrightText = metadata.copyrightText || row.copyright_text || DEFAULT_DATA.copyrightText;
+    
+    // Get newsletter data from metadata or fallback to default
+    const newsletter = metadata.newsletter || row.newsletter || DEFAULT_DATA.newsletter;
 
     const footerData: FooterData = {
       socialLinks,
       footerLinks,
       copyrightText,
+      newsletter,
       metadata: {
         copyrightText,
       },
@@ -171,6 +183,7 @@ export async function POST(request: NextRequest) {
         footer_links: data.footerLinks,
         metadata: {
           copyrightText: data.copyrightText,
+          newsletter: data.newsletter,
         },
       })
       .select();

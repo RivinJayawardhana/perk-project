@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { setMetaTags } from "@/lib/meta-tags";
+import StaticContactHero from "@/components/StaticContactHero";
 
 interface ContactPageContent {
   hero: {
@@ -91,6 +92,15 @@ export default function Contact() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        
+        // Extract specific validation error messages
+        if (errorData.details && Array.isArray(errorData.details)) {
+          const errorMessages = errorData.details
+            .map((err: any) => err.message)
+            .join(', ');
+          throw new Error(errorMessages);
+        }
+        
         throw new Error(errorData.error || 'Failed to submit form');
       }
 
@@ -119,21 +129,17 @@ export default function Contact() {
       <Header />
       <main className="bg-[#fcfaf7] min-h-screen py-0">
       {/* Hero Section */}
-      <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6]">
-        <div className="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <div className="text-[#e6b756] font-semibold mb-2 text-sm sm:text-base font-display">
-            {contentLoading ? "Contact us" : pageContent?.hero.subtitle || "Contact us"}
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 font-display">
-            {contentLoading ? "We'd love to hear from you" : pageContent?.hero.title || "We'd love to hear from you"}
-          </h1>
-          <p className="text-sm sm:text-base md:text-lg text-[#6b6f76]">
-            {contentLoading ? "Loading..." : pageContent?.hero.description || "Whether you have a question about perks, partnerships, or anything else—our team is ready to help."}
-          </p>
-        </div>
-      </section>
+      <StaticContactHero />
 
-      {/* Contact Form Section */}
+      {contentLoading && (
+        <section className="py-12 sm:py-16 bg-[#f5f3f0]">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[#6b6f76]">
+            Loading contact form...
+          </div>
+        </section>
+      )}
+
+      {!contentLoading && (
       <section className="py-12 sm:py-16 bg-[#f5f3f0]">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <form
@@ -232,6 +238,7 @@ export default function Contact() {
           </form>
         </div>
       </section>
+      )}
       </main>
       <Footer />
     </>

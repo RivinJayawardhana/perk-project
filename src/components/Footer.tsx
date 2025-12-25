@@ -24,6 +24,10 @@ interface FooterData {
   socialLinks: SocialLink[];
   footerLinks: FooterSection[];
   copyrightText?: string;
+  newsletter?: {
+    title: string;
+    subtitle: string;
+  };
 }
 
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -103,10 +107,10 @@ export default function Footer() {
       {/* Newsletter Section */}
       <div className="max-w-6xl mx-auto text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold mb-2">
-          Never Miss a <span className="text-[#e6b756]">Gift Moment</span>
+          {footerData?.newsletter?.title || "Never Miss a Gift Moment"}
         </h2>
         <div className="text-[#b0b4bb] mb-6">
-          Get exclusive offers, new experience alerts, and gifting inspiration delivered to your inbox.
+          {footerData?.newsletter?.subtitle || "Get exclusive offers, new experience alerts, and gifting inspiration delivered to your inbox."}
         </div>
         <form 
           onSubmit={handleNewsletterSubmit}

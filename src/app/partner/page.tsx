@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { setMetaTags } from "@/lib/meta-tags";
+import StaticPartnerHero from "@/components/StaticPartnerHero";
 
 interface PartnerContent {
   hero: {
@@ -105,6 +106,15 @@ export default function Partner() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        
+        // Extract specific validation error messages
+        if (errorData.details && Array.isArray(errorData.details)) {
+          const errorMessages = errorData.details
+            .map((err: any) => err.message)
+            .join(', ');
+          throw new Error(errorMessages);
+        }
+        
         throw new Error(errorData.error || 'Failed to submit application');
       }
 
@@ -132,11 +142,13 @@ export default function Partner() {
     return (
       <>
         <Header />
-        <main className="bg-[#fcfaf7] min-h-screen flex items-center justify-center">
-          <div className="flex flex-col items-center gap-2">
-            <Loader2 className="w-8 h-8 animate-spin text-[#e6b756]" />
-            <p className="text-[#6b6f76]">Loading partner page...</p>
-          </div>
+        <main className="bg-[#fcfaf7] min-h-screen">
+          <StaticPartnerHero />
+          <section className="py-12 sm:py-16 bg-[#f5f3f0]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[#6b6f76]">
+              Loading partner information...
+            </div>
+          </section>
         </main>
         <Footer />
       </>
@@ -149,16 +161,7 @@ export default function Partner() {
       <main className="bg-[#fcfaf7] min-h-screen">
 
       {/* Hero Section */}
-      <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6] border-b">
-        <div className="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <div className="text-[#e6b756] font-semibold mb-2 text-sm sm:text-base font-display">{content.hero.subtitle}</div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 font-display">{content.hero.title}</h1>
-          <p className="text-[#6b6f76] text-sm sm:text-base md:text-lg mb-6 sm:mb-8">{content.hero.description}</p>
-          <a href="#apply">
-            <Button className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 sm:px-8 py-2 sm:py-3 rounded-full hover:bg-[#f5d488] w-full sm:w-auto">{content.hero.buttonText}</Button>
-          </a>
-        </div>
-      </section>
+      <StaticPartnerHero />
 
       {/* Benefits Section */}
       <section className="bg-[#1a2233] py-12 sm:py-16 lg:py-20">

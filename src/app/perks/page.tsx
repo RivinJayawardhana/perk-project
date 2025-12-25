@@ -19,6 +19,7 @@ import { useSubmitLead } from "@/hooks/useLeadForms";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { setMetaTags } from "@/lib/meta-tags";
+import StaticPerksHero from "@/components/StaticPerksHero";
 
 interface PerksPageContent {
   hero: {
@@ -404,284 +405,287 @@ export default function Perks() {
       <Header />
       <main className="bg-[#fcfaf7] min-h-screen">
         {/* Hero Section */}
-        <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6] border-b">
-          <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-3 sm:mb-4 font-display">
-              {contentLoading ? "Discover your next perk" : pageContent?.hero.title || "Discover your next perk"}
-            </h1>
-            <p className="text-[#6b6f76] text-sm sm:text-base md:text-lg">
-              {isLoading ? "Loading exclusive deals..." : pageContent?.hero.description || `Browse ${mockPerks.length}+ exclusive deals on tools, services, and experiences for founders and teams.`}
-            </p>
-          </div>
-        </section>
-
-        {/* Perks Grid with Filters */}
-        <section className="py-8 sm:py-12 bg-[#f5f3f0]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Filters Sidebar */}
-          <aside className="w-full lg:w-80 bg-white rounded-2xl shadow-sm p-4 sm:p-6 h-fit hidden lg:block">
-            <div className="flex justify-between items-center mb-4 sm:mb-6">
-              <div className="font-bold text-base sm:text-lg text-[#23272f] font-display">
-                {filteredPerks.length} deals found
-              </div>
-              {activeFiltersCount > 0 && (
-                <button
-                  onClick={handleClearFilters}
-                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  Clear all filters
-                </button>
-              )}
+        <StaticPerksHero />
+        
+        {isLoading && (
+          <section className="py-12 sm:py-16 bg-[#f5f3f0]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[#6b6f76]">
+              Loading exclusive deals...
             </div>
+          </section>
+        )}
 
-            {/* Search */}
-            <div className="mb-4 sm:mb-6">
-              <Input
-                placeholder="Search deals..."
-                value={searchTerm}
-                onChange={e => {
-                  setSearchTerm(e.target.value);
-                  setTimeout(handleFilter, 0);
-                }}
-                className="rounded-lg border-gray-200"
-              />
-            </div>
-
-            {/* Deal Type Section */}
-            <div className="mb-6 sm:mb-8">
-              <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Deal Type</h3>
-              <div className="space-y-3">
-                {dealTypeOptions.map((option) => (
-                  <label key={option.label} className="flex items-center justify-between cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        checked={selectedDealTypes.includes(option.label)}
-                        onCheckedChange={() => handleDealTypeChange(option.label)}
-                        className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
-                      />
-                      <span className="text-sm text-[#6b6f76] group-hover:text-[#23272f]">
-                        {option.label}
-                      </span>
+        {!isLoading && (
+          <>
+            {/* Perks Grid with Filters */}
+            <section className="py-8 sm:py-12 bg-[#f5f3f0]">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
+                {/* Filters Sidebar */}
+                <aside className="w-full lg:w-80 bg-white rounded-2xl shadow-sm p-4 sm:p-6 h-fit hidden lg:block">
+                  <div className="flex justify-between items-center mb-4 sm:mb-6">
+                    <div className="font-bold text-base sm:text-lg text-[#23272f] font-display">
+                      {filteredPerks.length} deals found
                     </div>
-                    <span className="text-xs text-[#8a8e9a] bg-gray-100 px-2 py-0.5 rounded">
-                      {option.count}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Divider */}
-            <hr className="my-6 border-gray-200" />
-
-            {/* Category Section */}
-            <div className="mb-6 sm:mb-8">
-              <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Category</h3>
-              <div className="space-y-3">
-                {categoryOptions.map((option) => (
-                  <label key={option.label} className="flex items-center justify-between cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        checked={selectedCategories.includes(option.label)}
-                        onCheckedChange={() => handleCategoryChange(option.label)}
-                        className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
-                      />
-                      <span className="text-sm text-[#6b6f76] group-hover:text-[#23272f]">
-                        {option.label}
-                      </span>
-                    </div>
-                    <span className="text-xs text-[#8a8e9a] bg-gray-100 px-2 py-0.5 rounded">
-                      {option.count}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Subcategory Section (only shown if category is selected) */}
-            {selectedCategories.length > 0 && selectedCategories.map(category => (
-              subcategoryOptions[category] && (
-                <div key={category} className="mb-6 ml-4 border-l border-gray-200 pl-4">
-                  <h4 className="font-medium text-sm text-[#6b6f76] mb-3 font-display">Goals</h4>
-                  <div className="space-y-2">
-                    {subcategoryOptions[category].map((subOption) => (
-                      <label key={subOption.label} className="flex items-center justify-between cursor-pointer group">
-                        <div className="flex items-center gap-3">
-                          <Checkbox
-                            checked={selectedSubcategories.includes(subOption.label)}
-                            onCheckedChange={() => handleSubcategoryChange(subOption.label)}
-                            className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
-                          />
-                          <span className="text-xs text-[#6b6f76] group-hover:text-[#23272f]">
-                            {subOption.label}
-                          </span>
-                        </div>
-                        <span className="text-xs text-[#8a8e9a]">
-                          {subOption.count}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )
-            ))}
-
-            {/* Location Section */}
-            <div className="mb-6 sm:mb-8">
-              <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Location</h3>
-              <div className="space-y-3">
-                {locationOptions.map((option) => (
-                  <label key={option.label} className="flex items-center justify-between cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        checked={selectedLocations.includes(option.label)}
-                        onCheckedChange={() => handleLocationChange(option.label)}
-                        className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
-                      />
-                      <span className="text-sm text-[#6b6f76] group-hover:text-[#23272f]">
-                        {option.label}
-                      </span>
-                    </div>
-                    <span className="text-xs text-[#8a8e9a] bg-gray-100 px-2 py-0.5 rounded">
-                      {option.count}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Divider */}
-            <hr className="my-6 border-gray-200" />
-
-            {/* Best For Section */}
-            <div className="mb-4">
-              <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Best For (optional)</h3>
-              <div className="space-y-3">
-                {bestForOptions.map((option) => (
-                  <label key={option.label} className="flex items-center justify-between cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        checked={selectedBestFor.includes(option.label)}
-                        onCheckedChange={() => handleBestForChange(option.label)}
-                        className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
-                      />
-                      <span className="text-sm text-[#6b6f76] group-hover:text-[#23272f]">
-                        {option.label}
-                      </span>
-                    </div>
-                    <span className="text-xs text-[#8a8e9a] bg-gray-100 px-2 py-0.5 rounded">
-                      {option.count}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </aside>
-
-          {/* Mobile Filters Button */}
-          <div className="lg:hidden mb-4 w-full">
-            <Button className="w-full bg-white border border-gray-200 text-[#23272f] hover:bg-gray-50">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              Filters ({activeFiltersCount})
-            </Button>
-          </div>
-
-          {/* Perks Grid */}
-          <div className="flex-1 w-full">
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    <div className="w-full h-40 sm:h-48 bg-gray-200 animate-pulse"></div>
-                    <div className="p-3 sm:p-4 space-y-3">
-                      <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                      <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                      <div className="flex gap-2">
-                        <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
-                        <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
-                  {filteredPerks.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((perk) => (
-                <div key={perk.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
-                  <div className="relative">
-                    <img src={perk.image} alt={perk.title} className="w-full h-40 sm:h-48 object-cover" />
-                    <span className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-[#f8eac7] text-[#23272f] px-3 sm:px-4 py-1 sm:py-2 rounded-full font-bold text-sm sm:text-base font-display">
-                      {perk.discount}
-                    </span>
-                  </div>
-                  <div className="p-4 sm:p-5 flex flex-col h-full">
-                    {/* Company & Category */}
-                    <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                      <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold font-display flex-shrink-0">
-                        {perk.company.charAt(0)}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs sm:text-sm text-[#6b6f76]">{perk.company}</span>
-                        <span className="text-xs text-[#6b6f76]">{perk.category}{perk.subcategory ? ` • ${perk.subcategory}` : ""}</span>
-                      </div>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="font-semibold text-[#23272f] mb-2 text-sm sm:text-base font-display line-clamp-2">{perk.title}</h3>
-
-                    {/* Description */}
-                    <p className="text-[#6b6f76] text-xs sm:text-sm mb-4 sm:mb-6 flex-1">{perk.description}</p>
-
-                    {/* Valid Until Date */}
-                    {perk.validUntil && (
-                      <div className="text-xs sm:text-sm text-[#6b6f76] mb-4 flex items-center gap-2">
-                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                          <rect x="3" y="4" width="18" height="18" rx="2"/>
-                          <path d="M16 2v4M8 2v4M3 10h18"/>
-                        </svg>
-                        Valid until {perk.validUntil}
-                      </div>
+                    {activeFiltersCount > 0 && (
+                      <button
+                        onClick={handleClearFilters}
+                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        Clear all filters
+                      </button>
                     )}
-
-                    {/* Get Deal Button */}
-                    <Button 
-                      onClick={() => handleGetDeal(perk)}
-                      className="bg-[#e6b756] text-[#1a2233] font-semibold py-2.5 sm:py-3 rounded-full text-sm sm:text-base hover:bg-[#f5d488] transition-colors font-display w-full">
-                      Get Deal
-                    </Button>
                   </div>
-                </div>
-              ))}
-            </div>
 
-            {/* Pagination */}
-            {filteredPerks.length > ITEMS_PER_PAGE && (
-              <div className="flex justify-center items-center gap-4 mt-8 sm:mt-10">
-                <Button 
-                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                  disabled={currentPage === 0}
-                  className="bg-white border border-[#e6b756] text-[#e6b756] font-semibold px-6 sm:px-8 py-2 rounded-full hover:bg-[#fffbe6] transition-colors font-display text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed">
-                  Previous
-                </Button>
-                <span className="text-sm sm:text-base text-[#6b6f76] font-medium">
-                  Page {currentPage + 1} of {Math.ceil(filteredPerks.length / ITEMS_PER_PAGE)}
-                </span>
-                <Button 
-                  onClick={() => setCurrentPage(Math.min(Math.ceil(filteredPerks.length / ITEMS_PER_PAGE) - 1, currentPage + 1))}
-                  disabled={currentPage >= Math.ceil(filteredPerks.length / ITEMS_PER_PAGE) - 1}
-                  className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 sm:px-8 py-2 rounded-full hover:bg-[#f5d488] transition-colors font-display text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed">
-                  Next
-                </Button>
+                  {/* Search */}
+                  <div className="mb-4 sm:mb-6">
+                    <Input
+                      placeholder="Search deals..."
+                      value={searchTerm}
+                      onChange={e => {
+                        setSearchTerm(e.target.value);
+                        setTimeout(handleFilter, 0);
+                      }}
+                      className="rounded-lg border-gray-200"
+                    />
+                  </div>
+
+                  {/* Deal Type Section */}
+                  <div className="mb-6 sm:mb-8">
+                    <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Deal Type</h3>
+                    <div className="space-y-3">
+                      {dealTypeOptions.map((option) => (
+                        <label key={option.label} className="flex items-center justify-between cursor-pointer group">
+                          <div className="flex items-center gap-3">
+                            <Checkbox
+                              checked={selectedDealTypes.includes(option.label)}
+                              onCheckedChange={() => handleDealTypeChange(option.label)}
+                              className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
+                            />
+                            <span className="text-sm text-[#6b6f76] group-hover:text-[#23272f]">
+                              {option.label}
+                            </span>
+                          </div>
+                          <span className="text-xs text-[#8a8e9a] bg-gray-100 px-2 py-0.5 rounded">
+                            {option.count}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <hr className="my-6 border-gray-200" />
+
+                  {/* Category Section */}
+                  <div className="mb-6 sm:mb-8">
+                    <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Category</h3>
+                    <div className="space-y-3">
+                      {categoryOptions.map((option) => (
+                        <label key={option.label} className="flex items-center justify-between cursor-pointer group">
+                          <div className="flex items-center gap-3">
+                            <Checkbox
+                              checked={selectedCategories.includes(option.label)}
+                              onCheckedChange={() => handleCategoryChange(option.label)}
+                              className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
+                            />
+                            <span className="text-sm text-[#6b6f76] group-hover:text-[#23272f]">
+                              {option.label}
+                            </span>
+                          </div>
+                          <span className="text-xs text-[#8a8e9a] bg-gray-100 px-2 py-0.5 rounded">
+                            {option.count}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Subcategory Section (only shown if category is selected) */}
+                  {selectedCategories.length > 0 && selectedCategories.map(category => (
+                    subcategoryOptions[category] && (
+                      <div key={category} className="mb-6 ml-4 border-l border-gray-200 pl-4">
+                        <h4 className="font-medium text-sm text-[#6b6f76] mb-3 font-display">Goals</h4>
+                        <div className="space-y-2">
+                          {subcategoryOptions[category].map((subOption) => (
+                            <label key={subOption.label} className="flex items-center justify-between cursor-pointer group">
+                              <div className="flex items-center gap-3">
+                                <Checkbox
+                                  checked={selectedSubcategories.includes(subOption.label)}
+                                  onCheckedChange={() => handleSubcategoryChange(subOption.label)}
+                                  className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
+                                />
+                                <span className="text-xs text-[#6b6f76] group-hover:text-[#23272f]">
+                                  {subOption.label}
+                                </span>
+                              </div>
+                              <span className="text-xs text-[#8a8e9a]">
+                                {subOption.count}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  ))}
+
+                  {/* Location Section */}
+                  <div className="mb-6 sm:mb-8">
+                    <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Location</h3>
+                    <div className="space-y-3">
+                      {locationOptions.map((option) => (
+                        <label key={option.label} className="flex items-center justify-between cursor-pointer group">
+                          <div className="flex items-center gap-3">
+                            <Checkbox
+                              checked={selectedLocations.includes(option.label)}
+                              onCheckedChange={() => handleLocationChange(option.label)}
+                              className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
+                            />
+                            <span className="text-sm text-[#6b6f76] group-hover:text-[#23272f]">
+                              {option.label}
+                            </span>
+                          </div>
+                          <span className="text-xs text-[#8a8e9a] bg-gray-100 px-2 py-0.5 rounded">
+                            {option.count}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <hr className="my-6 border-gray-200" />
+
+                  {/* Best For Section */}
+                  <div className="mb-4">
+                    <h3 className="font-semibold text-[#23272f] mb-3 sm:mb-4 text-sm sm:text-base font-display">Best For</h3>
+                    <div className="space-y-3">
+                      {bestForOptions.map((option) => (
+                        <label key={option.label} className="flex items-center justify-between cursor-pointer group">
+                          <div className="flex items-center gap-3">
+                            <Checkbox
+                              checked={selectedBestFor.includes(option.label)}
+                              onCheckedChange={() => handleBestForChange(option.label)}
+                              className="rounded border-gray-300 data-[state=checked]:bg-[#e6b756] data-[state=checked]:border-[#e6b756]"
+                            />
+                            <span className="text-sm text-[#6b6f76] group-hover:text-[#23272f]">
+                              {option.label}
+                            </span>
+                          </div>
+                          <span className="text-xs text-[#8a8e9a] bg-gray-100 px-2 py-0.5 rounded">
+                            {option.count}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </aside>
+
+                {/* Mobile Filters Button */}
+                <div className="lg:hidden mb-4 w-full">
+                  <Button className="w-full bg-white border border-gray-200 text-[#23272f] hover:bg-gray-50">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    Filters ({activeFiltersCount})
+                  </Button>
+                </div>
+
+                {/* Perks Grid */}
+                <div className="flex-1 w-full">
+                  {isLoading ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                          <div className="w-full h-40 sm:h-48 bg-gray-200 animate-pulse"></div>
+                          <div className="p-3 sm:p-4 space-y-3">
+                            <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                            <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                            <div className="flex gap-2">
+                              <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
+                              <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
+                        {filteredPerks.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((perk) => (
+                          <div key={perk.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
+                            <div className="relative">
+                              <img src={perk.image} alt={perk.title} className="w-full h-40 sm:h-48 object-cover" />
+                              <span className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-[#f8eac7] text-[#23272f] px-3 sm:px-4 py-1 sm:py-2 rounded-full font-bold text-sm sm:text-base font-display">
+                                {perk.discount}
+                              </span>
+                            </div>
+                            <div className="p-4 sm:p-5 flex flex-col h-full">
+                              {/* Company & Category */}
+                              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                                <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold font-display flex-shrink-0">
+                                  {perk.company.charAt(0)}
+                                </div>
+                                <div className="flex flex-col">
+                                  <span className="text-xs sm:text-sm text-[#6b6f76]">{perk.company}</span>
+                                  <span className="text-xs text-[#6b6f76]">{perk.category}{perk.subcategory ? ` • ${perk.subcategory}` : ""}</span>
+                                </div>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="font-semibold text-[#23272f] mb-2 text-sm sm:text-base font-display line-clamp-2">{perk.title}</h3>
+
+                              {/* Description */}
+                              <p className="text-[#6b6f76] text-xs sm:text-sm mb-4 sm:mb-6 flex-1">{perk.description}</p>
+
+                              {/* Valid Until Date */}
+                              {perk.validUntil && (
+                                <div className="text-xs sm:text-sm text-[#6b6f76] mb-4 flex items-center gap-2">
+                                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                                    <path d="M16 2v4M8 2v4M3 10h18"/>
+                                  </svg>
+                                  Valid until {perk.validUntil}
+                                </div>
+                              )}
+
+                              {/* Get Deal Button */}
+                              <Button 
+                                onClick={() => handleGetDeal(perk)}
+                                className="bg-[#e6b756] text-[#1a2233] font-semibold py-2.5 sm:py-3 rounded-full text-sm sm:text-base hover:bg-[#f5d488] transition-colors font-display w-full">
+                                Get Deal
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Pagination */}
+                      {filteredPerks.length > ITEMS_PER_PAGE && (
+                        <div className="flex justify-center items-center gap-4 mt-8 sm:mt-10">
+                          <Button 
+                            onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                            disabled={currentPage === 0}
+                            className="bg-white border border-[#e6b756] text-[#e6b756] font-semibold px-6 sm:px-8 py-2 rounded-full hover:bg-[#fffbe6] transition-colors font-display text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed">
+                            Previous
+                          </Button>
+                          <span className="text-sm sm:text-base text-[#6b6f76] font-medium">
+                            Page {currentPage + 1} of {Math.ceil(filteredPerks.length / ITEMS_PER_PAGE)}
+                          </span>
+                          <Button 
+                            onClick={() => setCurrentPage(Math.min(Math.ceil(filteredPerks.length / ITEMS_PER_PAGE) - 1, currentPage + 1))}
+                            disabled={currentPage >= Math.ceil(filteredPerks.length / ITEMS_PER_PAGE) - 1}
+                            className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 sm:px-8 py-2 rounded-full hover:bg-[#f5d488] transition-colors font-display text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed">
+                            Next
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-              </div>
-            )}
-          </div>
-        </div>
-        </section>
+            </section>
+          </>
+        )}
       </main>
       
       {/* Lead Form Modal */}

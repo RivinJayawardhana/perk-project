@@ -5,8 +5,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Eye, X } from "lucide-react";
+import { Loader2, Eye, X, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Lead {
   id: string;
@@ -47,10 +48,14 @@ function getAvatarColor(name: string): string {
 function LeadDetailModal({
   lead,
   onClose,
+  onDelete,
 }: {
   lead: Lead;
   onClose: () => void;
+  onDelete: (leadId: string) => Promise<void>;
 }) {
+  const [deleting, setDeleting] = useState(false);
+  const { toast } = useToast();
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("en-US", {
       year: "numeric",
@@ -181,6 +186,38 @@ function LeadDetailModal({
             </div>
           )}
         </div>
+
+        {/* Delete Button */}
+        <div className="mt-8 pt-6 border-t">
+          <Button
+            onClick={async () => {
+              setDeleting(true);
+              try {
+                await onDelete(lead.id);
+                onClose();
+              } catch (error) {
+                console.error("Delete error:", error);
+              } finally {
+                setDeleting(false);
+              }
+            }}
+            disabled={deleting}
+            variant="destructive"
+            className="w-full bg-red-600 hover:bg-red-700"
+          >
+            {deleting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              <>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Lead
+              </>
+            )}
+          </Button>
+        </div>
       </Card>
     </div>
   );
@@ -188,8 +225,35 @@ function LeadDetailModal({
 
 export default function AdminLeadsList() {
   const { data: leads = [], isLoading } = useLeads();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+
+  const handleDeleteLead = async (leadId: string) => {
+    try {
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete lead");
+      }
+
+      toast({
+        title: "Success",
+        description: "Lead deleted successfully",
+      });
+
+      // Refresh the leads list
+      window.location.reload();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete lead",
+        variant: "destructive",
+      });
+    }
+  };
 
   const filteredLeads = leads.filter((lead: Lead) => {
     const searchLower = searchTerm.toLowerCase();
@@ -241,7 +305,7 @@ export default function AdminLeadsList() {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto overflow-y-auto max-h-[600px] border border-muted rounded-lg">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-muted">
@@ -325,6 +389,7 @@ export default function AdminLeadsList() {
         <LeadDetailModal
           lead={selectedLead}
           onClose={() => setSelectedLead(null)}
+          onDelete={handleDeleteLead}
         />
       )}
     </div>

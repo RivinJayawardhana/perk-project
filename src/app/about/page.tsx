@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { setMetaTags } from "@/lib/meta-tags";
+import StaticAboutHero from "@/components/StaticAboutHero";
 
 interface AboutContent {
   hero: {
@@ -62,8 +63,9 @@ export default function About() {
     return (
       <>
         <Header />
-        <main className="bg-[#fcfaf7] min-h-screen flex items-center justify-center">
-          <div className="text-[#6b6f76]">Loading...</div>
+        <main className="bg-[#fcfaf7] min-h-screen">
+          <StaticAboutHero />
+          <div className="text-center py-10 text-[#6b6f76]">Loading about content...</div>
         </main>
         <Footer />
       </>
@@ -75,14 +77,7 @@ export default function About() {
       <Header />
       <main className="bg-[#fcfaf7]">
       {/* Hero Section */}
-      <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="mb-2 sm:mb-3 text-[#e6b756] font-semibold text-sm sm:text-base font-display">{content.hero.subtitle}</div>
-
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 font-display">{content.hero.title}</h1>
-        <p className="text-sm sm:text-base md:text-lg text-[#6b6f76] max-w-2xl mx-auto">{content.hero.description}</p>
-      </div>
-      </section>
+      <StaticAboutHero />
 
       {/* Stats Section */}
       <section className="bg-[#1a2233] py-10 sm:py-12 lg:py-16">

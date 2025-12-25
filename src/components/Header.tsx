@@ -41,7 +41,6 @@ export default function Header() {
 
         {/* Desktop Right Section */}
         <div className="hidden lg:flex gap-4 items-center">
-          <Link href="/admin" className="text-white hover:text-[#e6b756] transition-colors">Admin</Link>
           <Link href="/perks">
             <button className="bg-[#e6b756] text-[#1a2233] font-semibold px-6 py-2 rounded-full hover:bg-[#f5d488] transition-colors">
               Explore Perks
@@ -108,13 +107,6 @@ export default function Header() {
                 onClick={() => setIsOpen(false)}
               >
                 Contact
-              </Link>
-              <Link 
-                href="/admin" 
-                className="text-white hover:text-[#e6b756] hover:bg-[#232b3b] transition-colors py-3 px-4 rounded-lg"
-                onClick={() => setIsOpen(false)}
-              >
-                Admin
               </Link>
               <hr className="border-[#232b3b] my-2" />
               <Link 

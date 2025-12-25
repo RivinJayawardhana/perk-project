@@ -222,7 +222,7 @@ export default function Categories() {
           </Dialog>
         </div>
 
-        <div className="border rounded-lg overflow-hidden">
+        <div className="border rounded-lg overflow-x-auto overflow-y-auto max-h-[600px]">
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr>

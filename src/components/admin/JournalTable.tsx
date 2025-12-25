@@ -119,7 +119,7 @@ export function JournalTable() {
           </Link>
         </div>
 
-        <div className="bg-card rounded-lg border overflow-hidden">
+        <div className="bg-card rounded-lg border overflow-x-auto overflow-y-auto max-h-[600px]">
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr>

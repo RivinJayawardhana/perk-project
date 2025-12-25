@@ -1,19 +1,19 @@
 import { z } from 'zod'
 
 export const ContactFormSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').max(100),
-  email: z.string().email('Invalid email address'),
-  subject: z.string().min(3, 'Subject must be at least 3 characters').max(200),
-  message: z.string().min(5, 'Message must be at least 5 characters').max(5000),
+  name: z.string().min(2, 'Name is too short (minimum 2 characters)').max(100),
+  email: z.string().email('Please enter a valid email address'),
+  subject: z.string().min(3, 'Subject is too short (minimum 3 characters)').max(200),
+  message: z.string().min(5, 'Message is too short (minimum 5 characters)').max(5000),
   recaptchaToken: z.string().min(1, 'reCAPTCHA verification failed'),
 })
 
 export const PartnerFormSchema = z.object({
-  company: z.string().min(2, 'Company name must be at least 2 characters').max(100),
-  contact: z.string().min(2, 'Contact name must be at least 2 characters').max(100),
-  email: z.string().email('Invalid email address'),
-  website: z.string().url('Invalid website URL').max(500),
-  offer: z.string().min(5, 'Offer description must be at least 5 characters').max(5000),
+  company: z.string().min(2, 'Company name is too short (minimum 2 characters)').max(100),
+  contact: z.string().min(2, 'Contact name is too short (minimum 2 characters)').max(100),
+  email: z.string().email('Please enter a valid email address'),
+  website: z.string().url('Please enter a valid website URL').max(500),
+  offer: z.string().min(5, 'Offer description is too short (minimum 5 characters)').max(5000),
   recaptchaToken: z.string().min(1, 'reCAPTCHA verification failed'),
 })
 
