@@ -8,6 +8,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "VentureNext - Exclusive Perks for Ambitious Founders",
   description: "Discover exclusive deals, discounts, and perks designed for founders and startup teams.",
+  icons: {
+    icon: "/favicon.png",
+  },
   openGraph: {
     title: "VentureNext - Exclusive Perks for Ambitious Founders",
     description: "Discover exclusive deals, discounts, and perks designed for founders and startup teams.",

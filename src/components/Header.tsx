@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,9 +22,13 @@ export default function Header() {
       <nav className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 bg-[#1a2233] shadow-md">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#e6b756] flex items-center justify-center text-lg font-bold text-[#1a2233]">
-            V
-          </div>
+          <Image 
+            src="/logo.png" 
+            alt="VentureNext Logo" 
+            width={32} 
+            height={32} 
+            className="w-8 h-8"
+          />
           <span className="text-lg sm:text-xl font-bold text-white">
             enture<span className="text-[#e6b756]">Next</span>
           </span>

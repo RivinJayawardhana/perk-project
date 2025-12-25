@@ -152,29 +152,31 @@ function HomeContent() {
               </div>
 
               {/* Content Container */}
-              <div className="p-4 sm:p-5 flex flex-col h-full">
-                {/* Logo and Company Name */}
-                <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                  <img src={perk.logo_url || "/images/placeholder.jpg"} alt={perk.name} className="w-8 sm:w-10 h-8 sm:h-10 rounded-full border border-gray-200 flex-shrink-0" />
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-[#23272f] font-display text-sm sm:text-base line-clamp-1">{perk.name}</span>
-                    <span className="text-xs text-[#6b6f76]">{perk.category}{perk.subcategory ? ` • ${perk.subcategory}` : ""}</span>
+              <div className="p-4 sm:p-5 flex flex-col h-full justify-between">
+                <div>
+                  {/* Logo and Company Name */}
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <img src={perk.logo_url || "/images/placeholder.jpg"} alt={perk.name} className="w-8 sm:w-10 h-8 sm:h-10 rounded-full border border-gray-200 flex-shrink-0" />
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-[#23272f] font-display text-sm sm:text-base line-clamp-1">{perk.name}</span>
+                      <span className="text-xs text-[#6b6f76]">{perk.category}{perk.subcategory ? ` • ${perk.subcategory}` : ""}</span>
+                    </div>
                   </div>
+
+                  {/* Description */}
+                  <div className="text-sm sm:text-base text-[#23272f] font-semibold font-display mb-2 line-clamp-2">{perk.description}</div>
+
+                  {/* Expiry Date */}
+                  {perk.expiry && (
+                    <div className="text-xs sm:text-sm text-[#6b6f76] mb-4 sm:mb-6 flex items-center gap-2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                        <path d="M16 2v4M8 2v4M3 10h18"/>
+                      </svg>
+                      Valid until {perk.expiry}
+                    </div>
+                  )}
                 </div>
-
-                {/* Description */}
-                <div className="text-sm sm:text-base text-[#23272f] font-semibold font-display mb-2 line-clamp-2">{perk.description}</div>
-
-                {/* Expiry Date */}
-                {perk.expiry && (
-                  <div className="text-xs sm:text-sm text-[#6b6f76] mb-4 sm:mb-6 flex items-center gap-2">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="4" width="18" height="18" rx="2"/>
-                      <path d="M16 2v4M8 2v4M3 10h18"/>
-                    </svg>
-                    Valid until {perk.expiry}
-                  </div>
-                )}
 
                 {/* Get Deal Button */}
                 <Link href="/perks" className="w-full">
