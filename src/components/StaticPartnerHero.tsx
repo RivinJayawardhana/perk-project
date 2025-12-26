@@ -6,7 +6,7 @@ export default function StaticPartnerHero() {
           Partner program
         </div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 font-display">
-          Partner With StartupPerks
+          Partner With VentureNext
         </h1>
         <p className="text-sm sm:text-base md:text-lg text-[#6b6f76]">
           Join our partner program and reach our community of founders and startup teams.

@@ -12,7 +12,7 @@ export default function BlogPost() {
     <div className="min-h-screen bg-white">
       {/* Navigation */}
       <nav className="flex items-center justify-between p-6 bg-white border-b">
-        <div className="text-2xl font-bold text-gray-900">StartupPerks</div>
+        <div className="text-2xl font-bold text-gray-900">VentureNext</div>
         <div className="hidden md:flex gap-8">
           <Link href="/" className="text-gray-600 hover:text-gray-900">Home</Link>
           <Link href="/about" className="text-gray-600 hover:text-gray-900">About</Link>

@@ -1,54 +1,91 @@
-
-"use client";
-
 import Link from "next/link";
-import React, { Suspense, useEffect } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useHomeContent } from "@/hooks/useHomeContent";
-import { usePerks } from "@/hooks/usePerks";
-import { useJournals } from "@/hooks/useJournals";
-import { setMetaTags } from "@/lib/meta-tags";
-import StaticHero from "@/components/StaticHero";
+import { Metadata } from "next";
 
-function HomeContent() {
-  const { content, isLoading } = useHomeContent();
-  const { data: allPerks = [] } = usePerks();
-  const { data: allJournals = [] } = useJournals("published", 3);
+async function fetchHomeContent() {
+  try {
+    const res = await fetch(new URL("/api/home-content", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+      next: { revalidate: 3600 }
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching home content:", error);
+    return null;
+  }
+}
 
-  // Set meta tags when content loads
-  useEffect(() => {
-    if (content.seo) {
-      setMetaTags(content.seo.metaTitle, content.seo.metaDescription);
-    }
-  }, [content.seo]);
+async function fetchPerks() {
+  try {
+    const res = await fetch(new URL("/api/perks", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+      next: { revalidate: 3600 }
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching perks:", error);
+    return [];
+  }
+}
 
-  // Get first 4 perks as featured deals
-  const featuredDeals = allPerks.slice(0, 4);
-  
-  // Get first 3 published journals as articles
-  const journalArticles = allJournals.slice(0, 3);
-  
-  if (isLoading) {
+async function fetchJournals() {
+  try {
+    const res = await fetch(new URL("/api/journals?status=published&limit=3", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+      next: { revalidate: 3600 }
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching journals:", error);
+    return [];
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await fetchHomeContent();
+  return {
+    title: content?.seo?.metaTitle || "VentureNext - Exclusive Perks for Ambitious Founders",
+    description: content?.seo?.metaDescription || "Discover exclusive deals, discounts, and perks designed for founders and startup teams.",    openGraph: {
+      url: "https://venturenext.co",
+    },
+    alternates: {
+      canonical: "https://venturenext.co",
+    },  };
+}
+
+export default async function Home() {
+  const [content, allPerks, allJournals] = await Promise.all([
+    fetchHomeContent(),
+    fetchPerks(),
+    fetchJournals(),
+  ]);
+
+  if (!content) {
     return (
       <>
         <Header />
-        <main className="bg-[#fcfaf7] min-h-screen">
-          <StaticHero />
-          <div className="text-center py-10 text-[#6b6f76]">Loading featured deals...</div>
+        <main className="bg-[#fcfaf7] min-h-screen flex items-center justify-center">
+          <div className="text-[#6b6f76]">Unable to load home content</div>
         </main>
         <Footer />
       </>
     );
   }
 
+  // Get first 4 perks as featured deals
+  const featuredDeals = allPerks.slice(0, 4);
+  
+  // Get first 3 published journals as articles
+  const journalArticles = allJournals.slice(0, 3);
+
   return (
     <>
       <Header />
       <main className="bg-[#fcfaf7] min-h-screen">
-
       {/* Hero Section */}
       <section className="bg-[#fcfaf7] py-12 sm:py-16 lg:py-24 overflow-hidden relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -81,7 +118,7 @@ function HomeContent() {
                 <span className="bg-[#f8eac7] text-[#b48a1e] px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-semibold font-display">{content.hero.badge}</span>
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 leading-tight font-display">
-                {content.hero.title.split('\n').map((line, idx) => (
+                {content.hero.title.split('\n').map((line: string, idx: number) => (
                   <React.Fragment key={idx}>
                     {idx > 0 && <br className="hidden sm:block" />}
                     {idx === content.hero.title.split('\n').length - 1 && (
@@ -195,7 +232,7 @@ function HomeContent() {
         <h2 className="text-2xl sm:text-3xl font-bold text-[#23272f] text-center mb-3 sm:mb-4 font-display">{content.howItWorks.title}</h2>
         <p className="text-[#6b6f76] text-center mb-8 sm:mb-10 text-sm sm:text-base">{content.howItWorks.subtitle}</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {content.howItWorks.steps.map((step, idx) => (
+          {content.howItWorks.steps.map((step: any, idx: number) => (
             <div key={idx} className="bg-white rounded-2xl shadow-sm p-6 sm:p-8 flex flex-col items-center">
               <div className="w-10 h-10 rounded-full bg-[#e6b756] flex items-center justify-center font-bold text-[#1a2233] mb-4 font-display">0{idx + 1}</div>
               <div className="text-lg sm:text-xl font-semibold mb-2 font-display">{step.title}</div>
@@ -216,7 +253,7 @@ function HomeContent() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {journalArticles.map((article) => (
+          {journalArticles.map((article: any) => (
             <Link key={article.id} href={`/journal/${article.slug}`} className="block">
               <div className="bg-white rounded-2xl border shadow-sm p-4 sm:p-5 flex flex-col h-full relative hover:shadow-md transition-shadow">
                 <img src={article.featured_image_url || "/images/placeholder.jpg"} alt={article.title} className="w-full h-28 sm:h-32 object-cover rounded-xl mb-3 sm:mb-4" />
@@ -269,21 +306,5 @@ function HomeContent() {
       </main>
       <Footer />
     </>
-  );
-}
-
-export default function Home() {
-  return (
-    <Suspense fallback={
-      <>
-        <Header />
-        <main className="bg-[#fcfaf7] min-h-screen flex items-center justify-center">
-          <div className="text-[#6b6f76]">Loading...</div>
-        </main>
-        <Footer />
-      </>
-    }>
-      <HomeContent />
-    </Suspense>
   );
 }

@@ -1,11 +1,8 @@
-
-"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useState, useEffect } from "react";
-import { setMetaTags } from "@/lib/meta-tags";
+import { Metadata } from "next";
 import StaticAboutHero from "@/components/StaticAboutHero";
 
 interface AboutContent {
@@ -32,40 +29,47 @@ interface AboutContent {
     description: string;
     buttonText: string;
   };
+  seo?: {
+    metaTitle: string;
+    metaDescription: string;
+  };
 }
 
-export default function About() {
-  const [content, setContent] = useState<AboutContent | null>(null);
-  const [loading, setLoading] = useState(true);
+async function fetchAboutContent(): Promise<AboutContent | null> {
+  try {
+    const res = await fetch(new URL("/api/about-content", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+      next: { revalidate: 3600 }
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching about content:", error);
+    return null;
+  }
+}
 
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const res = await fetch("/api/about-content");
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        setContent(data);
-        // Set meta tags when content loads
-        if (data.seo) {
-          setMetaTags(data.seo.metaTitle, data.seo.metaDescription);
-        }
-      } catch (error) {
-        console.error("Error loading about content:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await fetchAboutContent();
+  return {
+    title: content?.seo?.metaTitle || "About VentureNext",
+    description: content?.seo?.metaDescription || "Learn about VentureNext and our mission",    openGraph: {
+      url: "https://venturenext.co/about",
+    },
+    alternates: {
+      canonical: "https://venturenext.co/about",
+    },  };
+}
 
-    fetchContent();
-  }, []);
+export default async function About() {
+  const content = await fetchAboutContent();
 
-  if (loading || !content) {
+  if (!content) {
     return (
       <>
         <Header />
         <main className="bg-[#fcfaf7] min-h-screen">
           <StaticAboutHero />
-          <div className="text-center py-10 text-[#6b6f76]">Loading about content...</div>
+          <div className="text-center py-10 text-[#6b6f76]">Unable to load about content</div>
         </main>
         <Footer />
       </>

@@ -99,10 +99,6 @@ export default function Footer() {
     }
   };
 
-  if (loading) {
-    return null;
-  }
-
   return (
     <footer className="bg-[#181c23] text-[#e6e6e6] pt-12 pb-6 px-4 mt-16">
       {/* Newsletter Section */}
