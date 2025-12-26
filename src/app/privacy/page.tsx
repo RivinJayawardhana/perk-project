@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import StaticPrivacyHero from "@/components/StaticPrivacyHero";
 import PrivacyTabContent from "@/components/PrivacyTabContent";
 
-export const revalidate = 3600; // ISR: regenerate every hour
+export const revalidate = 0; // Disable ISR during builds, regenerate on request
 
 interface Section {
   id: string;
@@ -27,17 +27,23 @@ interface ContentData {
 }
 
 const getBaseUrl = () => {
+  // Vercel production
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  return "http://localhost:3000";
+  // Local development
+  if (typeof window === "undefined") {
+    // Server-side only
+    return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  }
+  return "";
 };
 
 async function fetchPrivacyContent(): Promise<ContentData | null> {
   try {
     const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/privacy-content`;
-    const res = await fetch(url, {
+    if (!baseUrl) return null;
+    const res = await fetch(`${baseUrl}/api/privacy-content`, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
@@ -51,8 +57,8 @@ async function fetchPrivacyContent(): Promise<ContentData | null> {
 async function fetchTermsContent(): Promise<ContentData | null> {
   try {
     const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/terms-content`;
-    const res = await fetch(url, {
+    if (!baseUrl) return null;
+    const res = await fetch(`${baseUrl}/api/terms-content`, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;

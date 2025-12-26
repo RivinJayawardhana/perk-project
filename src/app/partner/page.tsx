@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import StaticPartnerHero from "@/components/StaticPartnerHero";
 import PartnerForm from "@/components/PartnerForm";
 
-export const revalidate = 3600; // ISR: regenerate every hour
+export const revalidate = 0; // Disable ISR during builds, regenerate on request
 
 interface PartnerContent {
   hero: {
@@ -35,17 +35,23 @@ interface PartnerContent {
 }
 
 const getBaseUrl = () => {
+  // Vercel production
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  return "http://localhost:3000";
+  // Local development
+  if (typeof window === "undefined") {
+    // Server-side only
+    return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  }
+  return "";
 };
 
 async function fetchPartnerContent(): Promise<PartnerContent | null> {
   try {
     const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/partner-content`;
-    const res = await fetch(url, {
+    if (!baseUrl) return null;
+    const res = await fetch(`${baseUrl}/api/partner-content`, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
