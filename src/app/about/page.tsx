@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { Metadata } from "next";
 import StaticAboutHero from "@/components/StaticAboutHero";
 
-export const revalidate = 0; // Disable ISR during builds, regenerate on request
+export const revalidate = 3600; // ISR: regenerate every hour
 
 interface AboutContent {
   hero: {
@@ -38,22 +38,17 @@ interface AboutContent {
 }
 
 const getBaseUrl = () => {
-  // Vercel production
+  // Runtime check - Vercel sets VERCEL_URL during execution
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  // Local development
-  if (typeof window === "undefined") {
-    // Server-side only
-    return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  }
-  return "";
+  // Fallback for local development
+  return "http://localhost:3000";
 };
 
 async function fetchAboutContent(): Promise<AboutContent | null> {
   try {
     const baseUrl = getBaseUrl();
-    if (!baseUrl) return null;
     const res = await fetch(`${baseUrl}/api/about-content`, {
       next: { revalidate: 3600 }
     });

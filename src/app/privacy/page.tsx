@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import StaticPrivacyHero from "@/components/StaticPrivacyHero";
 import PrivacyTabContent from "@/components/PrivacyTabContent";
 
-export const revalidate = 0; // Disable ISR during builds, regenerate on request
+export const revalidate = 3600; // ISR: regenerate every hour
 
 interface Section {
   id: string;
@@ -27,22 +27,17 @@ interface ContentData {
 }
 
 const getBaseUrl = () => {
-  // Vercel production
+  // Runtime check - Vercel sets VERCEL_URL during execution
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  // Local development
-  if (typeof window === "undefined") {
-    // Server-side only
-    return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  }
-  return "";
+  // Fallback for local development
+  return "http://localhost:3000";
 };
 
 async function fetchPrivacyContent(): Promise<ContentData | null> {
   try {
     const baseUrl = getBaseUrl();
-    if (!baseUrl) return null;
     const res = await fetch(`${baseUrl}/api/privacy-content`, {
       next: { revalidate: 3600 }
     });
@@ -57,7 +52,6 @@ async function fetchPrivacyContent(): Promise<ContentData | null> {
 async function fetchTermsContent(): Promise<ContentData | null> {
   try {
     const baseUrl = getBaseUrl();
-    if (!baseUrl) return null;
     const res = await fetch(`${baseUrl}/api/terms-content`, {
       next: { revalidate: 3600 }
     });

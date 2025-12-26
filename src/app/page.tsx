@@ -6,28 +6,20 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Metadata } from "next";
 
-export const revalidate = 0; // Disable ISR during builds, regenerate on request
+export const revalidate = 3600; // ISR: regenerate every hour
 
 const getBaseUrl = () => {
-  // Vercel production
+  // Runtime check - Vercel sets VERCEL_URL during execution
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  // Local development
-  if (typeof window === "undefined") {
-    // Server-side only
-    return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  }
-  return "";
+  // Fallback for local development
+  return "http://localhost:3000";
 };
 
 async function fetchHomeContent() {
   try {
     const baseUrl = getBaseUrl();
-    if (!baseUrl) {
-      console.warn("Base URL not available");
-      return null;
-    }
     const res = await fetch(`${baseUrl}/api/home-content`, {
       next: { revalidate: 3600 }
     });
@@ -42,7 +34,6 @@ async function fetchHomeContent() {
 async function fetchPerks() {
   try {
     const baseUrl = getBaseUrl();
-    if (!baseUrl) return [];
     const res = await fetch(`${baseUrl}/api/perks`, {
       next: { revalidate: 3600 }
     });
@@ -57,7 +48,6 @@ async function fetchPerks() {
 async function fetchJournals() {
   try {
     const baseUrl = getBaseUrl();
-    if (!baseUrl) return [];
     const res = await fetch(`${baseUrl}/api/journals?status=published&limit=3`, {
       next: { revalidate: 3600 }
     });
