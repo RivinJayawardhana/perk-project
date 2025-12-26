@@ -36,7 +36,7 @@ interface PartnerContent {
 
 async function fetchPartnerContent(): Promise<PartnerContent | null> {
   try {
-    const res = await fetch(new URL("/api/partner-content", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+    const res = await fetch("/api/partner-content", {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;

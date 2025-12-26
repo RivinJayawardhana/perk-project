@@ -28,7 +28,7 @@ interface ContentData {
 
 async function fetchPrivacyContent(): Promise<ContentData | null> {
   try {
-    const res = await fetch(new URL("/api/privacy-content", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+    const res = await fetch("/api/privacy-content", {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
@@ -41,7 +41,7 @@ async function fetchPrivacyContent(): Promise<ContentData | null> {
 
 async function fetchTermsContent(): Promise<ContentData | null> {
   try {
-    const res = await fetch(new URL("/api/terms-content", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+    const res = await fetch("/api/terms-content", {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;

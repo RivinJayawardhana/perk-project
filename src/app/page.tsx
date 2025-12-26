@@ -10,7 +10,7 @@ export const revalidate = 3600; // ISR: regenerate every hour
 
 async function fetchHomeContent() {
   try {
-    const res = await fetch(new URL("/api/home-content", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+    const res = await fetch("/api/home-content", {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
@@ -23,7 +23,7 @@ async function fetchHomeContent() {
 
 async function fetchPerks() {
   try {
-    const res = await fetch(new URL("/api/perks", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+    const res = await fetch("/api/perks", {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return [];
@@ -36,7 +36,7 @@ async function fetchPerks() {
 
 async function fetchJournals() {
   try {
-    const res = await fetch(new URL("/api/journals?status=published&limit=3", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+    const res = await fetch("/api/journals?status=published&limit=3", {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return [];

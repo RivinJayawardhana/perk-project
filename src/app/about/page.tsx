@@ -39,7 +39,7 @@ interface AboutContent {
 
 async function fetchAboutContent(): Promise<AboutContent | null> {
   try {
-    const res = await fetch(new URL("/api/about-content", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {
+    const res = await fetch("/api/about-content", {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
