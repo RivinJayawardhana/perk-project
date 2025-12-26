@@ -9,24 +9,40 @@ import { Metadata } from "next";
 export const revalidate = 3600; // ISR: regenerate every hour
 
 const getBaseUrl = () => {
-  // Runtime check - Vercel sets VERCEL_URL during execution
+  // Use NEXT_PUBLIC_APP_URL if available (most reliable for Vercel)
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+  // Fallback to VERCEL_URL (Vercel provides this at runtime)
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  // Fallback for local development
+  // Local development
   return "http://localhost:3000";
 };
 
 async function fetchHomeContent() {
   try {
     const baseUrl = getBaseUrl();
-    const res = await fetch(`${baseUrl}/api/home-content`, {
+    const url = `${baseUrl}/api/home-content`;
+    console.log("[fetchHomeContent] Fetching from:", url);
+    
+    const res = await fetch(url, {
       next: { revalidate: 3600 }
     });
-    if (!res.ok) return null;
-    return res.json();
+    
+    console.log("[fetchHomeContent] Response status:", res.status);
+    
+    if (!res.ok) {
+      console.error("[fetchHomeContent] Response not OK:", res.status, res.statusText);
+      return null;
+    }
+    
+    const data = await res.json();
+    console.log("[fetchHomeContent] Data received successfully");
+    return data;
   } catch (error) {
-    console.error("Error fetching home content:", error);
+    console.error("[fetchHomeContent] Error:", error);
     return null;
   }
 }
@@ -34,13 +50,14 @@ async function fetchHomeContent() {
 async function fetchPerks() {
   try {
     const baseUrl = getBaseUrl();
-    const res = await fetch(`${baseUrl}/api/perks`, {
+    const url = `${baseUrl}/api/perks`;
+    const res = await fetch(url, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return [];
     return res.json();
   } catch (error) {
-    console.error("Error fetching perks:", error);
+    console.error("[fetchPerks] Error:", error);
     return [];
   }
 }
@@ -48,13 +65,14 @@ async function fetchPerks() {
 async function fetchJournals() {
   try {
     const baseUrl = getBaseUrl();
-    const res = await fetch(`${baseUrl}/api/journals?status=published&limit=3`, {
+    const url = `${baseUrl}/api/journals?status=published&limit=3`;
+    const res = await fetch(url, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return [];
     return res.json();
   } catch (error) {
-    console.error("Error fetching journals:", error);
+    console.error("[fetchJournals] Error:", error);
     return [];
   }
 }

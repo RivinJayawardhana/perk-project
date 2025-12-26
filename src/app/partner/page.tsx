@@ -35,24 +35,39 @@ interface PartnerContent {
 }
 
 const getBaseUrl = () => {
-  // Runtime check - Vercel sets VERCEL_URL during execution
+  // Use NEXT_PUBLIC_APP_URL if available (most reliable for Vercel)
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+  // Fallback to VERCEL_URL (Vercel provides this at runtime)
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  // Fallback for local development
+  // Local development
   return "http://localhost:3000";
 };
 
 async function fetchPartnerContent(): Promise<PartnerContent | null> {
   try {
     const baseUrl = getBaseUrl();
-    const res = await fetch(`${baseUrl}/api/partner-content`, {
+    const url = `${baseUrl}/api/partner-content`;
+    console.log("[fetchPartnerContent] Fetching from:", url);
+    
+    const res = await fetch(url, {
       next: { revalidate: 3600 }
     });
-    if (!res.ok) return null;
-    return res.json();
+    
+    console.log("[fetchPartnerContent] Response status:", res.status);
+    if (!res.ok) {
+      console.error("[fetchPartnerContent] Response not OK:", res.status);
+      return null;
+    }
+    
+    const data = await res.json();
+    console.log("[fetchPartnerContent] Data received successfully");
+    return data;
   } catch (error) {
-    console.error("Error fetching partner content:", error);
+    console.error("[fetchPartnerContent] Error:", error);
     return null;
   }
 }
