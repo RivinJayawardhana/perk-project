@@ -6,6 +6,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Metadata } from "next";
 
+export const revalidate = 3600; // ISR: regenerate every hour
+
 async function fetchHomeContent() {
   try {
     const res = await fetch(new URL("/api/home-content", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"), {

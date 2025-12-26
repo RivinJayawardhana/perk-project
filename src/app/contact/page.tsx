@@ -4,6 +4,8 @@ import { Metadata } from "next";
 import StaticContactHero from "@/components/StaticContactHero";
 import ContactFormClient from "@/components/ContactFormClient";
 
+export const revalidate = 3600; // ISR: regenerate every hour
+
 export const metadata: Metadata = {
   title: "Contact Us - VentureNext",
   description: "Get in touch with VentureNext. We'd love to hear from you.",

@@ -4,6 +4,8 @@ import { Metadata } from "next";
 import StaticPartnerHero from "@/components/StaticPartnerHero";
 import PartnerForm from "@/components/PartnerForm";
 
+export const revalidate = 3600; // ISR: regenerate every hour
+
 interface PartnerContent {
   hero: {
     subtitle: string;

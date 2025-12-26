@@ -4,6 +4,8 @@ import { Metadata } from "next";
 import StaticPrivacyHero from "@/components/StaticPrivacyHero";
 import PrivacyTabContent from "@/components/PrivacyTabContent";
 
+export const revalidate = 3600; // ISR: regenerate every hour
+
 interface Section {
   id: string;
   heading: string;

@@ -9,6 +9,18 @@ import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { setMetaTags } from "@/lib/meta-tags";
 
+// Format website URL - allow users to enter without www or https://
+const formatWebsite = (url: string): string => {
+  if (!url.trim()) return url;
+  let formatted = url.trim().toLowerCase();
+  // Remove https:// or http://
+  formatted = formatted.replace(/^https?:\/\//, '');
+  // Remove www.
+  formatted = formatted.replace(/^www\./, '');
+  // Add https:// back
+  return `https://${formatted}`;
+};
+
 interface PartnerContent {
   hero: {
     subtitle: string;
@@ -86,7 +98,11 @@ export default function PartnerForm({ content }: { content: PartnerContent }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...form, recaptchaToken: token }),
+        body: JSON.stringify({
+        ...form,
+        website: formatWebsite(form.website),
+        recaptchaToken: token
+      }),
       });
 
       if (!response.ok) {

@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import { Metadata } from "next";
 import StaticAboutHero from "@/components/StaticAboutHero";
 
+export const revalidate = 3600; // ISR: regenerate every hour
+
 interface AboutContent {
   hero: {
     subtitle: string;
