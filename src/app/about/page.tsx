@@ -37,9 +37,16 @@ interface AboutContent {
   };
 }
 
+const getBaseUrl = () => {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+};
+
 async function fetchAboutContent(): Promise<AboutContent | null> {
   try {
-    const res = await fetch("/api/about-content", {
+    const res = await fetch(`${getBaseUrl()}/api/about-content`, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;

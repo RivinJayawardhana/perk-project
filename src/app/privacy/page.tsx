@@ -26,9 +26,16 @@ interface ContentData {
   };
 }
 
+const getBaseUrl = () => {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+};
+
 async function fetchPrivacyContent(): Promise<ContentData | null> {
   try {
-    const res = await fetch("/api/privacy-content", {
+    const res = await fetch(`${getBaseUrl()}/api/privacy-content`, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
@@ -41,7 +48,7 @@ async function fetchPrivacyContent(): Promise<ContentData | null> {
 
 async function fetchTermsContent(): Promise<ContentData | null> {
   try {
-    const res = await fetch("/api/terms-content", {
+    const res = await fetch(`${getBaseUrl()}/api/terms-content`, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;

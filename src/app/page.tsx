@@ -8,9 +8,16 @@ import { Metadata } from "next";
 
 export const revalidate = 3600; // ISR: regenerate every hour
 
+const getBaseUrl = () => {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+};
+
 async function fetchHomeContent() {
   try {
-    const res = await fetch("/api/home-content", {
+    const res = await fetch(`${getBaseUrl()}/api/home-content`, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
@@ -23,7 +30,7 @@ async function fetchHomeContent() {
 
 async function fetchPerks() {
   try {
-    const res = await fetch("/api/perks", {
+    const res = await fetch(`${getBaseUrl()}/api/perks`, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return [];
@@ -36,7 +43,7 @@ async function fetchPerks() {
 
 async function fetchJournals() {
   try {
-    const res = await fetch("/api/journals?status=published&limit=3", {
+    const res = await fetch(`${getBaseUrl()}/api/journals?status=published&limit=3`, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return [];

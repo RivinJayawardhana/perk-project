@@ -34,9 +34,16 @@ interface PartnerContent {
   };
 }
 
+const getBaseUrl = () => {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+};
+
 async function fetchPartnerContent(): Promise<PartnerContent | null> {
   try {
-    const res = await fetch("/api/partner-content", {
+    const res = await fetch(`${getBaseUrl()}/api/partner-content`, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
