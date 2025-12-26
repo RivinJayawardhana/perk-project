@@ -9,15 +9,19 @@ import { Metadata } from "next";
 export const revalidate = 3600; // ISR: regenerate every hour
 
 const getBaseUrl = () => {
+  // For Vercel production builds
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
+  // Fallback for local development
   return "http://localhost:3000";
 };
 
 async function fetchHomeContent() {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/home-content`, {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/home-content`;
+    const res = await fetch(url, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
@@ -30,7 +34,9 @@ async function fetchHomeContent() {
 
 async function fetchPerks() {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/perks`, {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/perks`;
+    const res = await fetch(url, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return [];
@@ -43,7 +49,9 @@ async function fetchPerks() {
 
 async function fetchJournals() {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/journals?status=published&limit=3`, {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/journals?status=published&limit=3`;
+    const res = await fetch(url, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return [];

@@ -35,7 +35,9 @@ const getBaseUrl = () => {
 
 async function fetchPrivacyContent(): Promise<ContentData | null> {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/privacy-content`, {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/privacy-content`;
+    const res = await fetch(url, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
@@ -48,7 +50,9 @@ async function fetchPrivacyContent(): Promise<ContentData | null> {
 
 async function fetchTermsContent(): Promise<ContentData | null> {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/terms-content`, {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/terms-content`;
+    const res = await fetch(url, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;

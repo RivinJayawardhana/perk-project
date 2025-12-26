@@ -43,7 +43,9 @@ const getBaseUrl = () => {
 
 async function fetchPartnerContent(): Promise<PartnerContent | null> {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/partner-content`, {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/partner-content`;
+    const res = await fetch(url, {
       next: { revalidate: 3600 }
     });
     if (!res.ok) return null;
