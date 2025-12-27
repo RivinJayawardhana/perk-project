@@ -9,6 +9,8 @@ const supabase = createClient(
 interface SEOData {
   metaTitle: string;
   metaDescription: string;
+  ogImage?: string;
+  ogType?: string;
 }
 
 interface PartnerContent {
@@ -133,6 +135,8 @@ export async function GET(request: NextRequest) {
         content.seo = {
           metaTitle: row.title || DEFAULT_CONTENT.seo?.metaTitle || "",
           metaDescription: row.description || DEFAULT_CONTENT.seo?.metaDescription || "",
+          ogImage: row.metadata?.ogImage || DEFAULT_CONTENT.seo?.ogImage || "",
+          ogType: row.metadata?.ogType || DEFAULT_CONTENT.seo?.ogType || "website",
         };
       }
     }
@@ -198,6 +202,10 @@ export async function POST(request: NextRequest) {
         title: content.seo.metaTitle || "",
         description: content.seo.metaDescription || "",
         content: "",
+        metadata: {
+          ogImage: content.seo?.ogImage || "",
+          ogType: content.seo?.ogType || "website",
+        } as any,
         section_order: 0,
       });
     }

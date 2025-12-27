@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,11 +21,14 @@ interface ContactPageContent {
   seo?: {
     metaTitle: string;
     metaDescription: string;
+    ogImage?: string;
+    ogType?: string;
   };
 }
 
 export default function EditContactPage() {
   const { toast } = useToast();
+
   const [content, setContent] = useState<ContactPageContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -133,7 +136,12 @@ export default function EditContactPage() {
               onChange={(e) =>
                 setContent({
                   ...content,
-                  seo: { ...content.seo, metaTitle: e.target.value } as any,
+                  seo: {
+                    metaTitle: e.target.value,
+                    metaDescription: content.seo?.metaDescription || "",
+                    ogImage: content.seo?.ogImage || "",
+                    ogType: content.seo?.ogType || "website",
+                  },
                 })
               }
               placeholder="e.g., Contact VentureNext - Get in Touch"
@@ -148,7 +156,12 @@ export default function EditContactPage() {
               onChange={(e) =>
                 setContent({
                   ...content,
-                  seo: { ...content.seo, metaDescription: e.target.value } as any,
+                  seo: {
+                    metaTitle: content.seo?.metaTitle || "",
+                    metaDescription: e.target.value,
+                    ogImage: content.seo?.ogImage || "",
+                    ogType: content.seo?.ogType || "website",
+                  },
                 })
               }
               placeholder="e.g., Have questions? Contact our team..."

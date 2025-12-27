@@ -38,6 +38,8 @@ interface HomePageContent {
   seo?: {
     metaTitle: string;
     metaDescription: string;
+    ogImage?: string;
+    ogType?: string;
   };
 }
 
@@ -106,6 +108,7 @@ export default function EditHomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [content, setContent] = useState<HomePageContent>(DEFAULT_CONTENT);
   const imageInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const ogImageInputRef = useRef<HTMLInputElement>(null);
 
   // Load content on mount
   useEffect(() => {
@@ -237,6 +240,8 @@ export default function EditHomePage() {
                       seo: {
                         metaTitle: e.target.value,
                         metaDescription: content.seo?.metaDescription || "",
+                        ogImage: content.seo?.ogImage,
+                        ogType: content.seo?.ogType,
                       },
                     })
                   }
@@ -257,6 +262,8 @@ export default function EditHomePage() {
                       seo: {
                         metaTitle: content.seo?.metaTitle || "",
                         metaDescription: e.target.value,
+                        ogImage: content.seo?.ogImage,
+                        ogType: content.seo?.ogType,
                       },
                     })
                   }
@@ -264,6 +271,111 @@ export default function EditHomePage() {
                   rows={3}
                 />
                 <p className="text-xs text-[#6b7280] mt-1">Recommended: 120-160 characters</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  OG Image URL
+                </label>
+                {content.seo?.ogImage && (
+                  <div className="mb-3 relative w-full max-w-xs">
+                    <img
+                      src={content.seo.ogImage}
+                      alt="OG Preview"
+                      className="w-full h-32 object-cover rounded-lg border border-[#e5e7eb]"
+                    />
+                    <button
+                      onClick={() =>
+                        setContent({
+                          ...content,
+                          seo: {
+                            metaTitle: content.seo?.metaTitle || "",
+                            metaDescription: content.seo?.metaDescription || "",
+                            ogImage: "",
+                            ogType: content.seo?.ogType,
+                          },
+                        })
+                      }
+                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+                <input
+                  ref={ogImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      toast({ title: "Uploading...", description: "Please wait" });
+                      const url = await upload(file, "seo-images");
+                      if (url) {
+                        setContent({
+                          ...content,
+                          seo: {
+                            metaTitle: content.seo?.metaTitle || "",
+                            metaDescription: content.seo?.metaDescription || "",
+                            ogImage: url,
+                            ogType: content.seo?.ogType,
+                          },
+                        });
+                        toast({
+                          title: "Success",
+                          description: "OG image uploaded",
+                        });
+                      }
+                    } catch (error) {
+                      toast({
+                        title: "Error",
+                        description: "Upload failed",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => ogImageInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="flex items-center gap-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  {isUploading ? "Uploading..." : "Upload OG Image (1200x630)"}
+                </Button>
+                <p className="text-xs text-[#6b7280] mt-1">
+                  Recommended: 1200x630 px
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  OG Type
+                </label>
+                <select
+                  value={content.seo?.ogType || "website"}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      seo: {
+                        metaTitle: content.seo?.metaTitle || "",
+                        metaDescription: content.seo?.metaDescription || "",
+                        ogImage: content.seo?.ogImage,
+                        ogType: e.target.value,
+                      },
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-[#d1d5db] rounded-md"
+                >
+                  <option value="website">Website</option>
+                  <option value="article">Article</option>
+                </select>
+                <p className="text-xs text-[#6b7280] mt-1">Content type for social media</p>
               </div>
             </div>
           </Card>

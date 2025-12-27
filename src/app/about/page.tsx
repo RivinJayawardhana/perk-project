@@ -33,6 +33,8 @@ interface AboutContent {
   seo?: {
     metaTitle: string;
     metaDescription: string;
+    ogImage?: string;
+    ogType?: string;
   };
 }
 
@@ -76,14 +78,39 @@ async function fetchAboutContent(): Promise<AboutContent | null> {
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await fetchAboutContent();
+  const title = content?.seo?.metaTitle || "About VentureNext";
+  const description = content?.seo?.metaDescription || "Learn about VentureNext and our mission";
+  const ogImage = content?.seo?.ogImage || "https://venturenext.io/og-image.jpg";
+  const ogType = (content?.seo?.ogType as "website" | "article") || "website";
+  
   return {
-    title: content?.seo?.metaTitle || "About VentureNext",
-    description: content?.seo?.metaDescription || "Learn about VentureNext and our mission",    openGraph: {
-      url: "https://venturenext.co/about",
+    title: title,
+    description: description,
+    openGraph: {
+      url: "https://venturenext.io/about",
+      title: title,
+      description: description,
+      type: ogType,
+      siteName: "VentureNext",
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: [ogImage],
     },
     alternates: {
-      canonical: "https://venturenext.co/about",
-    },  };
+      canonical: "https://venturenext.io/about",
+    },
+  };
 }
 
 export default async function About() {

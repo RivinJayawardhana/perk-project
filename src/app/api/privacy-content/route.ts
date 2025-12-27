@@ -11,6 +11,8 @@ interface PrivacyContent {
   seo?: {
     metaTitle: string;
     metaDescription: string;
+    ogImage?: string;
+    ogType?: string;
   };
   hero?: {
     subtitle: string;
@@ -87,6 +89,8 @@ export async function GET(request: NextRequest) {
       ? {
           metaTitle: seoRow.title || DEFAULT_CONTENT.seo?.metaTitle || "",
           metaDescription: seoRow.description || DEFAULT_CONTENT.seo?.metaDescription || "",
+          ogImage: seoRow.metadata?.ogImage || DEFAULT_CONTENT.seo?.ogImage || "",
+          ogType: seoRow.metadata?.ogType || DEFAULT_CONTENT.seo?.ogType || "website",
         }
       : DEFAULT_CONTENT.seo;
 
@@ -134,7 +138,11 @@ export async function POST(request: NextRequest) {
         description: body.seo.metaDescription,
         content: "",
         section_order: 0,
-        metadata: { id: "seo" },
+        metadata: {
+          id: "seo",
+          ogImage: body.seo.ogImage || "",
+          ogType: body.seo.ogType || "website",
+        } as any,
       });
     }
 

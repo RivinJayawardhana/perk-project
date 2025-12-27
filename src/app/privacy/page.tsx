@@ -18,6 +18,8 @@ interface ContentData {
   seo?: {
     metaTitle: string;
     metaDescription: string;
+    ogImage?: string;
+    ogType?: string;
   };
   hero?: {
     subtitle: string;
@@ -91,14 +93,22 @@ async function fetchTermsContent(): Promise<ContentData | null> {
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await fetchPrivacyContent();
+  const title = content?.seo?.metaTitle || "Privacy Policy - VentureNext";
+  const description = content?.seo?.metaDescription || "Read our privacy policy";
   return {
-    title: content?.seo?.metaTitle || "Privacy Policy - VentureNext",
-    description: content?.seo?.metaDescription || "Read our privacy policy",
+    title: title,
+    description: description,
     openGraph: {
-      url: "https://venturenext.co/privacy",
+      url: "https://venturenext.io/privacy",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: ["https://venturenext.io/og-image.jpg"],
     },
     alternates: {
-      canonical: "https://venturenext.co/privacy",
+      canonical: "https://venturenext.io/privacy",
     },
   };
 }

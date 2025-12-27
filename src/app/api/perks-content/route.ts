@@ -9,6 +9,8 @@ const supabase = createClient(
 interface SEOData {
   metaTitle: string;
   metaDescription: string;
+  ogImage?: string;
+  ogType?: string;
 }
 
 interface PerksPageContent {

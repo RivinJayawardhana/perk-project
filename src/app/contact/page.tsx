@@ -19,6 +19,8 @@ interface ContactContent {
   seo?: {
     metaTitle: string;
     metaDescription: string;
+    ogImage?: string;
+    ogType?: string;
   };
 }
 
@@ -67,7 +69,7 @@ async function fetchContactContent(): Promise<ContactContent | null> {
     const sanitizedData: ContactContent = {
       ...data,
       contactInfo: data.contactInfo || {
-        email: "support@venturenext.co",
+        email: "support@venturenext.io",
         phone: "+1 (555) 123-4567",
         location: "San Francisco, CA"
       }
@@ -83,14 +85,37 @@ async function fetchContactContent(): Promise<ContactContent | null> {
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await fetchContactContent();
+  const title = content?.seo?.metaTitle || "Contact Us - VentureNext";
+  const description = content?.seo?.metaDescription || "Get in touch with VentureNext. We'd love to hear from you.";
+  const ogImage = content?.seo?.ogImage || "https://venturenext.io/og-image.jpg";
+  const ogType = (content?.seo?.ogType as "website" | "article") || "website";
+  
   return {
-    title: content?.seo?.metaTitle || "Contact Us - VentureNext",
-    description: content?.seo?.metaDescription || "Get in touch with VentureNext. We'd love to hear from you.",
+    title: title,
+    description: description,
     openGraph: {
-      url: "https://venturenext.co/contact",
+      url: "https://venturenext.io/contact",
+      title: title,
+      description: description,
+      type: ogType,
+      siteName: "VentureNext",
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: [ogImage],
     },
     alternates: {
-      canonical: "https://venturenext.co/contact",
+      canonical: "https://venturenext.io/contact",
     },
   };
 }
@@ -102,7 +127,7 @@ export default async function Contact() {
   
   // Use contactInfo from content or fallback to defaults
   const contactInfo = content?.contactInfo || {
-    email: "support@venturenext.co",
+    email: "support@venturenext.io",
     phone: "+1 (555) 123-4567",
     location: "San Francisco, CA"
   };

@@ -4,6 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 interface SEOData {
   metaTitle: string;
   metaDescription: string;
+  ogImage?: string;
+  ogType?: string;
 }
 
 interface HomePageContent {
@@ -160,6 +162,8 @@ export async function GET(request: NextRequest) {
           content.seo = {
             metaTitle: row.title || defaultContent.seo?.metaTitle || "",
             metaDescription: row.description || defaultContent.seo?.metaDescription || "",
+            ogImage: row.metadata?.ogImage || defaultContent.seo?.ogImage || "",
+            ogType: row.metadata?.ogType || defaultContent.seo?.ogType || "website",
           };
         }
       });
@@ -254,6 +258,10 @@ export async function POST(request: NextRequest) {
         title: body.seo.metaTitle || "",
         description: body.seo.metaDescription || "",
         content: "",
+        metadata: {
+          ogImage: body.seo.ogImage || "",
+          ogType: body.seo.ogType || "website",
+        },
         section_order: 0,
         is_active: true,
       });

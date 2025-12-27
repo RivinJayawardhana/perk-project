@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         title: "Contact Information",
         description: "",
         content: JSON.stringify({
-          email: "support@venturenext.co",
+          email: "support@venturenext.io",
           phone: "+1 (555) 123-4567",
           location: "San Francisco, CA",
         }),
