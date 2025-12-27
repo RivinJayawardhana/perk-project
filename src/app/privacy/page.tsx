@@ -45,20 +45,16 @@ async function fetchPrivacyContent(): Promise<ContentData | null> {
   try {
     const baseUrl = getBaseUrl();
     const url = `${baseUrl}/api/privacy-content`;
-    console.log("[fetchPrivacyContent] Fetching from:", url);
     
     const res = await fetch(url, {
       next: { revalidate: 60 }
     });
     
-    console.log("[fetchPrivacyContent] Response status:", res.status);
     if (!res.ok) {
-      console.error("[fetchPrivacyContent] Response not OK:", res.status);
       return null;
     }
     
     const data = await res.json();
-    console.log("[fetchPrivacyContent] Data received successfully");
     return data;
   } catch (error) {
     console.error("[fetchPrivacyContent] Error:", error);
@@ -70,20 +66,16 @@ async function fetchTermsContent(): Promise<ContentData | null> {
   try {
     const baseUrl = getBaseUrl();
     const url = `${baseUrl}/api/terms-content`;
-    console.log("[fetchTermsContent] Fetching from:", url);
     
     const res = await fetch(url, {
       next: { revalidate: 60 }
     });
     
-    console.log("[fetchTermsContent] Response status:", res.status);
     if (!res.ok) {
-      console.error("[fetchTermsContent] Response not OK:", res.status);
       return null;
     }
     
     const data = await res.json();
-    console.log("[fetchTermsContent] Data received successfully");
     return data;
   } catch (error) {
     console.error("[fetchTermsContent] Error:", error);

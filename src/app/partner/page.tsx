@@ -52,20 +52,16 @@ async function fetchPartnerContent(): Promise<PartnerContent | null> {
   try {
     const baseUrl = getBaseUrl();
     const url = `${baseUrl}/api/partner-content`;
-    console.log("[fetchPartnerContent] Fetching from:", url);
     
     const res = await fetch(url, {
       next: { revalidate: 60 }
     });
     
-    console.log("[fetchPartnerContent] Response status:", res.status);
     if (!res.ok) {
-      console.error("[fetchPartnerContent] Response not OK:", res.status);
       return null;
     }
     
     const data = await res.json();
-    console.log("[fetchPartnerContent] Data received successfully");
     return data;
   } catch (error) {
     console.error("[fetchPartnerContent] Error:", error);

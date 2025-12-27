@@ -25,24 +25,18 @@ async function fetchHomeContent() {
   try {
     const baseUrl = getBaseUrl();
     const url = `${baseUrl}/api/home-content`;
-    console.log("[fetchHomeContent] Fetching from:", url);
     
     const res = await fetch(url, {
       next: { revalidate: 60 }
     });
     
-    console.log("[fetchHomeContent] Response status:", res.status);
-    
     if (!res.ok) {
-      console.error("[fetchHomeContent] Response not OK:", res.status, res.statusText);
       return null;
     }
     
     const data = await res.json();
-    console.log("[fetchHomeContent] Data received successfully");
     return data;
   } catch (error) {
-    console.error("[fetchHomeContent] Error:", error);
     return null;
   }
 }

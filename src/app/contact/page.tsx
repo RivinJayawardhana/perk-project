@@ -40,30 +40,16 @@ async function fetchContactContent(): Promise<ContactContent | null> {
   try {
     const baseUrl = getBaseUrl();
     const url = `${baseUrl}/api/contact-content`;
-    console.log("[fetchContactContent] Fetching from:", url);
     
     const res = await fetch(url, {
       next: { revalidate: 60 }
     });
     
-    console.log("[fetchContactContent] Response status:", res.status);
-    
     if (!res.ok) {
-      console.error("[fetchContactContent] Response not OK:", res.status, res.statusText);
       return null;
     }
     
     const data = await res.json();
-    console.log("[fetchContactContent] Full Data received:", JSON.stringify(data, null, 2));
-    console.log("[fetchContactContent] Has contactInfo key:", 'contactInfo' in data);
-    console.log("[fetchContactContent] contactInfo value:", data?.contactInfo);
-    console.log("[fetchContactContent] All response keys:", Object.keys(data));
-    
-    // Check if contactInfo exists in response (even if null/undefined)
-    if (!data.contactInfo) {
-      console.warn("[fetchContactContent] WARNING: contactInfo is missing or undefined in API response!");
-      console.warn("[fetchContactContent] Data structure:", data);
-    }
     
     // Always ensure contactInfo exists with defaults
     const sanitizedData: ContactContent = {
@@ -74,8 +60,6 @@ async function fetchContactContent(): Promise<ContactContent | null> {
         location: "San Francisco, CA"
       }
     };
-    
-    console.log("[fetchContactContent] Sanitized contactInfo:", sanitizedData.contactInfo);
     return sanitizedData;
   } catch (error) {
     console.error("[fetchContactContent] Error:", error);
@@ -123,16 +107,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Contact() {
   const content = await fetchContactContent();
 
-  console.log("[Contact Page] Full content received:", content);
-  
   // Use contactInfo from content or fallback to defaults
   const contactInfo = content?.contactInfo || {
     email: "support@venturenext.io",
     phone: "+1 (555) 123-4567",
     location: "San Francisco, CA"
   };
-
-  console.log("[Contact Page] Final contactInfo to display:", contactInfo);
 
   return (
     <>

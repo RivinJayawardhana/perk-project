@@ -55,20 +55,16 @@ async function fetchAboutContent(): Promise<AboutContent | null> {
   try {
     const baseUrl = getBaseUrl();
     const url = `${baseUrl}/api/about-content`;
-    console.log("[fetchAboutContent] Fetching from:", url);
     
     const res = await fetch(url, {
       next: { revalidate: 60 }
     });
     
-    console.log("[fetchAboutContent] Response status:", res.status);
     if (!res.ok) {
-      console.error("[fetchAboutContent] Response not OK:", res.status);
       return null;
     }
     
     const data = await res.json();
-    console.log("[fetchAboutContent] Data received successfully");
     return data;
   } catch (error) {
     console.error("[fetchAboutContent] Error:", error);
