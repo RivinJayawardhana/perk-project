@@ -89,6 +89,9 @@ export default function EditAboutPage() {
 
       if (!res.ok) throw new Error("Failed to save");
 
+      // Trigger immediate cache revalidation
+      await fetch("/api/revalidate?path=/about", { method: "POST" });
+
       toast({
         title: "Success",
         description: "About page updated successfully!",

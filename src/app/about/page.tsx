@@ -3,9 +3,8 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Metadata } from "next";
-import StaticAboutHero from "@/components/StaticAboutHero";
 
-export const revalidate = 3600; // ISR: regenerate every hour
+export const revalidate = 60; // ISR: regenerate every minute
 
 interface AboutContent {
   hero: {
@@ -57,7 +56,7 @@ async function fetchAboutContent(): Promise<AboutContent | null> {
     console.log("[fetchAboutContent] Fetching from:", url);
     
     const res = await fetch(url, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 60 }
     });
     
     console.log("[fetchAboutContent] Response status:", res.status);
@@ -95,8 +94,12 @@ export default async function About() {
       <>
         <Header />
         <main className="bg-[#fcfaf7] min-h-screen">
-          <StaticAboutHero />
-          <div className="text-center py-10 text-[#6b6f76]">Unable to load about content</div>
+          <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6]">
+            <div className="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 font-display">About Us</h1>
+              <p className="text-sm sm:text-base md:text-lg text-[#6b6f76]">Unable to load content</p>
+            </div>
+          </section>
         </main>
         <Footer />
       </>
@@ -107,8 +110,14 @@ export default async function About() {
     <>
       <Header />
       <main className="bg-[#fcfaf7]">
-      {/* Hero Section */}
-      <StaticAboutHero />
+      {/* Hero Section - Dynamic */}
+      <section className="py-16 sm:py-20 lg:py-24 bg-[#f5f3f0]">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          {content.hero.subtitle && <div className="text-[#e6b756] font-semibold mb-2 text-sm sm:text-base font-display">{content.hero.subtitle}</div>}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 font-display">{content.hero.title}</h1>
+          <p className="text-sm sm:text-base md:text-lg text-[#6b6f76]">{content.hero.description}</p>
+        </div>
+      </section>
 
       {/* Stats Section */}
       <section className="bg-[#1a2233] py-10 sm:py-12 lg:py-16">

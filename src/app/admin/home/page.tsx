@@ -169,6 +169,9 @@ export default function EditHomePage() {
       });
 
       if (response.ok) {
+        // Trigger immediate cache revalidation
+        await fetch("/api/revalidate?path=/", { method: "POST" });
+        
         toast({
           title: "Success",
           description: "Homepage content updated successfully!",

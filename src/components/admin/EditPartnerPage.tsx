@@ -89,6 +89,9 @@ export default function EditPartnerPage() {
 
       if (!res.ok) throw new Error("Failed to save content");
 
+      // Trigger immediate cache revalidation
+      await fetch("/api/revalidate?path=/partner", { method: "POST" });
+
       toast({
         title: "Success",
         description: "Partner page updated successfully!",

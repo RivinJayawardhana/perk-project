@@ -13,6 +13,11 @@ interface ContactPageContent {
     title: string;
     description: string;
   };
+  contactInfo?: {
+    email: string;
+    phone: string;
+    location: string;
+  };
   seo?: {
     metaTitle: string;
     metaDescription: string;
@@ -32,11 +37,24 @@ export default function EditContactPage() {
   const fetchContent = async () => {
     try {
       setLoading(true);
+      console.log("[EditContactPage] Fetching content...");
       const res = await fetch("/api/contact-content");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
+      console.log("[EditContactPage] Fetched data:", data);
+      
+      // Ensure contactInfo always has defaults
+      if (!data.contactInfo) {
+        data.contactInfo = {
+          email: "",
+          phone: "",
+          location: "",
+        };
+      }
+      
       setContent(data);
     } catch (error: any) {
+      console.error("[EditContactPage] Fetch error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to load content",
@@ -52,19 +70,35 @@ export default function EditContactPage() {
 
     try {
       setSaving(true);
+      console.log("[EditContactPage] Saving content:", content);
+      
       const res = await fetch("/api/contact-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(content),
       });
 
-      if (!res.ok) throw new Error("Failed to save content");
+      const responseData = await res.json();
+      console.log("[EditContactPage] API Response:", responseData);
+
+      if (!res.ok) {
+        throw new Error(responseData.error || "Failed to save content");
+      }
+
+      console.log("[EditContactPage] Save successful, triggering revalidation...");
+      // Trigger immediate cache revalidation
+      const revalidateRes = await fetch("/api/revalidate?path=/contact", { method: "POST" });
+      console.log("[EditContactPage] Revalidate response:", revalidateRes.status);
 
       toast({
         title: "Success",
         description: "Contact page updated successfully!",
       });
+      
+      // Refetch to confirm save
+      await fetchContent();
     } catch (error: any) {
+      console.error("[EditContactPage] Save error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to save changes",
@@ -125,8 +159,7 @@ export default function EditContactPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6 border">
-        <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Hero Section</h2>
+      <div className="bg-white rounded-xl shadow-sm p-6 border">        <h2 className="text-2xl font-bold text-[#23272f] mb-6 font-display">Hero Section</h2>
 
         <div className="space-y-4">
           <div>

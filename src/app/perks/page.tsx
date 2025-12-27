@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,10 +18,10 @@ import { useSubmitLead } from "@/hooks/useLeadForms";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { setMetaTags } from "@/lib/meta-tags";
-import StaticPerksHero from "@/components/StaticPerksHero";
 
 interface PerksPageContent {
   hero: {
+    subtitle?: string;
     title: string;
     description: string;
   };
@@ -52,7 +51,7 @@ const transformPerkData = (apiPerk: any): DisplayPerk => {
   return {
     id: apiPerk.id,
     company: apiPerk.name || "Unknown",
-    logo: apiPerk.logo_url || "/api/placeholder/40/40",
+    logo: apiPerk.logo_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect fill='%23e5e7eb' width='40' height='40'/%3E%3C/svg%3E",
     image: apiPerk.image_url || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80",
     category: apiPerk.category || "Uncategorized",
     subcategory: apiPerk.subcategory || undefined,
@@ -410,8 +409,14 @@ export default function Perks() {
     <>
       <Header />
       <main className="bg-[#fcfaf7] min-h-screen">
-        {/* Hero Section */}
-        <StaticPerksHero />
+{/* Hero Section - Dynamic */}
+      <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6]">
+        <div className="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          {pageContent?.hero?.subtitle && <div className="text-[#e6b756] font-semibold mb-2 text-sm sm:text-base font-display">{pageContent.hero.subtitle}</div>}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 font-display">{pageContent?.hero?.title || "Browse Our Exclusive Perks"}</h1>
+          <p className="text-sm sm:text-base md:text-lg text-[#6b6f76]">{pageContent?.hero?.description || "Discover exclusive deals and perks designed for startup teams and founders."}</p>
+        </div>
+      </section>
         
         {isLoading && (
           <section className="py-12 sm:py-16 bg-[#f5f3f0]">
@@ -621,7 +626,7 @@ export default function Perks() {
                           <div key={perk.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
                             <div className="relative">
                               <img src={perk.image} alt={perk.title} className="w-full h-40 sm:h-48 object-cover" />
-                              <span className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-[#f8eac7] text-[#23272f] px-3 sm:px-4 py-1 sm:py-2 rounded-full font-bold text-sm sm:text-base font-display">
+                              <span className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-[#e6b756] text-[#23272f] px-3 sm:px-4 py-1 sm:py-2 rounded-full font-bold text-sm sm:text-base font-display">
                                 {perk.discount}
                               </span>
                             </div>

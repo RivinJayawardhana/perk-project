@@ -141,6 +141,17 @@ export default function JournalPage({ params }: { params: Promise<{ slug: string
             </div>
           </div>
 
+          {/* Excerpt */}
+          {journal.excerpt && (
+            <div className="container mx-auto px-4 py-8 lg:py-12">
+              <div className="max-w-3xl mx-auto">
+                <p className="text-xl text-gray-700 italic mb-8 pb-8 border-b border-gray-200 leading-relaxed">
+                  {journal.excerpt}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Featured Image */}
           {journal.featured_image_url && (
             <div className="container mx-auto px-4 py-8 lg:py-12">
@@ -158,12 +169,6 @@ export default function JournalPage({ params }: { params: Promise<{ slug: string
         {/* Content Section */}
         <div className="container mx-auto px-4 py-12 lg:py-16">
           <div className="max-w-3xl mx-auto">
-            {/* Excerpt */}
-            {journal.excerpt && (
-              <p className="text-xl text-gray-700 italic mb-8 pb-8 border-b border-gray-200 leading-relaxed">
-                {journal.excerpt}
-              </p>
-            )}
 
             {/* Main Content */}
             <div className="prose prose-lg max-w-none mb-8">

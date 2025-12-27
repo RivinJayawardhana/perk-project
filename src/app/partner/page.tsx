@@ -1,10 +1,9 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Metadata } from "next";
-import StaticPartnerHero from "@/components/StaticPartnerHero";
 import PartnerForm from "@/components/PartnerForm";
 
-export const revalidate = 3600; // ISR: regenerate every hour
+export const revalidate = 60; // ISR: regenerate every minute
 
 interface PartnerContent {
   hero: {
@@ -54,7 +53,7 @@ async function fetchPartnerContent(): Promise<PartnerContent | null> {
     console.log("[fetchPartnerContent] Fetching from:", url);
     
     const res = await fetch(url, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 60 }
     });
     
     console.log("[fetchPartnerContent] Response status:", res.status);
@@ -106,8 +105,14 @@ export default async function Partner() {
       <Header />
       <main className="bg-[#fcfaf7] min-h-screen">
 
-      {/* Hero Section */}
-      <StaticPartnerHero />
+      {/* Hero Section - Dynamic */}
+      <section className="py-16 sm:py-20 lg:py-24 bg-[#faf8f6]">
+        <div className="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          {content.hero.subtitle && <div className="text-[#e6b756] font-semibold mb-2 text-sm sm:text-base font-display">{content.hero.subtitle}</div>}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#23272f] mb-4 sm:mb-6 font-display">{content.hero.title}</h1>
+          <p className="text-sm sm:text-base md:text-lg text-[#6b6f76]">{content.hero.description}</p>
+        </div>
+      </section>
 
       {/* Benefits Section */}
       <section className="bg-[#1a2233] py-12 sm:py-16 lg:py-20">

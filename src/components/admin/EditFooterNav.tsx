@@ -94,6 +94,17 @@ export default function EditFooterNav() {
         throw new Error(responseData.error || "Failed to save");
       }
 
+      // Trigger immediate cache revalidation for all pages (footer appears on all)
+      await Promise.all([
+        fetch("/api/revalidate?path=/", { method: "POST" }),
+        fetch("/api/revalidate?path=/about", { method: "POST" }),
+        fetch("/api/revalidate?path=/perks", { method: "POST" }),
+        fetch("/api/revalidate?path=/partner", { method: "POST" }),
+        fetch("/api/revalidate?path=/contact", { method: "POST" }),
+        fetch("/api/revalidate?path=/privacy", { method: "POST" }),
+        fetch("/api/revalidate?path=/journal", { method: "POST" }),
+      ]);
+
       toast({
         title: "Success",
         description: "Footer and nav content updated successfully!",

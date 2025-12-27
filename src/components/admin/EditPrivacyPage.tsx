@@ -113,6 +113,9 @@ export default function EditPrivacyPage() {
         throw new Error(errorData.error || "Failed to save");
       }
 
+      // Trigger immediate cache revalidation
+      await fetch("/api/revalidate?path=/privacy", { method: "POST" });
+
       setOriginalSections(sections);
       toast({
         title: "Success",

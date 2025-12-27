@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Metadata } from "next";
 
-export const revalidate = 3600; // ISR: regenerate every hour
+export const revalidate = 60; // ISR: regenerate every minute
 
 const getBaseUrl = () => {
   // Use NEXT_PUBLIC_APP_URL if available (most reliable for Vercel)
@@ -28,7 +28,7 @@ async function fetchHomeContent() {
     console.log("[fetchHomeContent] Fetching from:", url);
     
     const res = await fetch(url, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 60 }
     });
     
     console.log("[fetchHomeContent] Response status:", res.status);
@@ -52,7 +52,7 @@ async function fetchPerks() {
     const baseUrl = getBaseUrl();
     const url = `${baseUrl}/api/perks`;
     const res = await fetch(url, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 60 }
     });
     if (!res.ok) return [];
     return res.json();
@@ -67,7 +67,7 @@ async function fetchJournals() {
     const baseUrl = getBaseUrl();
     const url = `${baseUrl}/api/journals?status=published&limit=3`;
     const res = await fetch(url, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 60 }
     });
     if (!res.ok) return [];
     return res.json();
@@ -130,11 +130,11 @@ export default async function Home() {
                 alt="Team work" 
                 className="w-32 h-24 object-cover rounded-2xl shadow-lg transform -rotate-3 ml-4"
               />
-              {/* Middle Left Image */}
+              {/* Middle Left Image - Made bigger and moved toward center */}
               <img 
                 src={content.hero.heroImages[1]} 
                 alt="Workspace" 
-                className="w-28 h-32 object-cover rounded-2xl shadow-lg transform rotate-2"
+                className="w-36 h-40 object-cover rounded-2xl shadow-lg transform rotate-2 ml-auto mr-8"
               />
               {/* Bottom Left Image */}
               <img 
@@ -184,11 +184,11 @@ export default async function Home() {
                 alt="Office space" 
                 className="w-32 h-24 object-cover rounded-2xl shadow-lg transform rotate-3 ml-auto mr-4"
               />
-              {/* Middle Right Image */}
+              {/* Middle Right Image - Made bigger and moved toward center */}
               <img 
                 src={content.hero.heroImages[4]} 
                 alt="Creative workspace" 
-                className="w-28 h-32 object-cover rounded-2xl shadow-lg transform -rotate-3 ml-auto"
+                className="w-36 h-40 object-cover rounded-2xl shadow-lg transform -rotate-3 mr-auto ml-8"
               />
               {/* Bottom Right Image */}
               <img 
@@ -215,9 +215,9 @@ export default async function Home() {
             <div key={perk.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col h-full min-h-[420px] relative">
               {/* Image Container */}
               <div className="relative">
-                <img src={perk.image_url || "/images/placeholder.jpg"} alt={perk.name} className="w-full h-40 sm:h-48 object-cover" />
+                <img src={perk.image_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect fill='%23e5e7eb' width='400' height='200'/%3E%3C/svg%3E"} alt={perk.name} className="w-full h-40 sm:h-48 object-cover" />
                 {/* Discount Badge */}
-                <span className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-[#f8eac7] text-[#23272f] px-3 sm:px-4 py-1 sm:py-2 rounded-full font-bold text-sm sm:text-base font-display">{perk.discount}</span>
+                <span className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-[#e6b756] text-[#23272f] px-3 sm:px-4 py-1 sm:py-2 rounded-full font-bold text-sm sm:text-base font-display">{perk.discount}</span>
               </div>
 
               {/* Content Container */}
@@ -225,7 +225,7 @@ export default async function Home() {
                 <div>
                   {/* Logo and Company Name */}
                   <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                    <img src={perk.logo_url || "/images/placeholder.jpg"} alt={perk.name} className="w-8 sm:w-10 h-8 sm:h-10 rounded-full border border-gray-200 flex-shrink-0" />
+                    <img src={perk.logo_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23e5e7eb'/%3E%3C/svg%3E"} alt={perk.name} className="w-8 sm:w-10 h-8 sm:h-10 rounded-full border border-gray-200 flex-shrink-0" />
                     <div className="flex flex-col">
                       <span className="font-semibold text-[#23272f] font-display text-sm sm:text-base line-clamp-1">{perk.name}</span>
                       <span className="text-xs text-[#6b6f76]">{perk.category}{perk.subcategory ? ` • ${perk.subcategory}` : ""}</span>
@@ -288,7 +288,7 @@ export default async function Home() {
           {journalArticles.map((article: any) => (
             <Link key={article.id} href={`/journal/${article.slug}`} className="block">
               <div className="bg-white rounded-2xl border shadow-sm p-4 sm:p-5 flex flex-col h-full relative hover:shadow-md transition-shadow">
-                <img src={article.featured_image_url || "/images/placeholder.jpg"} alt={article.title} className="w-full h-28 sm:h-32 object-cover rounded-xl mb-3 sm:mb-4" />
+                <img src={article.featured_image_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='160'%3E%3Crect fill='%23e5e7eb' width='400' height='160'/%3E%3C/svg%3E"} alt={article.title} className="w-full h-28 sm:h-32 object-cover rounded-xl mb-3 sm:mb-4" />
                 <span className="absolute left-3 sm:left-4 top-3 sm:top-4 bg-[#f8eac7] text-[#b48a1e] px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold font-display">{article.category || "Insights"}</span>
                 <div className="text-base sm:text-lg font-semibold text-[#23272f] mb-2 font-display line-clamp-2">{article.title}</div>
                 <div className="text-[#6b6f76] mb-2 text-xs sm:text-sm line-clamp-2">{article.excerpt || article.content?.substring(0, 100)}</div>

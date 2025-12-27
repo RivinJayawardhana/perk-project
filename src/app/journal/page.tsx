@@ -107,7 +107,7 @@ export default function JournalPage() {
               <div className="grid md:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
                 <Link href={`/journal/${featuredPost.id}`} className="block relative">
                   <img
-                    src={featuredPost.featured_image_url || "/api/placeholder/600/400"}
+                    src={featuredPost.featured_image_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect fill='%23e5e7eb' width='600' height='400'/%3E%3C/svg%3E"}
                     alt={featuredPost.title}
                     className="rounded-xl object-cover w-full h-64 sm:h-72 md:h-80 lg:h-96 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
                   />
@@ -170,19 +170,6 @@ export default function JournalPage() {
                   {currentArticles.map((article: any) => (
                     <Link key={article.id} href={`/journal/${article.id}`}>
                       <div className="group cursor-pointer h-full flex flex-col bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
-                        <div className="relative overflow-hidden">
-                          <img
-                            src={article.featured_image_url || "/api/placeholder/400/250"}
-                            alt={article.title}
-                            className="w-full h-40 sm:h-48 md:h-56 object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
-                            <span className={`inline-block px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold ${getCategoryColor(article.category)}`}>
-                              {article.category || "General"}
-                            </span>
-                          </div>
-                        </div>
-
                         <div className="p-4 sm:p-5 flex flex-col flex-grow">
                           <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
                             <span className="truncate">{article.author || "Admin"}</span>
@@ -192,13 +179,26 @@ export default function JournalPage() {
                             </span>
                           </div>
 
-                          <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-3 group-hover:text-amber-500 transition-colors line-clamp-2">
-                            {article.title}
-                          </h3>
-
-                          <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
+                          <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 mb-3">
                             {article.excerpt}
                           </p>
+
+                          <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-4 group-hover:text-amber-500 transition-colors line-clamp-2">
+                            {article.title}
+                          </h3>
+                        </div>
+
+                        <div className="relative overflow-hidden">
+                          <img
+                            src={article.featured_image_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect fill='%23e5e7eb' width='400' height='250'/%3E%3C/svg%3E"}
+                            alt={article.title}
+                            className="w-full h-40 sm:h-48 md:h-56 object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
+                            <span className={`inline-block px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold ${getCategoryColor(article.category)}`}>
+                              {article.category || "General"}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </Link>

@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 export default function ContactFormClient() {
   const { toast } = useToast();
+  const { getToken } = useRecaptcha();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -30,12 +32,22 @@ export default function ContactFormClient() {
     setIsSubmitting(true);
 
     try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await getToken('contact_form');
+      
+      if (!recaptchaToken) {
+        throw new Error('reCAPTCHA verification failed. Please try again.');
+      }
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          recaptchaToken,
+        }),
       });
 
       if (!response.ok) {
@@ -138,46 +150,6 @@ export default function ContactFormClient() {
               </Button>
             </div>
           </form>
-        </div>
-
-        {/* Contact Info Section */}
-        <div className="mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          <div className="text-center">
-            <div className="flex justify-center mb-4">
-              <div className="bg-[#f8eac7] text-[#b48a1e] rounded-full p-3">
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                  <path d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" stroke="currentColor" strokeWidth="1.5" />
-                </svg>
-              </div>
-            </div>
-            <h3 className="font-semibold text-[#23272f] mb-2 font-display">Email</h3>
-            <p className="text-[#6b6f76] text-sm">support@venturenext.co</p>
-          </div>
-
-          <div className="text-center">
-            <div className="flex justify-center mb-4">
-              <div className="bg-[#f8eac7] text-[#b48a1e] rounded-full p-3">
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="1.5" />
-                </svg>
-              </div>
-            </div>
-            <h3 className="font-semibold text-[#23272f] mb-2 font-display">Phone</h3>
-            <p className="text-[#6b6f76] text-sm">+1 (555) 123-4567</p>
-          </div>
-
-          <div className="text-center">
-            <div className="flex justify-center mb-4">
-              <div className="bg-[#f8eac7] text-[#b48a1e] rounded-full p-3">
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="1.5" />
-                  <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="1.5" />
-                </svg>
-              </div>
-            </div>
-            <h3 className="font-semibold text-[#23272f] mb-2 font-display">Location</h3>
-            <p className="text-[#6b6f76] text-sm">San Francisco, CA</p>
-          </div>
         </div>
       </div>
     </section>

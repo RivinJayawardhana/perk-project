@@ -407,10 +407,10 @@ export function RichTextEditor({
       </div>
 
       <div className="bg-white p-4 min-h-[400px]">
-        {/* Updated className to handle list markers and link styles */}
+        {/* Updated className to remove blue focus border */}
         <EditorContent
           editor={editor}
-          className="prose prose-sm max-w-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-[400px] [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-blue-600 [&_a]:underline [&_a]:font-medium"
+          className="prose prose-sm max-w-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:ring-0 [&_.ProseMirror-focused]:outline-none [&_.ProseMirror]:min-h-[400px] [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-blue-600 [&_a]:underline [&_a]:font-medium"
         />
       </div>
     </div>

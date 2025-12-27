@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import StaticPrivacyHero from "@/components/StaticPrivacyHero";
 import PrivacyTabContent from "@/components/PrivacyTabContent";
 
-export const revalidate = 3600; // ISR: regenerate every hour
+export const revalidate = 60; // ISR: regenerate every minute
 
 interface Section {
   id: string;
@@ -46,7 +46,7 @@ async function fetchPrivacyContent(): Promise<ContentData | null> {
     console.log("[fetchPrivacyContent] Fetching from:", url);
     
     const res = await fetch(url, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 60 }
     });
     
     console.log("[fetchPrivacyContent] Response status:", res.status);
@@ -71,7 +71,7 @@ async function fetchTermsContent(): Promise<ContentData | null> {
     console.log("[fetchTermsContent] Fetching from:", url);
     
     const res = await fetch(url, {
-      next: { revalidate: 3600 }
+      next: { revalidate: 60 }
     });
     
     console.log("[fetchTermsContent] Response status:", res.status);

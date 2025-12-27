@@ -103,4 +103,62 @@
   .prose a {
     @apply text-blue-600 underline cursor-pointer hover:text-blue-800 transition-colors;
   }
+
+  /* Remove React Quill editor border/outline */
+  .ql-container {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .ql-container:focus,
+  .ql-container:focus-within {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .ql-editor {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .ql-editor:focus {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .ql-editor:focus-within {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .ql-toolbar {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Remove any parent wrapper styling */
+  .ql-wrapper {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Remove TipTap editor blue border/focus ring */
+  .ProseMirror {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .ProseMirror:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
 }

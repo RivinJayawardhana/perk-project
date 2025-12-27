@@ -61,6 +61,9 @@ export default function EditPerksPage() {
 
       if (!res.ok) throw new Error("Failed to save content");
 
+      // Trigger immediate cache revalidation
+      await fetch("/api/revalidate?path=/perks", { method: "POST" });
+
       toast({
         title: "Success",
         description: "Perks page updated successfully!",

@@ -114,6 +114,9 @@ export default function EditTermsPage() {
 
       if (!res.ok) throw new Error("Failed to save");
 
+      // Trigger immediate cache revalidation
+      await fetch("/api/revalidate?path=/privacy", { method: "POST" });
+
       toast({
         title: "Success",
         description: "Terms of Service page updated successfully!",
